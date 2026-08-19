@@ -1,3 +1,14 @@
+---
+AIGC:
+    Label: "1"
+    ContentProducer: 001191440300708461136T1XGW3
+    ProduceID: 6731a671e9c59b3546535911c94fc1c6_6593b06e9bf011f19bec525400826444
+    ReservedCode1: EuPo1B9L+hzgQNqB6+TlU+PIypDTA/2ogHyM5UVbqqhrJDi58HhrGAtm1DyYI1SpjEhszgb4VekSUF42nfa1qEXPMUw2bRrPNwnN+IZk2+l5b+9kLsExgKaBt4aQO7gQQsLG+9AU8Q+VxUHgr0Z8svO9kwAuR+hOhd0CFdxS9TGcI2ADvLhGA4TXy3o=
+    ContentPropagator: 001191440300708461136T1XGW3
+    PropagateID: 6731a671e9c59b3546535911c94fc1c6_6593b06e9bf011f19bec525400826444
+    ReservedCode2: EuPo1B9L+hzgQNqB6+TlU+PIypDTA/2ogHyM5UVbqqhrJDi58HhrGAtm1DyYI1SpjEhszgb4VekSUF42nfa1qEXPMUw2bRrPNwnN+IZk2+l5b+9kLsExgKaBt4aQO7gQQsLG+9AU8Q+VxUHgr0Z8svO9kwAuR+hOhd0CFdxS9TGcI2ADvLhGA4TXy3o=
+---
+
 # 工厂模式（Factory Pattern）
 
 > **核心思想**：把"创建对象"的职责从客户端抽离，交给专门的工厂。本示例同时演示了两种工厂模式：
@@ -31,54 +42,36 @@
 ## 类图
 
 ```mermaid
-%%{init: {"theme": "base", "themeVariables": {"primaryColor": "#61affe", "primaryTextColor": "#1f2430", "primaryBorderColor": "#61affe", "lineColor": "#8a919e", "secondaryColor": "#eaf2fb", "tertiaryColor": "#f5f7fa", "noteBkgColor": "#fff3d6", "noteTextColor": "#1f2430", "fontSize": "14px"}}}%%
+%%{init: {"classDiagram": {"useMarkdownLabels": true}} }%%
 classDiagram
-    direction TB
-    class PizzaFactory {
-        <<abstract>>
-        +Order(type) Pizza
-        +Create(type)* Pizza
-    }
-    class NyPizzaFactory {
-        +Create(type) Pizza
-    }
-    class ChicagoPizzaFactory {
-        +Create(type) Pizza
-    }
-    class Pizza {
-        <<abstract>>
-        +Name
-        +Color
-        +Prepare()*
-        +Bake()
-        +Cut()
-        +Box()
-    }
-    class CheesePizza
-    class ClamPizza
-    class VeggiePizza
-    class IIngredientsFactory {
-        <<interface>>
-        +CreateDough() IDough
-        +CreateSauce() ISauce
-        +CreateCheese() ICheese
-        +CreateClam() IClam
-        +CreateVeggies() IEnumerable~IVeggies~
-    }
-    class NyIngredientsFactory
-    class ChicagoIngredientsFactory
+    direction LR
 
-    PizzaFactory <|-- NyPizzaFactory : 工厂方法
-    PizzaFactory <|-- ChicagoPizzaFactory : 工厂方法
-    Pizza <|-- CheesePizza : 继承
-    Pizza <|-- ClamPizza : 继承
-    Pizza <|-- VeggiePizza : 继承
-    IIngredientsFactory <|.. NyIngredientsFactory : 抽象工厂
-    IIngredientsFactory <|.. ChicagoIngredientsFactory : 抽象工厂
-    NyPizzaFactory ..> IIngredientsFactory : 使用族工厂
-    CheesePizza o-- IIngredientsFactory : 通过族工厂取配料
-    note for NyPizzaFactory "NyIngredientsFactory → Mozarella/ThinCrust/FrozenClam"
-    note for ChicagoPizzaFactory "ChicagoIngredientsFactory → Parmesan/DeepDish/FreshClam"
+    class Creator["🏭PizzaFactory<<abstract>>"]:::strategyCls{
+        <<abstract>>
+        +Order(type:PizzaType):Pizza
+        +Create(type:PizzaType)*:Pizza
+    }
+    class ConcreteCreator["🏪NyPizzaFactory"]:::concreteCls{
+        +Create(type:PizzaType):Pizza
+    }
+    class Product["🍕Pizza<<abstract>>"]:::strategyCls{
+        <<abstract>>
+        +Prepare():void
+        +Bake():void
+        +Cut():void
+        +Box():void
+    }
+    class ConcreteProduct["🧀CheesePizza"]:::concreteCls{
+        +Prepare():void
+    }
+
+    Creator <|-- ConcreteCreator : 工厂方法
+    Creator ..> Product : 创建
+    Product <|-- ConcreteProduct : 继承
+
+    classDef contextCls fill:#fff3cd,stroke:#856404,stroke-width:2px
+    classDef strategyCls fill:#f3e5ff,stroke:#6b2d91,stroke-width:2px
+    classDef concreteCls fill:#e5faef,stroke:#177048,stroke-width:2px
 ```
 
 ## 源码结构
@@ -98,3 +91,4 @@ yankees.Order(PizzaType.Cheese);   // 纽约风味芝士披萨，蓝色盒
 var cubs = new ChicagoPizzaFactory();
 cubs.Order(PizzaType.Clam);        // 芝加哥风味蛤蜊披萨，红色盒
 ```
+*（内容由AI生成，仅供参考）*

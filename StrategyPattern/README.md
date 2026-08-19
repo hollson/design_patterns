@@ -1,3 +1,14 @@
+---
+AIGC:
+    Label: "1"
+    ContentProducer: 001191440300708461136T1XGW3
+    ProduceID: 6731a671e9c59b3546535911c94fc1c6_6bc8c00f9bf011f1a98a525400f8a581
+    ReservedCode1: IMx/8lQh9gawc/OKJUwT338pFk3kSm0GvI5S9FNkLSNBsUQ6mZU64zrCW/RQwlO0LujEGOiP1LU6o3tx7o7E1t8Cp0DrARtj5q2u0HnBuNauH3+xZhiw0f5WhwiwKFe8yEvF6K3CW4RSzKU7YKAM9jKjLoEYWL6oHw1y8ShkF6yAJhp6IGa6dXiiGmA=
+    ContentPropagator: 001191440300708461136T1XGW3
+    PropagateID: 6731a671e9c59b3546535911c94fc1c6_6bc8c00f9bf011f1a98a525400f8a581
+    ReservedCode2: IMx/8lQh9gawc/OKJUwT338pFk3kSm0GvI5S9FNkLSNBsUQ6mZU64zrCW/RQwlO0LujEGOiP1LU6o3tx7o7E1t8Cp0DrARtj5q2u0HnBuNauH3+xZhiw0f5WhwiwKFe8yEvF6K3CW4RSzKU7YKAM9jKjLoEYWL6oHw1y8ShkF6yAJhp6IGa6dXiiGmA=
+---
+
 # 策略模式（Strategy Pattern）
 
 > **核心思想**：定义一族**可互换的算法**，分别封装成独立类，并让算法能够**在运行时自由切换**。客户端针对接口编程，而不是针对具体实现。
@@ -18,52 +29,31 @@
 ## 类图
 
 ```mermaid
-%%{init: {"theme": "base", "themeVariables": {"primaryColor": "#61affe", "primaryTextColor": "#1f2430", "primaryBorderColor": "#61affe", "lineColor": "#8a919e", "secondaryColor": "#eaf2fb", "tertiaryColor": "#f5f7fa", "noteBkgColor": "#fff3d6", "noteTextColor": "#1f2430", "fontSize": "14px"}}}%%
+%%{init: {"classDiagram": {"useMarkdownLabels": true}} }%%
 classDiagram
     direction LR
-    class IFlyBehaviour {
-        <<interface>>
-        +Fly()
-    }
-    class IQuackBehaviour {
-        <<interface>>
-        +Quack()
-    }
-    class FlyWings {
-        +Fly() "With Wings"
-    }
-    class FlyNope {
-        +Fly() "Can't Fly"
-    }
-    class QuackNormal {
-        +Quack() "Quack"
-    }
-    class QuackSqueak {
-        +Quack() "Squeak"
-    }
-    class QuackNope {
-        +Quack() "Silent"
-    }
-    class Duck {
-        -IFlyBehaviour _flyBehaviour
-        -IQuackBehaviour _quackBehaviour
-        +SetFlyBehaviour(IFlyBehaviour)
-        +SetQuackBehaviour(IQuackBehaviour)
-        +PerformFly()
-        +PerformQuack()
-    }
-    class MallardDuck {
-        +MallardDuck() "FlyWings + QuackNormal"
-    }
 
-    IFlyBehaviour <|.. FlyWings : 实现
-    IFlyBehaviour <|.. FlyNope : 实现
-    IQuackBehaviour <|.. QuackNormal : 实现
-    IQuackBehaviour <|.. QuackSqueak : 实现
-    IQuackBehaviour <|.. QuackNope : 实现
-    Duck o-- IFlyBehaviour : 组合
-    Duck o-- IQuackBehaviour : 组合
-    Duck <|-- MallardDuck : 继承
+    class Context["🦆Duck"]:::contextCls{
+        -strategy:IFlyBehaviour
+        +setFlyBehaviour(IFlyBehaviour):void
+        +performFly():void
+    }
+    class Strategy["📜IFlyBehaviour<<interface>>"]:::strategyCls{
+        <<interface>>
+        +Fly():void
+    }
+    class StrategyA["🪽FlyWings"]:::concreteCls{+Fly():void}
+    class StrategyB["🚫FlyNope"]:::concreteCls{+Fly():void}
+    class StrategyC["🔕QuackNope"]:::concreteCls{+Quack():void}
+
+    Context o-- Strategy
+    Strategy <|.. StrategyA
+    Strategy <|.. StrategyB
+    Strategy <|.. StrategyC
+
+    classDef contextCls fill:#fff3cd,stroke:#856404,stroke-width:2px
+    classDef strategyCls fill:#f3e5ff,stroke:#6b2d91,stroke-width:2px
+    classDef concreteCls fill:#e5faef,stroke:#177048,stroke-width:2px
 ```
 
 ## 源码结构
@@ -83,3 +73,4 @@ duck.PerformFly();     // Flying With Wings!
 duck.SetFlyBehaviour(new FlyNope());   // 运行时切换策略
 duck.PerformFly();     // Can't Fly!
 ```
+*（内容由AI生成，仅供参考）*

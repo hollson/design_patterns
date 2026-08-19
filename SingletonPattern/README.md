@@ -1,3 +1,14 @@
+---
+AIGC:
+    Label: "1"
+    ContentProducer: 001191440300708461136T1XGW3
+    ProduceID: 6731a671e9c59b3546535911c94fc1c6_6a66e7dc9bf011f19467525400287e28
+    ReservedCode1: zjxGkDRUH4BZTng/PYmBxkElBZXSX/mmYfTT939Ot5c50aRYtZC18Hc8d747Kjwh/crH4DEEP0ZfTVYH8vkjUBCaH/mdGdVqssy8wYZNdf7mtph1UemL9/L+CG2WFDzsdAfTBXcC0ExB6RGxQNavBrfIXdoLx4vjHKfsURUx4lFBwWm1w+wKBcAD4yc=
+    ContentPropagator: 001191440300708461136T1XGW3
+    PropagateID: 6731a671e9c59b3546535911c94fc1c6_6a66e7dc9bf011f19467525400287e28
+    ReservedCode2: zjxGkDRUH4BZTng/PYmBxkElBZXSX/mmYfTT939Ot5c50aRYtZC18Hc8d747Kjwh/crH4DEEP0ZfTVYH8vkjUBCaH/mdGdVqssy8wYZNdf7mtph1UemL9/L+CG2WFDzsdAfTBXcC0ExB6RGxQNavBrfIXdoLx4vjHKfsURUx4lFBwWm1w+wKBcAD4yc=
+---
+
 # 单例模式（Singleton Pattern）
 
 > **核心思想**：保证一个类**只有一个实例**，并提供一个**全局访问点**。本示例用 .NET 的 `Lazy<T>` 实现线程安全且高性能的单例。
@@ -16,25 +27,26 @@
 ## 类图
 
 ```mermaid
-%%{init: {"theme": "base", "themeVariables": {"primaryColor": "#61affe", "primaryTextColor": "#1f2430", "primaryBorderColor": "#61affe", "lineColor": "#8a919e", "secondaryColor": "#eaf2fb", "tertiaryColor": "#f5f7fa", "noteBkgColor": "#fff3d6", "noteTextColor": "#1f2430", "fontSize": "14px"}}}%%
+%%{init: {"classDiagram": {"useMarkdownLabels": true}} }%%
 classDiagram
     direction LR
-    class ChocolateBoiler {
-        -static readonly Lazy~ChocolateBoiler~ _uniqueInstance
-        -bool _empty
-        -bool _boiled
-        -ChocolateBoiler()$
-        +Instance ChocolateBoiler$
-        +Fill()
-        +Boil()
-        +Drain()
+
+    class Singleton["☕ChocolateBoiler"]:::contextCls{
+        -static uniqueInstance:Lazy~ChocolateBoiler~
+        +static get Instance():ChocolateBoiler
+        +Fill():void
+        +Boil():void
+        +Drain():void
     }
-    class Program {
+    class Client["🧑‍💻Program"]:::contextCls{
         +Main()
     }
 
-    Program ..> ChocolateBoiler : 获取唯一实例
-    note for ChocolateBoiler "Lazy~T~ 保证线程安全的延迟初始化<br/>-ChocolateBoiler() 私有构造，禁止外部 new"
+    Client ..> Singleton : 获取唯一实例
+
+    classDef contextCls fill:#fff3cd,stroke:#856404,stroke-width:2px
+    classDef strategyCls fill:#f3e5ff,stroke:#6b2d91,stroke-width:2px
+    classDef concreteCls fill:#e5faef,stroke:#177048,stroke-width:2px
 ```
 
 ## 源码结构
@@ -56,3 +68,4 @@ boiler1.Fill();                       // 填充
 boiler2.Boil();                       // 同一实例 → 煮沸
 Console.WriteLine(boiler1 == boiler2); // True
 ```
+*（内容由AI生成，仅供参考）*

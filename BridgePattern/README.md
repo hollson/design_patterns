@@ -1,3 +1,14 @@
+---
+AIGC:
+    Label: "1"
+    ContentProducer: 001191440300708461136T1XGW3
+    ProduceID: 6731a671e9c59b3546535911c94fc1c6_60ac5db49bf011f1a98a525400f8a581
+    ReservedCode1: H7+91ottKpQiWtZHjFUJtg21h/9fdyCgJQJ/1yvuWRFiwztxeor1+tW9f+2o1uV5g74q7A33HhYvDD+Z/tynqRRSUzLaCGbQO2yJi59pjHHFAYYWQZi8hP8aS9RJuPf2Kc2wWBhr4xzECHj44yYUdliiQo2zx1OVh/ytur0fssmhd2ENhWaMhPyH2PE=
+    ContentPropagator: 001191440300708461136T1XGW3
+    PropagateID: 6731a671e9c59b3546535911c94fc1c6_60ac5db49bf011f1a98a525400f8a581
+    ReservedCode2: H7+91ottKpQiWtZHjFUJtg21h/9fdyCgJQJ/1yvuWRFiwztxeor1+tW9f+2o1uV5g74q7A33HhYvDD+Z/tynqRRSUzLaCGbQO2yJi59pjHHFAYYWQZi8hP8aS9RJuPf2Kc2wWBhr4xzECHj44yYUdliiQo2zx1OVh/ytur0fssmhd2ENhWaMhPyH2PE=
+---
+
 # 桥接模式（Bridge Pattern）
 
 > **核心思想**：将"抽象部分"与"实现部分"分离，使两者可以独立变化。桥接模式用**组合**代替继承，在抽象层持有实现层的接口引用，从而把"抽象"和"实现"两个维度解耦，各自扩展互不影响。
@@ -18,50 +29,40 @@
 ## 类图
 
 ```mermaid
-%%{init: {"theme": "base", "themeVariables": {"primaryColor": "#61affe", "primaryTextColor": "#1f2430", "primaryBorderColor": "#61affe", "lineColor": "#8a919e", "secondaryColor": "#eaf2fb", "tertiaryColor": "#f5f7fa", "noteBkgColor": "#fff3d6", "noteTextColor": "#1f2430", "fontSize": "14px"}}}%%
+%%{init: {"classDiagram": {"useMarkdownLabels": true}} }%%
 classDiagram
     direction LR
-    class IWeapon {
+
+    class Abstraction["🏛️Abstraction<<abstract>>"]:::strategyCls{
+        <<abstract>>
+        +Wield():void
+        +Swing():void
+        +Unwield():void
+    }
+    class RefinedAbstraction["⚔️Sword/Hammer"]:::concreteCls{
+        -enchantment:IEnchantment
+        +Wield():void
+        +Swing():void
+    }
+    class Implementor["🔗IEnchantment<<interface>>"]:::strategyCls{
         <<interface>>
-        +Wield()
-        +Swing()
-        +Unwield()
-        +GetEnchantment() IEnchantment
+        +OnActivate():void
+        +Apply():void
+        +OnDeactivate():void
     }
-    class IEnchantment {
-        <<interface>>
-        +OnActivate()
-        +Apply()
-        +OnDeactivate()
-    }
-    class Sword {
-        -IEnchantment _enchantment
-        +Wield()
-        +Swing()
-        +Unwield()
-    }
-    class Hammer {
-        -IEnchantment _enchantment
-        +Wield()
-        +Swing()
-        +Unwield()
-    }
-    class FlyingEnchantment {
-        +OnActivate()
-        +Apply()
-        +OnDeactivate()
-    }
-    class SoulEatingEnchantment {
-        +OnActivate()
-        +Apply()
-        +OnDeactivate()
+    class ConcreteImplementor["✨FlyingEnchantment"]:::concreteCls{
+        +OnActivate():void
+        +Apply():void
+        +OnDeactivate():void
     }
 
-    IWeapon <|.. Sword : 实现
-    IWeapon <|.. Hammer : 实现
-    IEnchantment <|.. FlyingEnchantment : 实现
-    IEnchantment <|.. SoulEatingEnchantment : 实现
-    IWeapon o-- IEnchantment : 组合(桥接)
+    Abstraction <|-- RefinedAbstraction : 继承
+    Abstraction o-- Implementor : 组合(桥接)
+    Implementor <|.. ConcreteImplementor : 实现
+
+    classDef contextCls fill:#fff3cd,stroke:#856404,stroke-width:2px
+    classDef strategyCls fill:#f3e5ff,stroke:#6b2d91,stroke-width:2px
+    classDef concreteCls fill:#e5faef,stroke:#177048,stroke-width:2px
 ```
 
 ## 源码结构
@@ -79,3 +80,4 @@ IWeapon sword = new Sword(new FlyingEnchantment());     // 剑 × 飞行
 IWeapon hammer = new Hammer(new SoulEatingEnchantment()); // 锤 × 噬魂
 sword.Wield();  // The sword is wielded. → The item begins to glow faintly.
 ```
+*（内容由AI生成，仅供参考）*

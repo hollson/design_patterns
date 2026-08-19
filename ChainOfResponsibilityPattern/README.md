@@ -1,3 +1,14 @@
+---
+AIGC:
+    Label: "1"
+    ContentProducer: 001191440300708461136T1XGW3
+    ProduceID: 6731a671e9c59b3546535911c94fc1c6_622eddc29bf011f19467525400287e28
+    ReservedCode1: 7no85TtRJoWqDG6vGowZInbr3jTVRqnyxFMbQygpjhCa1vUm9jei6JfqsUFfhiw2dUI5PCD0hMQbwd9LINUnEi0s2frtA6KrfFoy1z73BjRTEQ5dmQ6jDMI6b+xvWUM1X+JiDZl7SkQ+4BAPl26YWCVfB0+XS7XpL4EnXdZBQ8t8t6uquAZdKrvxvp8=
+    ContentPropagator: 001191440300708461136T1XGW3
+    PropagateID: 6731a671e9c59b3546535911c94fc1c6_622eddc29bf011f19467525400287e28
+    ReservedCode2: 7no85TtRJoWqDG6vGowZInbr3jTVRqnyxFMbQygpjhCa1vUm9jei6JfqsUFfhiw2dUI5PCD0hMQbwd9LINUnEi0s2frtA6KrfFoy1z73BjRTEQ5dmQ6jDMI6b+xvWUM1X+JiDZl7SkQ+4BAPl26YWCVfB0+XS7XpL4EnXdZBQ8t8t6uquAZdKrvxvp8=
+---
+
 # 职责链模式（Chain of Responsibility Pattern）
 
 > **核心思想**：将请求的发送者与接收者解耦，使**多个对象都有机会处理同一个请求**。这些处理对象被连成一条链，请求沿链传递，直到某个处理器能处理它为止。发送者无需知道具体由谁处理。
@@ -18,36 +29,33 @@
 ## 类图
 
 ```mermaid
-%%{init: {"theme": "base", "themeVariables": {"primaryColor": "#61affe", "primaryTextColor": "#1f2430", "primaryBorderColor": "#61affe", "lineColor": "#8a919e", "secondaryColor": "#eaf2fb", "tertiaryColor": "#f5f7fa", "noteBkgColor": "#fff3d6", "noteTextColor": "#1f2430", "fontSize": "14px"}}}%%
+%%{init: {"classDiagram": {"useMarkdownLabels": true}} }%%
 classDiagram
     direction LR
-    class IHandler {
+
+    class Handler["⛓️IHandler<<interface>>"]:::strategyCls{
         <<interface>>
-        +AddChain(IHandler)
-        +Handle(values, action) double?
+        +AddChain(handler:IHandler):void
+        +Handle(values:double[], action:string):double?
     }
-    class BaseHandler {
-        <<abstract>>
-        #IHandler _nextInLine
-        +AddChain(IHandler)
-        +Handle(values, action)* double?
+    class AdditionHandler["➕AdditionHandler"]:::concreteCls{
+        +Handle(values:double[], action:string):double?
     }
-    class AdditionHandler {
-        +Handle(values, action) double?
+    class SubtractionHandler["➖SubtractionHandler"]:::concreteCls{
+        +Handle(values:double[], action:string):double?
     }
-    class SubtractionHandler {
-        +Handle(values, action) double?
-    }
-    class MultiplicationHandler {
-        +Handle(values, action) double?
+    class MultiplicationHandler["✖️MultiplicationHandler"]:::concreteCls{
+        +Handle(values:double[], action:string):double?
     }
 
-    IHandler <|.. BaseHandler : 实现
-    BaseHandler <|-- AdditionHandler : 继承
-    BaseHandler <|-- SubtractionHandler : 继承
-    BaseHandler <|-- MultiplicationHandler : 继承
-    BaseHandler o--> IHandler : 持有后继节点(链)
-    note for BaseHandler "Handle() 处理不了时<br/>委托 _nextInLine.Handle()"
+    Handler <|.. AdditionHandler : 实现
+    Handler <|.. SubtractionHandler : 实现
+    Handler <|.. MultiplicationHandler : 实现
+    Handler o--> Handler : 后继节点(链)
+
+    classDef contextCls fill:#fff3cd,stroke:#856404,stroke-width:2px
+    classDef strategyCls fill:#f3e5ff,stroke:#6b2d91,stroke-width:2px
+    classDef concreteCls fill:#e5faef,stroke:#177048,stroke-width:2px
 ```
 
 ## 源码结构
@@ -66,3 +74,4 @@ additionHandler.AddChain(subtractionHandler);   // 链：加法 → 减法 → �
 
 var divisionResult = additionHandler.Handle(numbers, "divide"); // 无人处理 → null
 ```
+*（内容由AI生成，仅供参考）*

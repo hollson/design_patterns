@@ -1,3 +1,14 @@
+---
+AIGC:
+    Label: "1"
+    ContentProducer: 001191440300708461136T1XGW3
+    ProduceID: 6731a671e9c59b3546535911c94fc1c6_642396e49bf011f18cca525400e6dd8f
+    ReservedCode1: HxoIb7b7inOzXzSgPkZwLgnZ2OIaT0wINGMbAuyzsD0Obd6PEb6BFFCWhoFDamPoZvvyuZA/HOEYt208P7jKE5KEleIHYYX+AdlEklg88plD82IGkZnWWfKdK5EkcJ6c5iY/7cFeAchUK2+ihuXENoaA6o1wE/FW9tw+t2Opr0XedNF4wDw3B09Dp0Q=
+    ContentPropagator: 001191440300708461136T1XGW3
+    PropagateID: 6731a671e9c59b3546535911c94fc1c6_642396e49bf011f18cca525400e6dd8f
+    ReservedCode2: HxoIb7b7inOzXzSgPkZwLgnZ2OIaT0wINGMbAuyzsD0Obd6PEb6BFFCWhoFDamPoZvvyuZA/HOEYt208P7jKE5KEleIHYYX+AdlEklg88plD82IGkZnWWfKdK5EkcJ6c5iY/7cFeAchUK2+ihuXENoaA6o1wE/FW9tw+t2Opr0XedNF4wDw3B09Dp0Q=
+---
+
 # 装饰器模式（Decorator Pattern）
 
 > **核心思想**：**动态地**为对象添加额外职责，比继承更灵活。装饰器包装被装饰对象，并与其保持**相同的抽象类型**，因此可以像剥洋葱一样层层叠加，且对客户端透明。
@@ -18,50 +29,37 @@
 ## 类图
 
 ```mermaid
-%%{init: {"theme": "base", "themeVariables": {"primaryColor": "#61affe", "primaryTextColor": "#1f2430", "primaryBorderColor": "#61affe", "lineColor": "#8a919e", "secondaryColor": "#eaf2fb", "tertiaryColor": "#f5f7fa", "noteBkgColor": "#fff3d6", "noteTextColor": "#1f2430", "fontSize": "14px"}}}%%
+%%{init: {"classDiagram": {"useMarkdownLabels": true}} }%%
 classDiagram
     direction LR
-    class Beverage {
+
+    class Component["☕Beverage<<abstract>>"]:::strategyCls{
         <<abstract>>
-        #string _description
-        +Description
-        +Cost() double*
+        +Description:string
+        +Cost():double
     }
-    class CondimentDecorator {
+    class ConcreteComponent["🥤DarkRoast"]:::concreteCls{
+        +Description:string
+        +Cost():double
+    }
+    class Decorator["🎨CondimentDecorator<<abstract>>"]:::strategyCls{
         <<abstract>>
-        +Description*
+        +Description:string
     }
-    class Espresso {
-        +Description "Espresso"
-        +Cost() 1.99
-    }
-    class DarkRoast {
-        +Description "Dark Roast"
-        +Cost() 1.49
-    }
-    class HouseBlend {
-        +Description "House Blend"
-        +Cost() 2.49
-    }
-    class MochaCondiment {
-        -Beverage _beverage
-        +Description
-        +Cost() double
-    }
-    class WhipCondiment {
-        -Beverage _beverage
-        +Description
-        +Cost() double
+    class ConcreteDecorator["🧀MochaCondiment"]:::concreteCls{
+        -beverage:Beverage
+        +Description:string
+        +Cost():double
     }
 
-    Beverage <|-- CondimentDecorator : 继承
-    Beverage <|.. Espresso : 实现
-    Beverage <|.. DarkRoast : 实现
-    Beverage <|.. HouseBlend : 实现
-    CondimentDecorator <|.. MochaCondiment : 实现
-    CondimentDecorator <|.. WhipCondiment : 实现
-    CondimentDecorator o-- Beverage : 包装被装饰对象
-    note for MochaCondiment "Cost() = 0.2 + 被包装对象的 Cost()"
+    Component <|-- ConcreteComponent : 继承
+    Component <|-- Decorator : 继承
+    Decorator <|-- ConcreteDecorator : 继承
+    Decorator o-- Component : 包装被装饰对象
+
+    classDef contextCls fill:#fff3cd,stroke:#856404,stroke-width:2px
+    classDef strategyCls fill:#f3e5ff,stroke:#6b2d91,stroke-width:2px
+    classDef concreteCls fill:#e5faef,stroke:#177048,stroke-width:2px
 ```
 
 ## 源码结构
@@ -82,3 +80,4 @@ beverage2 = new MochaCondiment(beverage2);   // 再+摩卡 → "Double Mocha Dar
 beverage2 = new WhipCondiment(beverage2);    // +奶泡
 Console.WriteLine(beverage2.Description + " $" + beverage2.Cost()); // Mocha Mocha Whip Dark Roast $1.99
 ```
+*（内容由AI生成，仅供参考）*

@@ -1,3 +1,14 @@
+---
+AIGC:
+    Label: "1"
+    ContentProducer: 001191440300708461136T1XGW3
+    ProduceID: 6731a671e9c59b3546535911c94fc1c6_5fdd54819bf011f19bec525400826444
+    ReservedCode1: GEmf9tvBmTytP2zBGaVKND9a9lkAaQBT44ErVxxhT2LUnrU31K2/h9VJfUJgw/ThmR3zxoTRRwqok2JGXEurFT77t2rHLtpfxWttt/6UaZ4WeBIYztBxkNx+6L/A2AkHa3yuj58NJ00dq1oQAA4VGgIFEFIlvjV/nDI12FseB8zpO9JzNKAHDRWC9YY=
+    ContentPropagator: 001191440300708461136T1XGW3
+    PropagateID: 6731a671e9c59b3546535911c94fc1c6_5fdd54819bf011f19bec525400826444
+    ReservedCode2: GEmf9tvBmTytP2zBGaVKND9a9lkAaQBT44ErVxxhT2LUnrU31K2/h9VJfUJgw/ThmR3zxoTRRwqok2JGXEurFT77t2rHLtpfxWttt/6UaZ4WeBIYztBxkNx+6L/A2AkHa3yuj58NJ00dq1oQAA4VGgIFEFIlvjV/nDI12FseB8zpO9JzNKAHDRWC9YY=
+---
+
 # 适配器模式（Adapter Pattern）
 
 > **核心思想**：将一个类的接口转换成客户期望的另一个接口，使原本接口不兼容、无法一起工作的类可以协同工作。适配器像"转接头"，不改变原对象本身，只做接口翻译。
@@ -18,42 +29,35 @@
 ## 类图
 
 ```mermaid
-%%{init: {"theme": "base", "themeVariables": {"primaryColor": "#61affe", "primaryTextColor": "#1f2430", "primaryBorderColor": "#61affe", "lineColor": "#8a919e", "secondaryColor": "#eaf2fb", "tertiaryColor": "#f5f7fa", "noteBkgColor": "#fff3d6", "noteTextColor": "#1f2430", "fontSize": "14px"}}}%%
+%%{init: {"classDiagram": {"useMarkdownLabels": true}} }%%
 classDiagram
     direction LR
-    class IDuck {
+
+    class Client["🧑‍💻Client"]:::contextCls{
+        +Test(duck:IDuck):void
+    }
+    class Target["🎯IDuck<<interface>>"]:::strategyCls{
         <<interface>>
-        +Quack()
-        +Fly()
+        +Quack():void
+        +Fly():void
     }
-    class ITurkey {
-        <<interface>>
-        +Gobble()
-        +Fly()
+    class Adapter["🔌TurkeyAdapter"]:::concreteCls{
+        -turkey:ITurkey
+        +Quack():void
+        +Fly():void
     }
-    class WildTurkey {
-        +Gobble()
-        +Fly()
-    }
-    class MallardDuck {
-        +Quack()
-        +Fly()
-    }
-    class TurkeyAdapter {
-        -ITurkey _turkey
-        +Quack()
-        +Fly()
-    }
-    class Tester {
-        +Test(IDuck duck)
+    class Adaptee["🦃WildTurkey"]:::concreteCls{
+        +Gobble():void
+        +Fly():void
     }
 
-    IDuck <|.. MallardDuck : 实现
-    ITurkey <|.. WildTurkey : 实现
-    IDuck <|.. TurkeyAdapter : 实现
-    TurkeyAdapter o-- ITurkey : 组合(持有被适配者)
-    Tester ..> IDuck : 面向接口编程
-    note for TurkeyAdapter "Quack() → _turkey.Gobble()<br/>Fly() → 火鸡连续飞5次"
+    Client ..> Target : 面向接口编程
+    Target <|.. Adapter : 实现
+    Adapter o-- Adaptee : 组合(持有被适配者)
+
+    classDef contextCls fill:#fff3cd,stroke:#856404,stroke-width:2px
+    classDef strategyCls fill:#f3e5ff,stroke:#6b2d91,stroke-width:2px
+    classDef concreteCls fill:#e5faef,stroke:#177048,stroke-width:2px
 ```
 
 ## 源码结构
@@ -76,3 +80,4 @@ static void Tester(IDuck duck) {
     duck.Quack();  // 实际是火鸡 Gobble
 }
 ```
+*（内容由AI生成，仅供参考）*

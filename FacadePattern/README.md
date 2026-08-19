@@ -1,3 +1,14 @@
+---
+AIGC:
+    Label: "1"
+    ContentProducer: 001191440300708461136T1XGW3
+    ProduceID: 6731a671e9c59b3546535911c94fc1c6_64d924de9bf011f1a98a525400f8a581
+    ReservedCode1: xi21/AwkZH9g/syIrWRAhR7tWShBb62EIiO5AEPtJxUZqHrxSOB0NHYnuqJUq4J7MVopErXw5+JjC1KFkF0fn9ByAlUPlq8O2hjub67pFbdCqJ6TARWf5OoAdFIbXYVJlAxNx++Zgr6d4wKxzGspvoJhq2hX5FO+j9cKjAcCn26bQyCsqQqKRPyqvLg=
+    ContentPropagator: 001191440300708461136T1XGW3
+    PropagateID: 6731a671e9c59b3546535911c94fc1c6_64d924de9bf011f1a98a525400f8a581
+    ReservedCode2: xi21/AwkZH9g/syIrWRAhR7tWShBb62EIiO5AEPtJxUZqHrxSOB0NHYnuqJUq4J7MVopErXw5+JjC1KFkF0fn9ByAlUPlq8O2hjub67pFbdCqJ6TARWf5OoAdFIbXYVJlAxNx++Zgr6d4wKxzGspvoJhq2hX5FO+j9cKjAcCn26bQyCsqQqKRPyqvLg=
+---
+
 # 外观模式（Facade Pattern）
 
 > **核心思想**：为子系统中的一组接口提供一个**统一的高层接口**，让客户端用一个简单入口完成复杂的子系统调用，降低客户端与子系统的耦合。
@@ -17,40 +28,34 @@
 ## 类图
 
 ```mermaid
-%%{init: {"theme": "base", "themeVariables": {"primaryColor": "#61affe", "primaryTextColor": "#1f2430", "primaryBorderColor": "#61affe", "lineColor": "#8a919e", "secondaryColor": "#eaf2fb", "tertiaryColor": "#f5f7fa", "noteBkgColor": "#fff3d6", "noteTextColor": "#1f2430", "fontSize": "14px"}}}%%
+%%{init: {"classDiagram": {"useMarkdownLabels": true}} }%%
 classDiagram
     direction LR
-    class HomeTheatreFacade {
-        -Dimmer _dimmer
-        -Dvd _dvd
-        -DvdPlayer _dvdPlayer
-        +WatchMovie()
-        +Pause()
-        +Resume()
+
+    class Facade["🎬HomeTheatreFacade"]:::contextCls{
+        -dimmer:Dimmer
+        -dvdPlayer:DvdPlayer
+        +WatchMovie():void
+        +Pause():void
+        +Resume():void
     }
-    class Dimmer {
-        +Dim(val)
-        +Off()
+    class Subsystem1["💡Dimmer"]:::concreteCls{
+        +Dim(val:int):void
+        +Off():void
     }
-    class Dvd {
-        +Movie
-    }
-    class DvdPlayer {
-        +On()
-        +Insert(Dvd)
-        +Play()
-        +Pause()
-        +Resume()
-    }
-    class Program {
-        +Main()
+    class Subsystem2["📀DvdPlayer"]:::concreteCls{
+        +On():void
+        +Insert(dvd:Dvd):void
+        +Play():void
+        +Pause():void
     }
 
-    HomeTheatreFacade o-- Dimmer
-    HomeTheatreFacade o-- Dvd
-    HomeTheatreFacade o-- DvdPlayer
-    Program ..> HomeTheatreFacade : 只与外观交互
-    note for HomeTheatreFacade "WatchMovie() = Dim(5) + On() + Insert() + Play()"
+    Facade o-- Subsystem1 : 封装子系统
+    Facade o-- Subsystem2 : 封装子系统
+
+    classDef contextCls fill:#fff3cd,stroke:#856404,stroke-width:2px
+    classDef strategyCls fill:#f3e5ff,stroke:#6b2d91,stroke-width:2px
+    classDef concreteCls fill:#e5faef,stroke:#177048,stroke-width:2px
 ```
 
 ## 源码结构
@@ -69,3 +74,4 @@ homeTheater.WatchMovie();  // 内部自动完成 调光→开机→插碟→播�
 homeTheater.Pause();
 homeTheater.Resume();
 ```
+*（内容由AI生成，仅供参考）*

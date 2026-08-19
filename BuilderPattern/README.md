@@ -1,3 +1,14 @@
+---
+AIGC:
+    Label: "1"
+    ContentProducer: 001191440300708461136T1XGW3
+    ProduceID: 6731a671e9c59b3546535911c94fc1c6_616a63739bf011f18cca525400e6dd8f
+    ReservedCode1: xap0ZpdHy8Yn5igcEEYEf4OlePX+NbZqm/gYpM0eTmrMtvvoJumE2cIZqEDiO4dvcB5yYzaJQGOY2laFMNxmDJJInQzslktDuLjuJg1vXJbJmtsJULp04BE73NCp6ZQVOfEtwHlGHJZ0CPAZ4B6/f1D4OPhDoKj0FIh6LO5uUgDfX75YxleBnotfRBE=
+    ContentPropagator: 001191440300708461136T1XGW3
+    PropagateID: 6731a671e9c59b3546535911c94fc1c6_616a63739bf011f18cca525400e6dd8f
+    ReservedCode2: xap0ZpdHy8Yn5igcEEYEf4OlePX+NbZqm/gYpM0eTmrMtvvoJumE2cIZqEDiO4dvcB5yYzaJQGOY2laFMNxmDJJInQzslktDuLjuJg1vXJbJmtsJULp04BE73NCp6ZQVOfEtwHlGHJZ0CPAZ4B6/f1D4OPhDoKj0FIh6LO5uUgDfX75YxleBnotfRBE=
+---
+
 # 建造者模式（Builder Pattern）
 
 > **核心思想**：将一个复杂对象的**构建过程**与它的**表示**分离，使同样的构建步骤可以组装出不同的产品。由"指挥者"控制构建步骤的顺序，"建造者"负责各步骤的具体实现。
@@ -18,46 +29,41 @@
 ## 类图
 
 ```mermaid
-%%{init: {"theme": "base", "themeVariables": {"primaryColor": "#61affe", "primaryTextColor": "#1f2430", "primaryBorderColor": "#61affe", "lineColor": "#8a919e", "secondaryColor": "#eaf2fb", "tertiaryColor": "#f5f7fa", "noteBkgColor": "#fff3d6", "noteTextColor": "#1f2430", "fontSize": "14px"}}}%%
+%%{init: {"classDiagram": {"useMarkdownLabels": true}} }%%
 classDiagram
     direction LR
-    class IBuilder {
+
+    class Director["👨‍🍳Cook"]:::contextCls{
+        -builder:IBuilder
+        +Build():Hamburger
+        +ChangeBuilder(IBuilder):void
+    }
+    class Builder["🏗️IBuilder<<interface>>"]:::strategyCls{
         <<interface>>
-        +AddIngredients()
-        +AddShape()
-        +AddSize()
-        +Reset()
-        +Build() Hamburger
+        +AddIngredients():void
+        +AddShape():void
+        +AddSize():void
+        +Build():Hamburger
     }
-    class MyHamburgerBuilder {
-        -Hamburger _hamburger
-        +AddIngredients() "Bread/Meat/Tomato/Salad/Mayo"
-        +AddShape() "Kite"
-        +AddSize() 10
-        +Build() Hamburger
+    class ConcreteBuilder["🛠️MyHamburgerBuilder"]:::concreteCls{
+        +AddIngredients():void
+        +AddShape():void
+        +AddSize():void
+        +Build():Hamburger
     }
-    class WifesHamburgerBuilder {
-        -Hamburger _hamburger
-        +AddIngredients() "Bread/Salad"
-        +AddShape() "Cuboid"
-        +AddSize() 6
-        +Build() Hamburger
-    }
-    class Cook {
-        -IBuilder _builder
-        +Build() Hamburger
-        +ChangeBuilder(IBuilder)
-    }
-    class Hamburger {
-        +int Size
-        +string Shape
-        +string[] Ingredients
+    class Product["🍔Hamburger"]:::concreteCls{
+        +Size:int
+        +Shape:string
+        +Ingredients:string[]
     }
 
-    IBuilder <|.. MyHamburgerBuilder : 实现
-    IBuilder <|.. WifesHamburgerBuilder : 实现
-    Cook o-- IBuilder : 指挥者持有建造者
-    IBuilder ..> Hamburger : 产出
+    Director o-- Builder : 指挥者持有建造者
+    Builder <|.. ConcreteBuilder : 实现
+    Builder ..> Product : 构建产出
+
+    classDef contextCls fill:#fff3cd,stroke:#856404,stroke-width:2px
+    classDef strategyCls fill:#f3e5ff,stroke:#6b2d91,stroke-width:2px
+    classDef concreteCls fill:#e5faef,stroke:#177048,stroke-width:2px
 ```
 
 ## 源码结构
@@ -77,3 +83,4 @@ var myHamburger = cook.Build();                 // Ingredients: Bread Meat Tomat
 cook.ChangeBuilder(new WifesHamburgerBuilder());
 var wifesHamburger = cook.Build();              // Ingredients: Bread Salad, Size: 6, Shape: Cuboid
 ```
+*（内容由AI生成，仅供参考）*

@@ -1,3 +1,14 @@
+---
+AIGC:
+    Label: "1"
+    ContentProducer: 001191440300708461136T1XGW3
+    ProduceID: 6731a671e9c59b3546535911c94fc1c6_679f40d99bf011f18cca525400e6dd8f
+    ReservedCode1: iSJrrh2lEgy6cYplouv5KIJwFXiETGUNRqETfTm5S5XRm7MuCjklnhWC8hY/x0ZYQEqeiT5qleustmYnh+Jsm26p8yo/ohCKUJBr5ZCId7P0m/rfVXuH8KljbXGkW8e91YYHKBDPWsGNHLyKBy/1pldlGpy4x78NGFljcgGDKLwM6VcH6WUPAKGxW30=
+    ContentPropagator: 001191440300708461136T1XGW3
+    PropagateID: 6731a671e9c59b3546535911c94fc1c6_679f40d99bf011f18cca525400e6dd8f
+    ReservedCode2: iSJrrh2lEgy6cYplouv5KIJwFXiETGUNRqETfTm5S5XRm7MuCjklnhWC8hY/x0ZYQEqeiT5qleustmYnh+Jsm26p8yo/ohCKUJBr5ZCId7P0m/rfVXuH8KljbXGkW8e91YYHKBDPWsGNHLyKBy/1pldlGpy4x78NGFljcgGDKLwM6VcH6WUPAKGxW30=
+---
+
 # 中介者模式（Mediator Pattern）
 
 > **核心思想**：定义一个**中介对象**来封装一组对象之间的交互。各同事对象不再直接互相引用，而是通过中介者转发消息，从而**降低对象间的耦合**，使系统易于维护和扩展。
@@ -18,42 +29,37 @@
 ## 类图
 
 ```mermaid
-%%{init: {"theme": "base", "themeVariables": {"primaryColor": "#61affe", "primaryTextColor": "#1f2430", "primaryBorderColor": "#61affe", "lineColor": "#8a919e", "secondaryColor": "#eaf2fb", "tertiaryColor": "#f5f7fa", "noteBkgColor": "#fff3d6", "noteTextColor": "#1f2430", "fontSize": "14px"}}}%%
+%%{init: {"classDiagram": {"useMarkdownLabels": true}} }%%
 classDiagram
     direction LR
-    class Mediator {
+
+    class Mediator["🤝Mediator<<abstract>>"]:::strategyCls{
         <<abstract>>
-        +Send(message, colleague)*
+        +Send(message:string, colleague:Colleague):void
     }
-    class ManagerMediator {
-        +Colleague Customer
-        +Colleague Programmer
-        +Colleague Tester
-        +Send(message, colleague)
+    class ConcreteMediator["🧑‍💼ManagerMediator"]:::concreteCls{
+        -customer:Colleague
+        -programmer:Colleague
+        -tester:Colleague
+        +Send(message:string, colleague:Colleague):void
     }
-    class Colleague {
+    class Colleague["👥Colleague<<abstract>>"]:::strategyCls{
         <<abstract>>
-        #Mediator mediator
-        +Send(message)
-        +Notify(message)*
+        +Send(message:string):void
+        +Notify(message:string):void
     }
-    class Customer {
-        +Notify(message)
-    }
-    class Programmer {
-        +Notify(message)
-    }
-    class Tester {
-        +Notify(message)
+    class ConcreteColleague["🧑‍💻Programmer"]:::concreteCls{
+        +Notify(message:string):void
     }
 
-    Mediator <|-- ManagerMediator : 继承
-    Colleague <|-- Customer : 继承
-    Colleague <|-- Programmer : 继承
-    Colleague <|-- Tester : 继承
-    Colleague o-- Mediator : 持有中介者引用
-    ManagerMediator o-- Colleague : 维护同事
-    note for ManagerMediator "Customer→Programmer→Tester→Customer"
+    Mediator <|-- ConcreteMediator : 继承
+    ConcreteMediator o-- Colleague : 维护同事
+    Colleague <|-- ConcreteColleague : 继承
+    Colleague o-- Mediator : 持有中介者
+
+    classDef contextCls fill:#fff3cd,stroke:#856404,stroke-width:2px
+    classDef strategyCls fill:#f3e5ff,stroke:#6b2d91,stroke-width:2px
+    classDef concreteCls fill:#e5faef,stroke:#177048,stroke-width:2px
 ```
 
 ## 源码结构
@@ -75,3 +81,4 @@ else if (colleague == Programmer)
 else
     Customer.Notify(message);        // 测试员 → 客户
 ```
+*（内容由AI生成，仅供参考）*

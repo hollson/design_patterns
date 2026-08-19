@@ -1,3 +1,14 @@
+---
+AIGC:
+    Label: "1"
+    ContentProducer: 001191440300708461136T1XGW3
+    ProduceID: 6731a671e9c59b3546535911c94fc1c6_685bd7ca9bf011f19bec525400826444
+    ReservedCode1: miPZwnxfLZA1/Hol55wcKUsn58rKS2HDgZoq0dapFGj5y6XhJAQrrpZRukMOLYIC15PPldSQUsH+zh/G267/Zml9H0XXcEvm01qPZhTewSMI4gRbAO39g49sJi1RDa1uxvAgXZsxNTMcTlXI6WZHyhdknphBv+Lk5h/uo0OfERa9P1Fw4mvaQSQB/+4=
+    ContentPropagator: 001191440300708461136T1XGW3
+    PropagateID: 6731a671e9c59b3546535911c94fc1c6_685bd7ca9bf011f19bec525400826444
+    ReservedCode2: miPZwnxfLZA1/Hol55wcKUsn58rKS2HDgZoq0dapFGj5y6XhJAQrrpZRukMOLYIC15PPldSQUsH+zh/G267/Zml9H0XXcEvm01qPZhTewSMI4gRbAO39g49sJi1RDa1uxvAgXZsxNTMcTlXI6WZHyhdknphBv+Lk5h/uo0OfERa9P1Fw4mvaQSQB/+4=
+---
+
 # 观察者模式（Observer Pattern）
 
 > **核心思想**：定义对象间**一对多**的依赖关系，当被观察者（主题）状态改变时，**所有已注册的观察者自动收到通知**并作出更新。本示例基于 .NET 内置的 `IObservable<T>` / `IObserver<T>` 实现。
@@ -19,48 +30,31 @@
 ## 类图
 
 ```mermaid
-%%{init: {"theme": "base", "themeVariables": {"primaryColor": "#61affe", "primaryTextColor": "#1f2430", "primaryBorderColor": "#61affe", "lineColor": "#8a919e", "secondaryColor": "#eaf2fb", "tertiaryColor": "#f5f7fa", "noteBkgColor": "#fff3d6", "noteTextColor": "#1f2430", "fontSize": "14px"}}}%%
+%%{init: {"classDiagram": {"useMarkdownLabels": true}} }%%
 classDiagram
     direction LR
-    class IObservable~T~ {
+
+    class Subject["📡WeatherSupplier"]:::contextCls{
+        -observers:List~IObserver~Weather~~
+        +Subscribe(observer:IObserver~Weather~):IDisposable
+        +NotifyObservers():void
+    }
+    class Observer["👁️IObserver~Weather~<<interface>>"]:::strategyCls{
         <<interface>>
-        +Subscribe(observer) IDisposable
+        +OnNext(value:Weather):void
+        +OnError(error:Exception):void
     }
-    class IObserver~T~ {
-        <<interface>>
-        +OnNext(value)
-        +OnError(error)
-        +OnCompleted()
-    }
-    class WeatherSupplier {
-        -List~IObserver~Weather~~ _observers
-        +Subscribe(observer) IDisposable
-        +WeatherConditions(temp, humd, pres)
-    }
-    class WeatherMonitor {
-        -string _name
-        -IDisposable _cancellation
-        +Subscribe(provider)
-        +Unsubscribe()
-        +OnNext(value)
-    }
-    class Unsubscriber~T~ {
-        -List~IObserver~T~~ _observers
-        -IObserver~T~ _observer
-        +Dispose()
-    }
-    class Weather {
-        +Temperature
-        +Pressure
-        +Humidity
+    class ConcreteObserver["🖥️WeatherMonitor"]:::concreteCls{
+        +OnNext(value:Weather):void
+        +Unsubscribe():void
     }
 
-    IObservable~T~ <|.. WeatherSupplier : 实现
-    IObserver~T~ <|.. WeatherMonitor : 实现
-    WeatherSupplier o-- "0..*" IObserver~T~ : 观察者列表
-    WeatherSupplier ..> Unsubscriber~T~ : 返回订阅解绑句柄
-    WeatherMonitor o-- IDisposable : 订阅句柄
-    WeatherSupplier ..> Weather : 推送数据
+    Subject o-- "0..*" Observer : 观察者列表
+    Observer <|.. ConcreteObserver : 实现
+
+    classDef contextCls fill:#fff3cd,stroke:#856404,stroke-width:2px
+    classDef strategyCls fill:#f3e5ff,stroke:#6b2d91,stroke-width:2px
+    classDef concreteCls fill:#e5faef,stroke:#177048,stroke-width:2px
 ```
 
 ## 源码结构
@@ -81,3 +75,4 @@ provider.WeatherConditions(33.5, 0.04, 1.7);   // 观察者1 收到
 observer2.Subscribe(provider);                 // 观察者2 订阅
 provider.WeatherConditions(37.5, 0.07, 1.2);   // 两个观察者都收到
 ```
+*（内容由AI生成，仅供参考）*

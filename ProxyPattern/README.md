@@ -1,3 +1,14 @@
+---
+AIGC:
+    Label: "1"
+    ContentProducer: 001191440300708461136T1XGW3
+    ProduceID: 6731a671e9c59b3546535911c94fc1c6_69c507639bf011f1a98a525400f8a581
+    ReservedCode1: /jxiln/q0s3erBA7NhjIgTlSYE1p62WYVqVONnWeK2UqXLkIsPeNlP4iHLw4Q23jwGVlKPHw07gaaEXbN3EINuRkcKeB2Ckjl9YdzAapszaku2mVfCjGV27RqCy99pzz++9TAuTyYJ9JY1VHvDcgQFoIJiBZ7U0YCVzqfth9rJxSZHQMEE552fo1E8w=
+    ContentPropagator: 001191440300708461136T1XGW3
+    PropagateID: 6731a671e9c59b3546535911c94fc1c6_69c507639bf011f1a98a525400f8a581
+    ReservedCode2: /jxiln/q0s3erBA7NhjIgTlSYE1p62WYVqVONnWeK2UqXLkIsPeNlP4iHLw4Q23jwGVlKPHw07gaaEXbN3EINuRkcKeB2Ckjl9YdzAapszaku2mVfCjGV27RqCy99pzz++9TAuTyYJ9JY1VHvDcgQFoIJiBZ7U0YCVzqfth9rJxSZHQMEE552fo1E8w=
+---
+
 # 代理模式（Proxy Pattern）
 
 > **核心思想**：为真实对象提供一个**代理**，由代理控制对真实对象的访问。代理与真实对象实现**相同接口**，可在访问前后附加额外逻辑（如延迟加载、访问控制、日志等），对客户端透明。
@@ -18,32 +29,35 @@
 ## 类图
 
 ```mermaid
-%%{init: {"theme": "base", "themeVariables": {"primaryColor": "#61affe", "primaryTextColor": "#1f2430", "primaryBorderColor": "#61affe", "lineColor": "#8a919e", "secondaryColor": "#eaf2fb", "tertiaryColor": "#f5f7fa", "noteBkgColor": "#fff3d6", "noteTextColor": "#1f2430", "fontSize": "14px"}}}%%
+%%{init: {"classDiagram": {"useMarkdownLabels": true}} }%%
 classDiagram
     direction LR
-    class Image {
+
+    class Subject["🖼️Image<<interface>>"]:::strategyCls{
         <<interface>>
-        +display()
+        +display():void
     }
-    class RealImage {
-        -string _fileName
-        +display()
-        -loadFromDisk(fileName)
+    class RealSubject["🖥️RealImage"]:::concreteCls{
+        -fileName:string
+        +display():void
     }
-    class ProxyImage {
-        -RealImage _realImage
-        -string _fileName
-        +display()
+    class Proxy["🔐ProxyImage"]:::concreteCls{
+        -realImage:RealImage
+        -fileName:string
+        +display():void
     }
-    class Program {
+    class Client["🧑‍💻Program"]:::contextCls{
         +Main()
     }
 
-    Image <|.. RealImage : 实现
-    Image <|.. ProxyImage : 实现
-    ProxyImage o--> RealImage : 延迟创建
-    Program ..> Image : 面向接口
-    note for ProxyImage "首次 display() 才 new RealImage<br/>后续调用复用实例"
+    Subject <|.. RealSubject : 实现
+    Subject <|.. Proxy : 实现
+    Proxy o--> RealSubject : 延迟创建
+    Client ..> Subject : 面向接口
+
+    classDef contextCls fill:#fff3cd,stroke:#856404,stroke-width:2px
+    classDef strategyCls fill:#f3e5ff,stroke:#6b2d91,stroke-width:2px
+    classDef concreteCls fill:#e5faef,stroke:#177048,stroke-width:2px
 ```
 
 ## 源码结构
@@ -64,3 +78,4 @@ public void display() {
     _realImage.display();
 }
 ```
+*（内容由AI生成，仅供参考）*

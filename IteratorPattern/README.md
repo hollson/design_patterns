@@ -1,3 +1,14 @@
+---
+AIGC:
+    Label: "1"
+    ContentProducer: 001191440300708461136T1XGW3
+    ProduceID: 6731a671e9c59b3546535911c94fc1c6_66f3a3909bf011f19467525400287e28
+    ReservedCode1: riqKE1md9gdAPATDSYjzg5fgnG0wixbgPi09xJGmGYN3UPm9JAptvbYfJbtOyHQULmsHHGO1xZRpHBOXa5B/MiZCL6DO3qk+FWV2b27lTza0aqJlwfLA/mdwSPzD/0OvrVSsW4HBYQ8eXj7UTVkNM+YowcsFWAz5Wt75WLzxUCG/FaZ09eYub+IL5cQ=
+    ContentPropagator: 001191440300708461136T1XGW3
+    PropagateID: 6731a671e9c59b3546535911c94fc1c6_66f3a3909bf011f19467525400287e28
+    ReservedCode2: riqKE1md9gdAPATDSYjzg5fgnG0wixbgPi09xJGmGYN3UPm9JAptvbYfJbtOyHQULmsHHGO1xZRpHBOXa5B/MiZCL6DO3qk+FWV2b27lTza0aqJlwfLA/mdwSPzD/0OvrVSsW4HBYQ8eXj7UTVkNM+YowcsFWAz5Wt75WLzxUCG/FaZ09eYub+IL5cQ=
+---
+
 # 迭代器模式（Iterator Pattern）
 
 > **核心思想**：提供一种方法**顺序访问**一个聚合对象中的各个元素，而**不暴露其内部表示**。客户端通过统一的迭代器接口遍历集合，不关心底层是数组、链表还是其他结构。
@@ -18,57 +29,39 @@
 ## 类图
 
 ```mermaid
-%%{init: {"theme": "base", "themeVariables": {"primaryColor": "#61affe", "primaryTextColor": "#1f2430", "primaryBorderColor": "#61affe", "lineColor": "#8a919e", "secondaryColor": "#eaf2fb", "tertiaryColor": "#f5f7fa", "noteBkgColor": "#fff3d6", "noteTextColor": "#1f2430", "fontSize": "14px"}}}%%
+%%{init: {"classDiagram": {"useMarkdownLabels": true}} }%%
 classDiagram
     direction LR
-    class Menu {
-        +Name
-        +Description
-        +Price
-        +Vegetarian
+
+    class Client["🧑‍💻Client"]:::contextCls{
+        +PrintMenu(iter:IEnumerable):void
     }
-    class BreakfastMenu {
-        -List~Menu~ _items
-        +Items IEnumerable
+    class Aggregate["🗂️MenuAggregate<<interface>>"]:::strategyCls{
+        <<interface>>
+        +Items:IEnumerable
     }
-    class DinnerMenu {
-        -Menu[] _items
-        +Items IEnumerable
+    class Iterator["🔍Iterator<<interface>>"]:::strategyCls{
+        <<interface>>
+        +MoveNext():bool
+        +Current:Menu
     }
-    class BreakfastMenuIterator {
-        -List~Menu~ _items
-        +GetEnumerator() IEnumerator
+    class ConcreteAggregate["🍽️BreakfastMenu"]:::concreteCls{
+        -items:List~Menu~
+        +Items:IEnumerable
     }
-    class DinnerMenuIterator {
-        -Menu[] _items
-        +GetEnumerator() IEnumerator
-    }
-    class BreakfastMenuEnum {
-        -List~Menu~ _items
-        -int _position
-        +MoveNext()
-        +Current Menu
-    }
-    class DinnerMenuEnum {
-        -Menu[] _items
-        -int _position
-        +MoveNext()
-        +Current Menu
-    }
-    class Client {
-        -IEnumerable _breakfast
-        -IEnumerable _dinner
-        +PrintMenu()
+    class ConcreteIterator["🔀BreakfastMenuIterator"]:::concreteCls{
+        +MoveNext():bool
+        +Current:Menu
     }
 
-    BreakfastMenu ..> BreakfastMenuIterator : 创建迭代器
-    DinnerMenu ..> DinnerMenuIterator : 创建迭代器
-    BreakfastMenuIterator ..> BreakfastMenuEnum : 创建枚举器
-    DinnerMenuIterator ..> DinnerMenuEnum : 创建枚举器
-    BreakfastMenu o-- "0..*" Menu : List 存储
-    DinnerMenu o-- "0..*" Menu : 数组存储
-    Client o-- BreakfastMenu
-    Client o-- DinnerMenu
+    Client ..> Iterator : 通过迭代器遍历
+    ConcreteAggregate ..> ConcreteIterator : 创建迭代器
+    Iterator <|.. ConcreteIterator : 实现
+    Aggregate <|.. ConcreteAggregate : 实现
+
+    classDef contextCls fill:#fff3cd,stroke:#856404,stroke-width:2px
+    classDef strategyCls fill:#f3e5ff,stroke:#6b2d91,stroke-width:2px
+    classDef concreteCls fill:#e5faef,stroke:#177048,stroke-width:2px
 ```
 
 ## 源码结构
@@ -91,3 +84,4 @@ private void PrintMenu(IEnumerable iter) {
     }
 }
 ```
+*（内容由AI生成，仅供参考）*

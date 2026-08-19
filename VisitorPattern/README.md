@@ -1,3 +1,14 @@
+---
+AIGC:
+    Label: "1"
+    ContentProducer: 001191440300708461136T1XGW3
+    ProduceID: 6731a671e9c59b3546535911c94fc1c6_6d1362fc9bf011f1a98a525400f8a581
+    ReservedCode1: SGM8mMQwYlsFHF0zKBu7GLm36tACE/wwHYF2xMeDO4mKsE6P2eSQi/sQ6cAckFlWAwL0Lb9dH4DTckCe/f25JoiUEape0n5kLXEt7Jeug2WWuy/fby7mVPRoaS4d009oYYXoRQKBIwAGk9kZFdqcEhKUGaGoP/NE/9SnB5S+bECLCjWA6uLGRNZ+8w4=
+    ContentPropagator: 001191440300708461136T1XGW3
+    PropagateID: 6731a671e9c59b3546535911c94fc1c6_6d1362fc9bf011f1a98a525400f8a581
+    ReservedCode2: SGM8mMQwYlsFHF0zKBu7GLm36tACE/wwHYF2xMeDO4mKsE6P2eSQi/sQ6cAckFlWAwL0Lb9dH4DTckCe/f25JoiUEape0n5kLXEt7Jeug2WWuy/fby7mVPRoaS4d009oYYXoRQKBIwAGk9kZFdqcEhKUGaGoP/NE/9SnB5S+bECLCjWA6uLGRNZ+8w4=
+---
+
 # 访问者模式（Visitor Pattern）
 
 > **核心思想**：**将算法与对象结构分离**。在不修改现有类的前提下，为其增加新的操作——通过"访问者"在运行时对结构中每个元素执行相应操作（典型实现为**双重分派**）。
@@ -19,66 +30,35 @@
 ## 类图
 
 ```mermaid
-%%{init: {"theme": "base", "themeVariables": {"primaryColor": "#61affe", "primaryTextColor": "#1f2430", "primaryBorderColor": "#61affe", "lineColor": "#8a919e", "secondaryColor": "#eaf2fb", "tertiaryColor": "#f5f7fa", "noteBkgColor": "#fff3d6", "noteTextColor": "#1f2430", "fontSize": "14px"}}}%%
+%%{init: {"classDiagram": {"useMarkdownLabels": true}} }%%
 classDiagram
     direction LR
-    class IUnitVisitor {
+
+    class Visitor["🧑‍🔬IUnitVisitor<<interface>>"]:::strategyCls{
         <<interface>>
-        +VisitApartment(Apartment)
-        +VisitStudio(Studio)
-        +VisitBedroom(Bedroom)
-        +VisitLivingRoom(LivingRoom)
+        +VisitApartment(apartment:Apartment):void
+        +VisitBedroom(bedroom:Bedroom):void
     }
-    class Unit {
+    class ConcreteVisitor["🧹Cleaner"]:::concreteCls{
+        +VisitApartment(apartment:Apartment):void
+        +VisitBedroom(bedroom:Bedroom):void
+    }
+    class Element["🏠Unit<<abstract>>"]:::strategyCls{
         <<abstract>>
-        +Accept(IUnitVisitor)*
+        +Accept(visitor:IUnitVisitor):void
     }
-    class Apartment {
-        +Accept(IUnitVisitor)
-    }
-    class Studio {
-        +Accept(IUnitVisitor)
-    }
-    class Bedroom {
-        +Accept(IUnitVisitor)
-    }
-    class LivingRoom {
-        +Accept(IUnitVisitor)
-    }
-    class CompositeUnit {
-        -List~Unit~ _units
-        +Add(Unit)
-        +Accept(IUnitVisitor)
-    }
-    class Inspector {
-        +VisitApartment(Apartment) "检查公寓"
-        +VisitStudio(Studio)
-        +VisitBedroom(Bedroom)
-        +VisitLivingRoom(LivingRoom)
-    }
-    class Cleaner {
-        +VisitApartment(Apartment) "清扫公寓"
-        +VisitStudio(Studio)
-        +VisitBedroom(Bedroom)
-        +VisitLivingRoom(LivingRoom)
-    }
-    class Owner {
-        +VisitApartment(Apartment) "业主参观"
-        +VisitStudio(Studio)
-        +VisitBedroom(Bedroom)
-        +VisitLivingRoom(LivingRoom)
+    class ConcreteElement["🛏️Bedroom"]:::concreteCls{
+        +Accept(visitor:IUnitVisitor):void
     }
 
-    IUnitVisitor <|.. Inspector : 实现
-    IUnitVisitor <|.. Cleaner : 实现
-    IUnitVisitor <|.. Owner : 实现
-    Unit <|-- Apartment : 继承
-    Unit <|-- Studio : 继承
-    Unit <|-- Bedroom : 继承
-    Unit <|-- LivingRoom : 继承
-    Unit <|-- CompositeUnit : 继承(组合节点)
-    CompositeUnit o-- "0..*" Unit : 组合
-    Unit ..> IUnitVisitor : 调用 visitor.Visit(this)
+    Visitor <|.. ConcreteVisitor : 实现
+    Element <|-- ConcreteElement : 继承
+    ConcreteElement ..> Visitor : 调用 visitor.Visit(this)
+    ConcreteVisitor ..> ConcreteElement : 访问具体元素
+
+    classDef contextCls fill:#fff3cd,stroke:#856404,stroke-width:2px
+    classDef strategyCls fill:#f3e5ff,stroke:#6b2d91,stroke-width:2px
+    classDef concreteCls fill:#e5faef,stroke:#177048,stroke-width:2px
 ```
 
 ## 源码结构
@@ -98,3 +78,4 @@ public override void Accept(IUnitVisitor visitor) {
     visitor.VisitBedroom(this);   // 双重分派：元素类型 → 访问者重载
 }
 ```
+*（内容由AI生成，仅供参考）*

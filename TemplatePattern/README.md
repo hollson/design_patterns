@@ -1,3 +1,14 @@
+---
+AIGC:
+    Label: "1"
+    ContentProducer: 001191440300708461136T1XGW3
+    ProduceID: 6731a671e9c59b3546535911c94fc1c6_6c6718e69bf011f19467525400287e28
+    ReservedCode1: BtZthtlytgBmnjVoNwL7i3i0FpV6Nd4KiDGF3wgF4txf76o3Z7HM8ZudgQne4LXAxdWF4TmYxRE17imrrtQatD8f6MMhn/GUre78koejPcz7pL3VuuHt7e5H6cVtguKOwhkXlluFB0KMUWeWvtYkITCGNfIZ9diAgROSm1gYXkyBzija9UXVH3Xt9d4=
+    ContentPropagator: 001191440300708461136T1XGW3
+    PropagateID: 6731a671e9c59b3546535911c94fc1c6_6c6718e69bf011f19467525400287e28
+    ReservedCode2: BtZthtlytgBmnjVoNwL7i3i0FpV6Nd4KiDGF3wgF4txf76o3Z7HM8ZudgQne4LXAxdWF4TmYxRE17imrrtQatD8f6MMhn/GUre78koejPcz7pL3VuuHt7e5H6cVtguKOwhkXlluFB0KMUWeWvtYkITCGNfIZ9diAgROSm1gYXkyBzija9UXVH3Xt9d4=
+---
+
 # 模板方法模式（Template Method Pattern）
 
 > **核心思想**：在一个方法中定义算法的**骨架**，将一些步骤**延迟到子类实现**。父类固定流程、子类定制细节，从而在不改变算法结构的前提下复用公共逻辑。
@@ -17,38 +28,35 @@
 ## 类图
 
 ```mermaid
-%%{init: {"theme": "base", "themeVariables": {"primaryColor": "#61affe", "primaryTextColor": "#1f2430", "primaryBorderColor": "#61affe", "lineColor": "#8a919e", "secondaryColor": "#eaf2fb", "tertiaryColor": "#f5f7fa", "noteBkgColor": "#fff3d6", "noteTextColor": "#1f2430", "fontSize": "14px"}}}%%
+%%{init: {"classDiagram": {"useMarkdownLabels": true}} }%%
 classDiagram
-    direction TB
-    class Beverage {
+    direction LR
+
+    class AbstractClass["🍵Beverage<<abstract>>"]:::strategyCls{
         <<abstract>>
-        +Prepare()
-        #BoilWater()
-        #Brew()*
-        #PourInCup()
-        #AddCondiment()*
+        +Prepare():void
+        #Brew():void
+        #AddCondiment():void
     }
-    class Coffee {
-        #Brew() "Brew Coffee Grinds"
-        #AddCondiment() "Add Sugar And Milk"
+    class ConcreteClassA["☕Coffee"]:::concreteCls{
+        #Brew():void
+        #AddCondiment():void
     }
-    class Tea {
-        #Brew() "Steep Tea Bag"
-        #AddCondiment() "Add Lemon"
+    class ConcreteClassB["🍃Tea"]:::concreteCls{
+        #Brew():void
+        #AddCondiment():void
     }
-    class Person {
-        +string Name
-        +CompareTo(Person) int
-    }
-    class Program {
+    class Client["🧑‍💻Program"]:::contextCls{
         +Main()
     }
 
-    Beverage <|-- Coffee : 继承
-    Beverage <|-- Tea : 继承
-    Program ..> Beverage
-    Program ..> Person
-    note for Beverage "Prepare() 固定流程：<br/>BoilWater → Brew → PourInCup → AddCondiment"
+    AbstractClass <|-- ConcreteClassA : 继承
+    AbstractClass <|-- ConcreteClassB : 继承
+    Client ..> AbstractClass
+
+    classDef contextCls fill:#fff3cd,stroke:#856404,stroke-width:2px
+    classDef strategyCls fill:#f3e5ff,stroke:#6b2d91,stroke-width:2px
+    classDef concreteCls fill:#e5faef,stroke:#177048,stroke-width:2px
 ```
 
 ## 源码结构
@@ -70,3 +78,4 @@ public void Prepare() {
     AddCondiment();   // 子类定制：加糖奶 / 加柠檬
 }
 ```
+*（内容由AI生成，仅供参考）*

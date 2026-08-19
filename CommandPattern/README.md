@@ -1,3 +1,14 @@
+---
+AIGC:
+    Label: "1"
+    ContentProducer: 001191440300708461136T1XGW3
+    ProduceID: 6731a671e9c59b3546535911c94fc1c6_62cdba669bf011f19bec525400826444
+    ReservedCode1: 9F/KDbmmZFhYcNjlQP1yzf9oW6AYQKUCppwWwh+NjM1sXw+QD7921kyy8DG/4/dRJTVkMrsCRoBKvRfDZdh/jjrKtx2KwQg6uGjUzT1zVSJYfz3WxFb9+vXS/FFyjEY3gktcW4rPLxchUxsx8ECNSPuzStHThtYK20AX7n0cyiYBqURpnPYTRs559HU=
+    ContentPropagator: 001191440300708461136T1XGW3
+    PropagateID: 6731a671e9c59b3546535911c94fc1c6_62cdba669bf011f19bec525400826444
+    ReservedCode2: 9F/KDbmmZFhYcNjlQP1yzf9oW6AYQKUCppwWwh+NjM1sXw+QD7921kyy8DG/4/dRJTVkMrsCRoBKvRfDZdh/jjrKtx2KwQg6uGjUzT1zVSJYfz3WxFb9+vXS/FFyjEY3gktcW4rPLxchUxsx8ECNSPuzStHThtYK20AX7n0cyiYBqURpnPYTRs559HU=
+---
+
 # 命令模式（Command Pattern）
 
 > **核心思想**：将"请求"封装为对象，从而可以用不同的请求对调用方进行参数化，并支持请求的**排队、日志记录与撤销**。命令把"动作的发起者"与"动作的执行者"彻底解耦。
@@ -21,70 +32,39 @@
 ## 类图
 
 ```mermaid
-%%{init: {"theme": "base", "themeVariables": {"primaryColor": "#61affe", "primaryTextColor": "#1f2430", "primaryBorderColor": "#61affe", "lineColor": "#8a919e", "secondaryColor": "#eaf2fb", "tertiaryColor": "#f5f7fa", "noteBkgColor": "#fff3d6", "noteTextColor": "#1f2430", "fontSize": "14px"}}}%%
+%%{init: {"classDiagram": {"useMarkdownLabels": true}} }%%
 classDiagram
     direction LR
-    class ICommand {
+
+    class Invoker["🎮RemoteControl"]:::contextCls{
+        -onCommand:ICommand[]
+        -undoCommand:ICommand
+        +PushOn(slot:int):void
+        +PushOff(slot:int):void
+        +PushUndo():void
+    }
+    class Command["📋ICommand<<interface>>"]:::strategyCls{
         <<interface>>
-        +Execute()
-        +Undo()
+        +Execute():void
+        +Undo():void
     }
-    class RemoteControl {
-        -ICommand[] _onCommand
-        -ICommand[] _offCommand
-        -ICommand _undoCommand
-        +PushOn(slot)
-        +PushOff(slot)
-        +PushUndo()
+    class ConcreteCommand["🔘LightOnCommand"]:::concreteCls{
+        -light:Light
+        +Execute():void
+        +Undo():void
     }
-    class LightOnCommand {
-        -Light _light
-        +Execute()
-        +Undo()
-    }
-    class LightOffCommand {
-        -Light _light
-        +Execute()
-        +Undo()
-    }
-    class GarageDoorOpenCommand {
-        -Garage _garage
-        +Execute()
-        +Undo()
-    }
-    class GarageDoorCloseCommand {
-        -Garage _garage
-        +Execute()
-        +Undo()
-    }
-    class MacroCommand {
-        -ICommand[] _commands
-        +Execute()
-        +Undo()
-    }
-    class NoCommand {
-        +Execute()
-        +Undo()
-    }
-    class Light {
-        +On()
-        +Off()
-    }
-    class Garage {
-        +Open()
-        +Close()
+    class Receiver["💡Light"]:::concreteCls{
+        +On():void
+        +Off():void
     }
 
-    ICommand <|.. LightOnCommand : 实现
-    ICommand <|.. LightOffCommand : 实现
-    ICommand <|.. GarageDoorOpenCommand : 实现
-    ICommand <|.. GarageDoorCloseCommand : 实现
-    ICommand <|.. MacroCommand : 实现
-    ICommand <|.. NoCommand : 实现
-    LightOnCommand o-- Light
-    GarageDoorOpenCommand o-- Garage
-    RemoteControl o-- ICommand : 持有命令
-    MacroCommand o-- ICommand : 组合多个命令
+    Invoker o-- Command : 持有命令
+    Command <|.. ConcreteCommand : 实现
+    ConcreteCommand o-- Receiver : 绑定接收者
+
+    classDef contextCls fill:#fff3cd,stroke:#856404,stroke-width:2px
+    classDef strategyCls fill:#f3e5ff,stroke:#6b2d91,stroke-width:2px
+    classDef concreteCls fill:#e5faef,stroke:#177048,stroke-width:2px
 ```
 
 ## 源码结构
@@ -110,3 +90,4 @@ remote.PushUndo();    // 再撤销 → 打开
 remote[2] = new OnOffStruct { On = new MacroCommand(partyOn), Off = new MacroCommand(partyOff) };
 remote.PushOn(2);     // 一键开灯+开两个车库门
 ```
+*（内容由AI生成，仅供参考）*

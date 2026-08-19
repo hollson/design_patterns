@@ -1,3 +1,14 @@
+---
+AIGC:
+    Label: "1"
+    ContentProducer: 001191440300708461136T1XGW3
+    ProduceID: 6731a671e9c59b3546535911c94fc1c6_6b15e9bc9bf011f1a98a525400f8a581
+    ReservedCode1: 2JzHgGyjSSdLIhBsGKXaCn7wq6hFWCDK53tL8mcIT3LbNlNp4CAwUijjek8eeKeUY3gboYWCEULzdFQwwxuAKgXs5ggbes9sAsvz8K4RwKWxgaNgxxvE8OWKkw85uMtFGD4Lc5WICgshPV8A6Xm0p3TD0XpLXktb5mYqGFDAgjWMikzR4LAipDixwOM=
+    ContentPropagator: 001191440300708461136T1XGW3
+    PropagateID: 6731a671e9c59b3546535911c94fc1c6_6b15e9bc9bf011f1a98a525400f8a581
+    ReservedCode2: 2JzHgGyjSSdLIhBsGKXaCn7wq6hFWCDK53tL8mcIT3LbNlNp4CAwUijjek8eeKeUY3gboYWCEULzdFQwwxuAKgXs5ggbes9sAsvz8K4RwKWxgaNgxxvE8OWKkw85uMtFGD4Lc5WICgshPV8A6Xm0p3TD0XpLXktb5mYqGFDAgjWMikzR4LAipDixwOM=
+---
+
 # 状态模式（State Pattern）
 
 > **核心思想**：允许对象在其**内部状态改变时改变自身行为**，看起来像对象换了一个类。状态被封装为独立的状态对象，由状态对象自身决定下一步切换到哪个状态。
@@ -18,48 +29,42 @@
 ## 类图
 
 ```mermaid
-%%{init: {"theme": "base", "themeVariables": {"primaryColor": "#61affe", "primaryTextColor": "#1f2430", "primaryBorderColor": "#61affe", "lineColor": "#8a919e", "secondaryColor": "#eaf2fb", "tertiaryColor": "#f5f7fa", "noteBkgColor": "#fff3d6", "noteTextColor": "#1f2430", "fontSize": "14px"}}}%%
+%%{init: {"classDiagram": {"useMarkdownLabels": true}} }%%
 classDiagram
     direction LR
-    class GumballMachine {
-        -IState _state
-        +InsertQuarter()
-        +EjectQuarter()
-        +TurnCrank()
-        +Dispense()
-        +ReleaseBall()
+
+    class Context["🕹️GumballMachine"]:::contextCls{
+        -state:IState
+        +InsertQuarter():void
+        +EjectQuarter():void
+        +TurnCrank():void
+        +Dispense():void
     }
-    class IState {
+    class State["📌IState<<interface>>"]:::strategyCls{
         <<interface>>
-        +InsertQuarter()
-        +EjectQuarter()
-        +TurnCrank()
-        +Dispense()
+        +InsertQuarter():void
+        +EjectQuarter():void
+        +TurnCrank():void
+        +Dispense():void
     }
-    class NoQuarterState {
-        +InsertQuarter() "→ HasQuarterState"
+    class ConcreteStateA["🪙NoQuarterState"]:::concreteCls{
+        +InsertQuarter():void
     }
-    class HasQuarterState {
-        +EjectQuarter() "→ NoQuarterState"
-        +TurnCrank() "→ SoldState / WinnerState"
+    class ConcreteStateB["🍬HasQuarterState"]:::concreteCls{
+        +TurnCrank():void
     }
-    class SoldState {
-        +Dispense() "→ NoQuarterState / SoldOutState"
-    }
-    class SoldOutState {
-        +InsertQuarter() "拒绝"
-    }
-    class WinnerState {
-        +Dispense() "双倍糖果后 → 见底判断"
+    class ConcreteStateC["🚫SoldOutState"]:::concreteCls{
+        +InsertQuarter():void
     }
 
-    GumballMachine o--> IState : 当前状态
-    IState <|.. NoQuarterState : 实现
-    IState <|.. HasQuarterState : 实现
-    IState <|.. SoldState : 实现
-    IState <|.. SoldOutState : 实现
-    IState <|.. WinnerState : 实现
-    note for GumballMachine "所有动作委托给 _state"
+    Context o--> State : 当前状态
+    State <|.. ConcreteStateA : 实现
+    State <|.. ConcreteStateB : 实现
+    State <|.. ConcreteStateC : 实现
+
+    classDef contextCls fill:#fff3cd,stroke:#856404,stroke-width:2px
+    classDef strategyCls fill:#f3e5ff,stroke:#6b2d91,stroke-width:2px
+    classDef concreteCls fill:#e5faef,stroke:#177048,stroke-width:2px
 ```
 
 ## 源码结构
@@ -84,3 +89,4 @@ if (rnd.NextDouble() < 0.1) {
     _machine.SetState(_machine.SoldState);
 }
 ```
+*（内容由AI生成，仅供参考）*
