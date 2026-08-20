@@ -2,7 +2,6 @@
 
 [TOC]
 
-
 ## 一、📖 概述
 
 抽象工厂模式是**创建型设计模式**，提供一个接口用于创建**相关或依赖对象的家族**，而无需指定具体类。
@@ -84,12 +83,12 @@ classDiagram
 
 ### 2.3 关键角色
 
-| 角色 | 说明 |
-|------|------|
-| 抽象工厂 (IIngredientsFactory) | 定义创建一族产品的接口 |
+| 角色                                    | 说明                         |
+| --------------------------------------- | ---------------------------- |
+| 抽象工厂 (IIngredientsFactory)          | 定义创建一族产品的接口       |
 | 具体工厂 (Ny/ChicagoIngredientsFactory) | 实现抽象工厂，创建特定产品族 |
-| 抽象产品 (IDough/ISauce/ICheese) | 定义产品接口 |
-| 具体产品 (ThinCrust/CherryTomato 等) | 实现产品接口 |
+| 抽象产品 (IDough/ISauce/ICheese)        | 定义产品接口                 |
+| 具体产品 (ThinCrust/CherryTomato 等)    | 实现产品接口                 |
 
 <br/>
 
@@ -192,6 +191,7 @@ Console.WriteLine($"纽约风味: {dough.Name} + {sauce.Name} + {cheese.Name}");
 ```
 
 **运行结果**：
+
 ```
 纽约风味: 薄面团 + 樱桃番茄酱 + 马苏里拉
 ```
