@@ -61,7 +61,7 @@
 |----|------|------|------|----------|
 | 13 | [观察者模式 (Observer)](./ObserverPattern) | 🔵 | 定义一对多的依赖关系 | 推模型 vs 拉模型 |
 | 14 | [命令模式 (Command)](./CommandPattern) | 🔵 | 将请求封装为对象 | 撤销、宏命令、队列 |
-| 15 | [迭代器模式 (Iterator)](./IteratorPattern) | 🔵 | 统一遍历集合 | `IEnumerable< T>, yield return` |
+| 15 | [迭代器模式 (Iterator)](./IteratorPattern) | 🔵 | 统一遍历集合 | `IEnumerable<T> yield` |
 | 16 | [中介者模式 (Mediator)](./MediatorPattern) | 🟠 | 集中管理复杂通信 | 星形拓扑取代网状结构 |
 | 17 | [备忘录模式 (Memento)](./MementoPattern) | 🟠 | 捕获对象内部状态以便恢复 | 发起人、备忘录、管理者 |
 | 18 | [状态模式 (State)](./StatePattern) | 🟠 | 行为随状态变化 | 状态机模式 |
