@@ -14,7 +14,7 @@
 
 ## 概述
 
-本仓库提供现代 C# 风格的设计模式实现，每个模式包含：
+本仓库提供现代 `C#` 风格的设计模式实现，每个模式包含：
 
 - **伪代码教程**：循序渐进的讲解
 - **Mermaid 图表**：可视化理解结构
@@ -37,7 +37,7 @@
 | 02 | [工厂方法模式 (Factory Method)](./FactoryMethodPattern) | 🔵 | 由子类决定创建哪种对象 | 工厂方法，延迟创建 |
 | 03 | [抽象工厂模式 (Abstract Factory)](./AbstractFactoryPattern) | 🟠 | 创建一族相关产品的接口 | 产品族一致性 |
 | 04 | [建造者模式 (Builder)](./BuilderPattern) | 🔵 | 分步骤构建复杂对象 | `Director` 控制构建流程 |
-| 05 | [原型模式 (Prototype)](./PrototypePattern) | 🔵 | 通过克隆已有对象创建新对象 | `ICloneable`，深拷贝与浅拷贝 |
+| 05 | [原型模式 (Prototype)](./PrototypePattern) | 🔵 | 克隆已有对象创建新对象 | `ICloneable`，深/浅拷贝 |
 
 ### 结构型模式
 
@@ -75,9 +75,11 @@
 <br/>
 
 ## 快速开始
+**依赖环境**
 - [.NET 11.0 SDK](https://dotnet.microsoft.com/download) 或更高版本
 - 任意 C# IDE（Visual Studio、VS Code + C# 扩展、Rider）
 
+**运行示例**
 ```bash
 # 1. 克隆仓库
 git clone https://github.com/yourusername/design_patterns.git
