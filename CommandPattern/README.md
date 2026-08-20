@@ -1,4 +1,4 @@
-# 命令模式教程
+# 命令模式（Command Pattern）教程
 
 [TOC]
 
@@ -87,6 +87,15 @@ classDiagram
     LightOnCommand o-- Light : 绑定接收者
     GarageDoorOpenCommand o-- Garage : 绑定接收者
 ```
+
+### 2.3 关键角色
+
+| 角色 | 说明 |
+|------|------|
+| **命令接口（Command）** | 定义 `Execute()` 和 `Undo()` 的统一契约 |
+| **具体命令（Concrete Command）** | 绑定接收者，将 `Execute()` 映射到接收者的具体方法 |
+| **接收者（Receiver）** | 实际执行操作的对象 |
+| **调用者（Invoker）** | 持有命令引用并触发执行，不知道具体接收者是谁 |
 
 <br/>
 
@@ -285,3 +294,47 @@ remote.PushOn(1);       // 车库门已打开
 - **适用场景**：需要撤销、排队、日志化或解耦触发与执行的场景
 
 - **注意事项**：简单场景下命令模式会增加不必要的类，需权衡复杂度
+
+---
+
+## 八、🔬 宏命令与撤销
+
+### 8.1 宏命令
+
+宏命令是命令模式的组合扩展，将**多个命令封装为一个复合命令**。调用者无需逐个触发，一次 `Execute()` 即可批量执行。
+
+```csharp
+// 宏命令：组合多个命令
+public class MacroCommand : ICommand
+{
+    private readonly ICommand[] _commands;
+
+    public MacroCommand(ICommand[] commands) => _commands = commands;
+
+    public void Execute()
+    {
+        foreach (var cmd in _commands)
+            cmd.Execute();         // 依次执行所有子命令
+    }
+
+    public void Undo()
+    {
+        for (int i = _commands.Length - 1; i >= 0; i--)
+            _commands[i].Undo();   // 反序撤销所有子命令
+    }
+}
+```
+
+**典型场景**："一键离家"宏命令 → 关灯 + 关空调 + 锁门，三个操作合为一个命令对象。
+
+### 8.2 撤销机制
+
+撤销的核心在于每个命令对象**自行封装反向操作**：
+
+| 命令 | Execute（正向） | Undo（反向） |
+|------|----------------|-------------|
+| `LightOnCommand` | `light.On()` | `light.Off()` |
+| `LightOffCommand` | `light.Off()` | `light.On()` |
+| `MacroCommand` | 遍历执行所有子命令 | **反序**遍历撤销所有子命令 |
+
+调用者只需维护一个 `_undoCommand` 引用，每次执行新命令时覆盖，撤销时调用该命令的 `Undo()`。如需支持多步撤销（Undo/Redo），可将执行历史改为**命令栈**（两个栈分别记录可撤销和可重做的命令）。

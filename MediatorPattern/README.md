@@ -1,4 +1,4 @@
-# 中介者模式教程
+# 中介者模式（Mediator Pattern）教程
 
 [TOC]
 
@@ -77,6 +77,14 @@ classDiagram
     Colleague o-- Mediator
     ManagerMediator o-- Colleague
 ```
+
+### 2.3 关键角色
+
+| 角色 | 说明 |
+|------|------|
+| **中介者（Mediator）** | 定义交互接口，负责协调各同事之间的通信 |
+| **具体中介者（Concrete Mediator）** | 实现交互规则，持有所有同事的引用，根据发送者决定转发目标 |
+| **同事（Colleague）** | 仅持有中介者引用，通过 `Send` 发送消息，通过 `Notify` 接收消息 |
 
 <br/>
 

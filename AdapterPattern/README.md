@@ -1,4 +1,4 @@
-﻿# 适配器模式教程
+﻿# 适配器模式（Adapter Pattern）教程
 
 [TOC]
 
@@ -25,7 +25,7 @@
 
 ### 2.1 整体结构
 
-`mermaid
+```mermaid
 flowchart TD
     A["客户端 Client"] -->|"依赖"| B["目标接口 IDuck"]
     B -->|"实现"| C["适配器 TurkeyAdapter"]
@@ -35,11 +35,11 @@ flowchart TD
     style B fill:#E67E22,color:#fff
     style C fill:#7B68EE,color:#fff
     style D fill:#27AE60,color:#fff
-`
+```
 
 ### 2.2 类关系
 
-`mermaid
+```mermaid
 classDiagram
     class Client {
         +Test(duck: IDuck): void
@@ -62,7 +62,15 @@ classDiagram
     Client ..> IDuck : 面向接口编程
     IDuck <|.. TurkeyAdapter : 实现
     TurkeyAdapter o-- WildTurkey : 组合持有
-`
+```
+
+### 2.3 关键角色
+
+| 角色 | 说明 |
+|------|------|
+| 目标接口（Target） | 客户端期望使用的接口 |
+| 被适配者（Adaptee） | 接口不兼容、需要被适配的已有类 |
+| 适配器（Adapter） | 实现目标接口，内部持有被适配者，完成接口翻译 |
 
 <br/>
 
@@ -72,7 +80,7 @@ classDiagram
 
 ### 3.1 目标接口与被适配者
 
-`csharp
+```csharp
 // 目标接口：客户端期望的鸭子接口
 public interface IDuck
 {
@@ -86,11 +94,11 @@ public class WildTurkey
     public void Gobble() => Console.WriteLine("Gobble gobble");
     public void Fly() => Console.WriteLine("飞100米");
 }
-`
+```
 
 ### 3.2 适配器实现
 
-`csharp
+```csharp
 // 适配器：实现目标接口，内部持有被适配者
 public class TurkeyAdapter : IDuck
 {
@@ -108,11 +116,11 @@ public class TurkeyAdapter : IDuck
             _turkey.Fly();
     }
 }
-`
+```
 
 ### 3.3 客户端使用
 
-`csharp
+```csharp
 // 客户端只认识 IDuck
 static void Tester(IDuck duck)
 {
@@ -124,7 +132,7 @@ static void Tester(IDuck duck)
 var turkey = new WildTurkey();
 var adapter = new TurkeyAdapter(turkey);
 Tester(adapter);   // 火鸡以鸭子身份被使用
-`
+```
 
 <br/>
 
@@ -184,7 +192,21 @@ Tester 方法只依赖 IDuck 接口，不感知 TurkeyAdapter 的存在。运行
 
 <br/>
 
-## 七、📝 总结
+## 七、🔍 类适配器 vs 对象适配器
+
+| 维度 | 类适配器 | 对象适配器 |
+|------|----------|------------|
+| 实现方式 | 继承被适配者（多继承/接口+类） | 组合持有被适配者实例 |
+| 灵活性 | 编译期确定，无法切换被适配者 | 运行时可替换不同的被适配者 |
+| 耦合度 | 与被适配者有继承耦合 | 仅依赖目标接口，更松耦合 |
+| 适用语言 | 适合支持多继承的语言（C++） | 适合单继承语言（C#、Java），更通用 |
+| 覆盖能力 | 可重写被适配者的方法 | 仅能调用被适配者的公开方法 |
+
+> **本教程示例**：`TurkeyAdapter` 采用对象适配器方式——通过构造函数组合持有 `WildTurkey`，这是 C# / Java 中更推荐的做法。
+
+<br/>
+
+## 八、📝 总结
 
 - **核心思想**：将不兼容的接口转换为客户期望的接口，使类可以协同工作
 

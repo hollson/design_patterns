@@ -1,4 +1,4 @@
-# 迭代器模式教程
+# 迭代器模式（Iterator Pattern）教程
 
 [TOC]
 
@@ -82,6 +82,15 @@ classDiagram
     BreakfastMenu ..> BreakfastMenuIterator : 创建
     DinnerMenu ..> DinnerMenuIterator : 创建
 ```
+
+### 2.3 关键角色
+
+| 角色 | 说明 |
+|------|------|
+| **迭代器（Iterator）** | 定义遍历协议：`MoveNext()` 和 `Current` |
+| **聚合（Aggregate）** | 提供创建迭代器的工厂方法 |
+| **具体迭代器** | 实现特定集合的遍历逻辑 |
+| **具体聚合** | 持有数据并返回对应迭代器 |
 
 <br/>
 
@@ -245,3 +254,46 @@ public class Waitress
 - **适用场景**：需要遍历异构集合或支持多种遍历方式
 
 - **注意事项**：C# 已内置 `IEnumerable<T>`，通常直接使用而非自定义迭代器
+
+---
+
+## 八、🔬 C# 内置迭代器
+
+C# 语言本身已深度集成了迭代器模式，日常开发中**无需手动实现自定义迭代器**：
+
+### 8.1 `IEnumerable<T>` / `IEnumerator<T>`
+
+.NET 标准库的迭代器接口，是迭代器模式的标准实现：
+
+| 接口 | 方法 | 说明 |
+|------|------|------|
+| `IEnumerable<T>` | `GetEnumerator()` | 返回迭代器，相当于 `IAggregate.CreateIterator()` |
+| `IEnumerator<T>` | `MoveNext()` | 移动到下一个元素 |
+| `IEnumerator<T>` | `Current` | 获取当前元素 |
+| `IEnumerator<T>` | `Reset()` | 重置到初始位置 |
+
+### 8.2 `yield return` 语法糖
+
+C# 提供 `yield return` 自动生成迭代器，无需手动编写迭代器类：
+
+```csharp
+// 无需自定义迭代器类，编译器自动生成状态机
+public class BreakfastMenu : IEnumerable<Menu>
+{
+    private readonly List<Menu> _items = new();
+
+    public IEnumerator<Menu> GetEnumerator()
+    {
+        for (int i = 0; i < _items.Count; i++)
+            yield return _items[i];  // 编译器生成迭代器状态机
+    }
+
+    IEnumerator IEnumerable.GetEnumerator() => GetEnumerator();
+}
+```
+
+`yield return` 的优势：编译器自动生成实现了 `IEnumerator<T>` 的状态机类，代码量从一个独立迭代器类缩减为一个 `yield` 语句，且支持惰性求值（按需逐个产出元素，不一次性加载全部数据）。
+
+### 8.3 `foreach` 与迭代器
+
+`foreach` 语法在编译时被转换为对 `GetEnumerator()` + `MoveNext()` + `Current` 的调用，本质上就是迭代器模式的消费者。自定义集合只需实现 `IEnumerable<T>`，即可无缝支持 `foreach` 遍历。

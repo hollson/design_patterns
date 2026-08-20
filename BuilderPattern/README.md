@@ -1,4 +1,4 @@
-# 建造者模式教程
+# 建造者模式（Builder Pattern）教程
 
 [TOC]
 
@@ -84,6 +84,15 @@ classDiagram
     IBuilder <|.. WifesHamburgerBuilder
     IBuilder ..> Hamburger : 构建产出
 ```
+
+### 2.3 关键角色
+
+| 角色 | 说明 |
+|------|------|
+| 抽象建造者 Builder | 定义构建步骤的接口 |
+| 具体建造者 ConcreteBuilder | 实现各构建步骤，产出具体产品 |
+| 指挥者 Director | 编排构建步骤的顺序 |
+| 产品 Product | 被构建的复杂对象 |
 
 <br/>
 
@@ -191,9 +200,24 @@ var wifesHamburger = cook.Build();
 
 `IBuilder` 定义了构建步骤的契约：`AddIngredients` → `AddShape` → `AddSize` → `Build`。所有具体建造者遵循同一套接口，保证步骤一致性。
 
-### 4.2 指挥者
+### 4.2 Director 的作用
 
-`Cook` 固定执行构建顺序，不关心每步的具体实现。通过 `ChangeBuilder` 可在运行时切换建造者，实现同一流程产出不同产品。
+Director（指挥者）是建造者模式中容易被忽视的角色，但它是模式的核心价值所在：
+
+- **封装构建算法**：将"先放配料、再定形状、最后定尺寸"的固定顺序封装在 `Cook` 中，客户端和建造者都不需要知道这个顺序
+
+- **隔离变化**：算法骨架不变（开闭原则），变更只发生在具体建造者的产品细节中
+
+- **有无 Director 的区别**：
+
+  | 对比 | 有 Director（经典建造者） | 无 Director（Builder 变体） |
+  |------|--------------------------|---------------------------|
+  | 构建顺序 | 由 Director 统一编排 | 由客户端自行调用 |
+  | 适用场景 | 构建流程固定，多处复用 | 一次性构建，顺序灵活 |
+  | 典型代表 | 本例 `Cook` 类 | .NET 的 `StringBuilder`、LINQ 的 `QueryBuilder` |
+  | 代码耦合 | 客户端只调 `Build()`，不感知步骤 | 客户端需了解每个步骤及顺序 |
+
+- **何时省略 Director**：当构建步骤少、流程不需要复用时，可直接用流式调用（链式 Builder），省略 Director 以减少类数量。
 
 ### 4.3 产品
 

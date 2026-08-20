@@ -1,4 +1,4 @@
-# 访问者模式教程
+# 访问者模式（Visitor Pattern）教程
 
 [TOC]
 
@@ -89,6 +89,15 @@ classDiagram
     Apartment ..> Unit : contains
     Bedroom ..> IUnitVisitor : Accept
 ```
+
+### 2.3 关键角色
+
+| 角色 | 说明 |
+|------|------|
+| **元素接口（Element）** | 声明 `Accept(visitor)` 方法，接受访问者 |
+| **具体元素（Concrete Element）** | 实现 `Accept`，在内部调用 `visitor.VisitXxx(this)` |
+| **访问者接口（Visitor）** | 为每种元素类型声明一个 `Visit` 重载方法 |
+| **具体访问者（Concrete Visitor）** | 实现特定操作逻辑，每个 `Visit` 方法处理一种元素 |
 
 <br/>
 
@@ -270,3 +279,53 @@ visitor.VisitBedroom(this);
 - **适用场景**：元素类型稳定但操作频繁增加的场景
 
 - **注意事项**：新增元素类型成本高，设计时需评估元素类型的稳定性
+
+---
+
+## 八、🔬 双重分派机制详解
+
+双重分派（Double Dispatch）是访问者模式的核心机制，解决了一个关键问题：**如何让执行逻辑同时取决于元素类型和访问者类型**。
+
+### 8.1 单分派 vs 双分派
+
+| 机制 | 决定因素 | C# 实现方式 | 局限 |
+|------|----------|-------------|------|
+| **单分派** | 仅由接收者类型决定 | 普通虚方法 `bedroom.Clean()` | 无法区分"谁来操作" |
+| **双分派** | 接收者类型 + 参数类型共同决定 | `Accept` + 方法重载 | 需要两层间接调用 |
+
+### 8.2 执行流程拆解
+
+以 `apartment.Accept(new Inspector())` 为例：
+
+```
+第一重分派（元素类型决定）：
+  apartment.Accept(visitor)
+    → visitor.VisitApartment(this)   ← 选择 Visit 重载（Bedroom/LivingRoom/Apartment）
+
+第二重分派（访问者类型决定）：
+  visitor.VisitApartment(apartment)
+    → Inspector 的具体实现            ← 选择访问者的实际逻辑（检查/清洁/参观）
+```
+
+### 8.3 为什么需要两重？
+
+```csharp
+// 如果只用一重分派（只有元素类型）：
+public class Bedroom
+{
+    public void Accept(Inspector inspector) { ... }  // 为每个访问者写重载 → 类爆炸
+    public void Accept(Cleaner cleaner) { ... }
+    public void Accept(HomeOwner owner) { ... }
+}
+
+// 访问者模式的解法（双重分派）：
+public class Bedroom
+{
+    public override void Accept(IUnitVisitor visitor)
+        => visitor.VisitBedroom(this);  // 统一入口，由接口分派到具体访问者
+}
+```
+
+**第一重**让元素选择正确的 `Visit` 重载（利用 C# 的**静态类型分派**，`this` 的编译时类型决定调用哪个重载）；**第二重**让访问者在 `VisitXxx` 方法中根据自身类型执行不同逻辑（利用 C# 的**运行时多态**，虚方法分派到 `Inspector` 或 `Cleaner`）。
+
+两重分派组合后，**无需为每对（元素 × 访问者）编写组合类**，新增访问者只需实现 `IUnitVisitor` 接口即可。

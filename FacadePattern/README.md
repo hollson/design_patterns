@@ -1,4 +1,4 @@
-# 外观模式教程
+# 外观模式（Facade Pattern）教程
 
 [TOC]
 
@@ -70,6 +70,14 @@ classDiagram
     HomeTheatreFacade o-- Dvd
     HomeTheatreFacade o-- DvdPlayer
 ```
+
+### 2.3 关键角色
+
+| 角色 | 说明 |
+|------|------|
+| 外观（Facade） | 封装子系统复杂度，提供统一高层接口 |
+| 子系统（Subsystem） | 实际执行业务逻辑的组件 |
+| 客户端（Client） | 只与外观交互，不直接依赖子系统 |
 
 <br/>
 

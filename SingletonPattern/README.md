@@ -1,4 +1,4 @@
-# 单例模式教程
+# 单例模式（Singleton Pattern）教程
 
 [TOC]
 
@@ -58,6 +58,14 @@ classDiagram
 
     Client ..> ChocolateBoiler : 获取唯一实例
 ```
+
+### 2.3 关键角色
+
+| 角色 | 说明 |
+|------|------|
+| 私有构造函数 | 阻止外部通过 new 创建实例 |
+| 静态实例字段 | 保存唯一的实例引用 |
+| 全局访问属性 | 提供外部获取实例的统一入口 |
 
 <br/>
 
@@ -142,9 +150,46 @@ True
 
 构造函数设为 `private`，阻止外部通过 `new` 创建实例，是单例的基石。
 
-### 4.2 Lazy\<T\> 实现
+### 4.2 实现方式对比
 
-`Lazy<T>` 由 CLR 保证线程安全，首次访问时才执行构造函数，既避免双重检查锁定的复杂性，又实现延迟加载。
+.NET 中单例有多种实现方式，各有取舍：
+
+| 方式 | 代码复杂度 | 线程安全 | 延迟初始化 | 推荐场景 |
+|------|-----------|---------|-----------|---------|
+| `Lazy<T>`（本例） | 低 | CLR 保证 | 首次访问时创建 | **首选方案**，简洁安全 |
+| 双重检查锁定 (DCL) | 中 | 需手动加锁 | 首次访问时创建 | 需要兼容老版本 .NET |
+| 饿汉式（静态字段） | 低 | 类加载即创建 | 不支持 | 启动就需要的实例 |
+| `Lazy<T>` + `LazyThreadSafetyMode.ExecutionAndPublication` | 低 | 默认即此模式 | 首次访问时创建 | `Lazy<T>` 默认行为，无需额外配置 |
+
+**双重检查锁定的传统写法**（了解即可，实际开发优先用 `Lazy<T>`）：
+
+```csharp
+public class Singleton
+{
+    private static volatile Singleton _instance;
+    private static readonly object _lock = new object();
+
+    public static Singleton Instance
+    {
+        get
+        {
+            if (_instance == null)                // 第一次检查（无锁，快速路径）
+            {
+                lock (_lock)
+                {
+                    if (_instance == null)        // 第二次检查（有锁，防止并发重复创建）
+                        _instance = new Singleton();
+                }
+            }
+            return _instance;
+        }
+    }
+
+    private Singleton() { }
+}
+```
+
+**为什么推荐 `Lazy<T>`**：一行代码实现线程安全的延迟初始化，无需手动管理锁、`volatile` 关键字和双重检查，CLR 内部已做优化。
 
 ### 4.3 全局访问点
 

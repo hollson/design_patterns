@@ -1,4 +1,4 @@
-# 组合模式教程
+# 组合模式（Composite Pattern）教程
 
 [TOC]
 
@@ -30,7 +30,7 @@ flowchart TD
     A["客户端"] -->|"调用统一接口"| B["MenuComponent 抽象组件"]
     B -->|"继承"| C["Menu 组合节点"]
     B -->|"继承"| D["MenuItem 叶子节点"]
-    C -->|"包含 0..*" E["子 MenuComponent"]
+    C -->|"包含多个"| E["子 MenuComponent"]
     E -->|"递归指向"| B
 
     style A fill:#4A90D9,color:#fff
@@ -68,6 +68,14 @@ classDiagram
     MenuComponent <|-- MenuItem
     Menu o-- "0..*" MenuComponent
 ```
+
+### 2.3 关键角色
+
+| 角色 | 说明 |
+|------|------|
+| 抽象组件（Component） | 定义叶子和容器的统一接口 |
+| 组合节点（Composite） | 包含子组件，实现容器操作（Add/Remove/遍历） |
+| 叶子节点（Leaf） | 不含子节点，实现具体业务操作 |
 
 <br/>
 
@@ -230,7 +238,21 @@ allMenus.Print();  // 一次调用，递归输出整棵树
 
 <br/>
 
-## 七、📝 总结
+## 七、🔍 透明式 vs 安全式
+
+| 维度 | 透明式（本教程） | 安全式 |
+|------|------------------|--------|
+| 统一接口 | Component 声明所有方法（Add/Remove/GetChild/Print） | Component 仅声明叶子操作，容器方法仅在 Composite 中定义 |
+| 叶子节点 | 被迫看到 Add/Remove 等无意义方法，通常抛出异常 | 不感知容器操作，接口更干净 |
+| 客户端体验 | 完全透明，无需判断叶子或容器 | 需要区分类型才能调用容器方法 |
+| 类型安全 | 叶子调用 Add 可能运行时才报错 | 编译期即可捕获类型错误 |
+| 适用场景 | 客户端主要做统一遍历操作（如 Print） | 叶子和容器的方法差异大，且客户端可能需要特化操作 |
+
+> **本教程示例**：采用透明式——`MenuComponent` 统一声明 `Add/Remove/GetChild/Print`，`MenuItem` 中不支持的方法由基类抛出 `NotImplementedException`。
+
+<br/>
+
+## 八、📝 总结
 
 - **核心思想**：将对象组合成树形结构，使叶子和容器的使用具有一致性
 
