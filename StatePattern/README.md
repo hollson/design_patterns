@@ -1,14 +1,3 @@
----
-AIGC:
-    Label: "1"
-    ContentProducer: 001191440300708461136T1XGW3
-    ProduceID: 6731a671e9c59b3546535911c94fc1c6_6b15e9bc9bf011f1a98a525400f8a581
-    ReservedCode1: 2JzHgGyjSSdLIhBsGKXaCn7wq6hFWCDK53tL8mcIT3LbNlNp4CAwUijjek8eeKeUY3gboYWCEULzdFQwwxuAKgXs5ggbes9sAsvz8K4RwKWxgaNgxxvE8OWKkw85uMtFGD4Lc5WICgshPV8A6Xm0p3TD0XpLXktb5mYqGFDAgjWMikzR4LAipDixwOM=
-    ContentPropagator: 001191440300708461136T1XGW3
-    PropagateID: 6731a671e9c59b3546535911c94fc1c6_6b15e9bc9bf011f1a98a525400f8a581
-    ReservedCode2: 2JzHgGyjSSdLIhBsGKXaCn7wq6hFWCDK53tL8mcIT3LbNlNp4CAwUijjek8eeKeUY3gboYWCEULzdFQwwxuAKgXs5ggbes9sAsvz8K4RwKWxgaNgxxvE8OWKkw85uMtFGD4Lc5WICgshPV8A6Xm0p3TD0XpLXktb5mYqGFDAgjWMikzR4LAipDixwOM=
----
-
 # 状态模式（State Pattern）
 
 > **核心思想**：允许对象在其**内部状态改变时改变自身行为**，看起来像对象换了一个类。状态被封装为独立的状态对象，由状态对象自身决定下一步切换到哪个状态。
@@ -89,4 +78,3 @@ if (rnd.NextDouble() < 0.1) {
     _machine.SetState(_machine.SoldState);
 }
 ```
-*（内容由AI生成，仅供参考）*

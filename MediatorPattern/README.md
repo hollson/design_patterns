@@ -1,14 +1,3 @@
----
-AIGC:
-    Label: "1"
-    ContentProducer: 001191440300708461136T1XGW3
-    ProduceID: 6731a671e9c59b3546535911c94fc1c6_679f40d99bf011f18cca525400e6dd8f
-    ReservedCode1: iSJrrh2lEgy6cYplouv5KIJwFXiETGUNRqETfTm5S5XRm7MuCjklnhWC8hY/x0ZYQEqeiT5qleustmYnh+Jsm26p8yo/ohCKUJBr5ZCId7P0m/rfVXuH8KljbXGkW8e91YYHKBDPWsGNHLyKBy/1pldlGpy4x78NGFljcgGDKLwM6VcH6WUPAKGxW30=
-    ContentPropagator: 001191440300708461136T1XGW3
-    PropagateID: 6731a671e9c59b3546535911c94fc1c6_679f40d99bf011f18cca525400e6dd8f
-    ReservedCode2: iSJrrh2lEgy6cYplouv5KIJwFXiETGUNRqETfTm5S5XRm7MuCjklnhWC8hY/x0ZYQEqeiT5qleustmYnh+Jsm26p8yo/ohCKUJBr5ZCId7P0m/rfVXuH8KljbXGkW8e91YYHKBDPWsGNHLyKBy/1pldlGpy4x78NGFljcgGDKLwM6VcH6WUPAKGxW30=
----
-
 # 中介者模式（Mediator Pattern）
 
 > **核心思想**：定义一个**中介对象**来封装一组对象之间的交互。各同事对象不再直接互相引用，而是通过中介者转发消息，从而**降低对象间的耦合**，使系统易于维护和扩展。
@@ -81,4 +70,3 @@ else if (colleague == Programmer)
 else
     Customer.Notify(message);        // 测试员 → 客户
 ```
-*（内容由AI生成，仅供参考）*

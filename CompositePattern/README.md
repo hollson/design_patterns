@@ -1,14 +1,3 @@
----
-AIGC:
-    Label: "1"
-    ContentProducer: 001191440300708461136T1XGW3
-    ProduceID: 6731a671e9c59b3546535911c94fc1c6_638578ab9bf011f19467525400287e28
-    ReservedCode1: Ors/dB64OfGLAO2WClVTkVq+ufrALv/Ab2mbp2V9aDNiABpL8zeAGoVHVxQqF3SRPSdguDpWAgYVqEJEbkoH3q0uj6inDJgrptP982YXPfIu9ADPKD72LJ50YZN3KVyAbxtEX6iaNfo36GAiisPS94sXslX4U8zItGqsCqTKoYTGX5PtNU7VLXoW2Pc=
-    ContentPropagator: 001191440300708461136T1XGW3
-    PropagateID: 6731a671e9c59b3546535911c94fc1c6_638578ab9bf011f19467525400287e28
-    ReservedCode2: Ors/dB64OfGLAO2WClVTkVq+ufrALv/Ab2mbp2V9aDNiABpL8zeAGoVHVxQqF3SRPSdguDpWAgYVqEJEbkoH3q0uj6inDJgrptP982YXPfIu9ADPKD72LJ50YZN3KVyAbxtEX6iaNfo36GAiisPS94sXslX4U8zItGqsCqTKoYTGX5PtNU7VLXoW2Pc=
----
-
 # 组合模式（Composite Pattern）
 
 > **核心思想**：将对象组合成**树形结构**以表示"部分-整体"的层次关系，使得**单个对象（叶子）和组合对象（容器）的使用具有一致性**——客户端可以用同一套接口操作它们。
@@ -74,4 +63,3 @@ dinner.Add(dessert);          // 容器内再嵌容器
 menu.Add(breakfast); menu.Add(lunch); menu.Add(dinner);
 menu.Print();                 // 一次调用，递归输出整棵树
 ```
-*（内容由AI生成，仅供参考）*

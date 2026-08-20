@@ -1,14 +1,3 @@
----
-AIGC:
-    Label: "1"
-    ContentProducer: 001191440300708461136T1XGW3
-    ProduceID: 6731a671e9c59b3546535911c94fc1c6_685bd7ca9bf011f19bec525400826444
-    ReservedCode1: miPZwnxfLZA1/Hol55wcKUsn58rKS2HDgZoq0dapFGj5y6XhJAQrrpZRukMOLYIC15PPldSQUsH+zh/G267/Zml9H0XXcEvm01qPZhTewSMI4gRbAO39g49sJi1RDa1uxvAgXZsxNTMcTlXI6WZHyhdknphBv+Lk5h/uo0OfERa9P1Fw4mvaQSQB/+4=
-    ContentPropagator: 001191440300708461136T1XGW3
-    PropagateID: 6731a671e9c59b3546535911c94fc1c6_685bd7ca9bf011f19bec525400826444
-    ReservedCode2: miPZwnxfLZA1/Hol55wcKUsn58rKS2HDgZoq0dapFGj5y6XhJAQrrpZRukMOLYIC15PPldSQUsH+zh/G267/Zml9H0XXcEvm01qPZhTewSMI4gRbAO39g49sJi1RDa1uxvAgXZsxNTMcTlXI6WZHyhdknphBv+Lk5h/uo0OfERa9P1Fw4mvaQSQB/+4=
----
-
 # 观察者模式（Observer Pattern）
 
 > **核心思想**：定义对象间**一对多**的依赖关系，当被观察者（主题）状态改变时，**所有已注册的观察者自动收到通知**并作出更新。本示例基于 .NET 内置的 `IObservable<T>` / `IObserver<T>` 实现。
@@ -75,4 +64,3 @@ provider.WeatherConditions(33.5, 0.04, 1.7);   // 观察者1 收到
 observer2.Subscribe(provider);                 // 观察者2 订阅
 provider.WeatherConditions(37.5, 0.07, 1.2);   // 两个观察者都收到
 ```
-*（内容由AI生成，仅供参考）*

@@ -1,14 +1,3 @@
----
-AIGC:
-    Label: "1"
-    ContentProducer: 001191440300708461136T1XGW3
-    ProduceID: 6731a671e9c59b3546535911c94fc1c6_60ac5db49bf011f1a98a525400f8a581
-    ReservedCode1: H7+91ottKpQiWtZHjFUJtg21h/9fdyCgJQJ/1yvuWRFiwztxeor1+tW9f+2o1uV5g74q7A33HhYvDD+Z/tynqRRSUzLaCGbQO2yJi59pjHHFAYYWQZi8hP8aS9RJuPf2Kc2wWBhr4xzECHj44yYUdliiQo2zx1OVh/ytur0fssmhd2ENhWaMhPyH2PE=
-    ContentPropagator: 001191440300708461136T1XGW3
-    PropagateID: 6731a671e9c59b3546535911c94fc1c6_60ac5db49bf011f1a98a525400f8a581
-    ReservedCode2: H7+91ottKpQiWtZHjFUJtg21h/9fdyCgJQJ/1yvuWRFiwztxeor1+tW9f+2o1uV5g74q7A33HhYvDD+Z/tynqRRSUzLaCGbQO2yJi59pjHHFAYYWQZi8hP8aS9RJuPf2Kc2wWBhr4xzECHj44yYUdliiQo2zx1OVh/ytur0fssmhd2ENhWaMhPyH2PE=
----
-
 # 桥接模式（Bridge Pattern）
 
 > **核心思想**：将"抽象部分"与"实现部分"分离，使两者可以独立变化。桥接模式用**组合**代替继承，在抽象层持有实现层的接口引用，从而把"抽象"和"实现"两个维度解耦，各自扩展互不影响。
@@ -80,4 +69,3 @@ IWeapon sword = new Sword(new FlyingEnchantment());     // 剑 × 飞行
 IWeapon hammer = new Hammer(new SoulEatingEnchantment()); // 锤 × 噬魂
 sword.Wield();  // The sword is wielded. → The item begins to glow faintly.
 ```
-*（内容由AI生成，仅供参考）*

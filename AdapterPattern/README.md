@@ -1,14 +1,3 @@
----
-AIGC:
-    Label: "1"
-    ContentProducer: 001191440300708461136T1XGW3
-    ProduceID: 6731a671e9c59b3546535911c94fc1c6_5fdd54819bf011f19bec525400826444
-    ReservedCode1: GEmf9tvBmTytP2zBGaVKND9a9lkAaQBT44ErVxxhT2LUnrU31K2/h9VJfUJgw/ThmR3zxoTRRwqok2JGXEurFT77t2rHLtpfxWttt/6UaZ4WeBIYztBxkNx+6L/A2AkHa3yuj58NJ00dq1oQAA4VGgIFEFIlvjV/nDI12FseB8zpO9JzNKAHDRWC9YY=
-    ContentPropagator: 001191440300708461136T1XGW3
-    PropagateID: 6731a671e9c59b3546535911c94fc1c6_5fdd54819bf011f19bec525400826444
-    ReservedCode2: GEmf9tvBmTytP2zBGaVKND9a9lkAaQBT44ErVxxhT2LUnrU31K2/h9VJfUJgw/ThmR3zxoTRRwqok2JGXEurFT77t2rHLtpfxWttt/6UaZ4WeBIYztBxkNx+6L/A2AkHa3yuj58NJ00dq1oQAA4VGgIFEFIlvjV/nDI12FseB8zpO9JzNKAHDRWC9YY=
----
-
 # 适配器模式（Adapter Pattern）
 
 > **核心思想**：将一个类的接口转换成客户期望的另一个接口，使原本接口不兼容、无法一起工作的类可以协同工作。适配器像"转接头"，不改变原对象本身，只做接口翻译。
@@ -80,4 +69,3 @@ static void Tester(IDuck duck) {
     duck.Quack();  // 实际是火鸡 Gobble
 }
 ```
-*（内容由AI生成，仅供参考）*

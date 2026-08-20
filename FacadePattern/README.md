@@ -1,14 +1,3 @@
----
-AIGC:
-    Label: "1"
-    ContentProducer: 001191440300708461136T1XGW3
-    ProduceID: 6731a671e9c59b3546535911c94fc1c6_64d924de9bf011f1a98a525400f8a581
-    ReservedCode1: xi21/AwkZH9g/syIrWRAhR7tWShBb62EIiO5AEPtJxUZqHrxSOB0NHYnuqJUq4J7MVopErXw5+JjC1KFkF0fn9ByAlUPlq8O2hjub67pFbdCqJ6TARWf5OoAdFIbXYVJlAxNx++Zgr6d4wKxzGspvoJhq2hX5FO+j9cKjAcCn26bQyCsqQqKRPyqvLg=
-    ContentPropagator: 001191440300708461136T1XGW3
-    PropagateID: 6731a671e9c59b3546535911c94fc1c6_64d924de9bf011f1a98a525400f8a581
-    ReservedCode2: xi21/AwkZH9g/syIrWRAhR7tWShBb62EIiO5AEPtJxUZqHrxSOB0NHYnuqJUq4J7MVopErXw5+JjC1KFkF0fn9ByAlUPlq8O2hjub67pFbdCqJ6TARWf5OoAdFIbXYVJlAxNx++Zgr6d4wKxzGspvoJhq2hX5FO+j9cKjAcCn26bQyCsqQqKRPyqvLg=
----
-
 # 外观模式（Facade Pattern）
 
 > **核心思想**：为子系统中的一组接口提供一个**统一的高层接口**，让客户端用一个简单入口完成复杂的子系统调用，降低客户端与子系统的耦合。
@@ -74,4 +63,3 @@ homeTheater.WatchMovie();  // 内部自动完成 调光→开机→插碟→播�
 homeTheater.Pause();
 homeTheater.Resume();
 ```
-*（内容由AI生成，仅供参考）*

@@ -1,14 +1,3 @@
----
-AIGC:
-    Label: "1"
-    ContentProducer: 001191440300708461136T1XGW3
-    ProduceID: 6731a671e9c59b3546535911c94fc1c6_62cdba669bf011f19bec525400826444
-    ReservedCode1: 9F/KDbmmZFhYcNjlQP1yzf9oW6AYQKUCppwWwh+NjM1sXw+QD7921kyy8DG/4/dRJTVkMrsCRoBKvRfDZdh/jjrKtx2KwQg6uGjUzT1zVSJYfz3WxFb9+vXS/FFyjEY3gktcW4rPLxchUxsx8ECNSPuzStHThtYK20AX7n0cyiYBqURpnPYTRs559HU=
-    ContentPropagator: 001191440300708461136T1XGW3
-    PropagateID: 6731a671e9c59b3546535911c94fc1c6_62cdba669bf011f19bec525400826444
-    ReservedCode2: 9F/KDbmmZFhYcNjlQP1yzf9oW6AYQKUCppwWwh+NjM1sXw+QD7921kyy8DG/4/dRJTVkMrsCRoBKvRfDZdh/jjrKtx2KwQg6uGjUzT1zVSJYfz3WxFb9+vXS/FFyjEY3gktcW4rPLxchUxsx8ECNSPuzStHThtYK20AX7n0cyiYBqURpnPYTRs559HU=
----
-
 # 命令模式（Command Pattern）
 
 > **核心思想**：将"请求"封装为对象，从而可以用不同的请求对调用方进行参数化，并支持请求的**排队、日志记录与撤销**。命令把"动作的发起者"与"动作的执行者"彻底解耦。
@@ -90,4 +79,3 @@ remote.PushUndo();    // 再撤销 → 打开
 remote[2] = new OnOffStruct { On = new MacroCommand(partyOn), Off = new MacroCommand(partyOff) };
 remote.PushOn(2);     // 一键开灯+开两个车库门
 ```
-*（内容由AI生成，仅供参考）*

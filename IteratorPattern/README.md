@@ -1,14 +1,3 @@
----
-AIGC:
-    Label: "1"
-    ContentProducer: 001191440300708461136T1XGW3
-    ProduceID: 6731a671e9c59b3546535911c94fc1c6_66f3a3909bf011f19467525400287e28
-    ReservedCode1: riqKE1md9gdAPATDSYjzg5fgnG0wixbgPi09xJGmGYN3UPm9JAptvbYfJbtOyHQULmsHHGO1xZRpHBOXa5B/MiZCL6DO3qk+FWV2b27lTza0aqJlwfLA/mdwSPzD/0OvrVSsW4HBYQ8eXj7UTVkNM+YowcsFWAz5Wt75WLzxUCG/FaZ09eYub+IL5cQ=
-    ContentPropagator: 001191440300708461136T1XGW3
-    PropagateID: 6731a671e9c59b3546535911c94fc1c6_66f3a3909bf011f19467525400287e28
-    ReservedCode2: riqKE1md9gdAPATDSYjzg5fgnG0wixbgPi09xJGmGYN3UPm9JAptvbYfJbtOyHQULmsHHGO1xZRpHBOXa5B/MiZCL6DO3qk+FWV2b27lTza0aqJlwfLA/mdwSPzD/0OvrVSsW4HBYQ8eXj7UTVkNM+YowcsFWAz5Wt75WLzxUCG/FaZ09eYub+IL5cQ=
----
-
 # 迭代器模式（Iterator Pattern）
 
 > **核心思想**：提供一种方法**顺序访问**一个聚合对象中的各个元素，而**不暴露其内部表示**。客户端通过统一的迭代器接口遍历集合，不关心底层是数组、链表还是其他结构。
@@ -84,4 +73,3 @@ private void PrintMenu(IEnumerable iter) {
     }
 }
 ```
-*（内容由AI生成，仅供参考）*

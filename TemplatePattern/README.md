@@ -1,14 +1,3 @@
----
-AIGC:
-    Label: "1"
-    ContentProducer: 001191440300708461136T1XGW3
-    ProduceID: 6731a671e9c59b3546535911c94fc1c6_6c6718e69bf011f19467525400287e28
-    ReservedCode1: BtZthtlytgBmnjVoNwL7i3i0FpV6Nd4KiDGF3wgF4txf76o3Z7HM8ZudgQne4LXAxdWF4TmYxRE17imrrtQatD8f6MMhn/GUre78koejPcz7pL3VuuHt7e5H6cVtguKOwhkXlluFB0KMUWeWvtYkITCGNfIZ9diAgROSm1gYXkyBzija9UXVH3Xt9d4=
-    ContentPropagator: 001191440300708461136T1XGW3
-    PropagateID: 6731a671e9c59b3546535911c94fc1c6_6c6718e69bf011f19467525400287e28
-    ReservedCode2: BtZthtlytgBmnjVoNwL7i3i0FpV6Nd4KiDGF3wgF4txf76o3Z7HM8ZudgQne4LXAxdWF4TmYxRE17imrrtQatD8f6MMhn/GUre78koejPcz7pL3VuuHt7e5H6cVtguKOwhkXlluFB0KMUWeWvtYkITCGNfIZ9diAgROSm1gYXkyBzija9UXVH3Xt9d4=
----
-
 # 模板方法模式（Template Method Pattern）
 
 > **核心思想**：在一个方法中定义算法的**骨架**，将一些步骤**延迟到子类实现**。父类固定流程、子类定制细节，从而在不改变算法结构的前提下复用公共逻辑。
@@ -78,4 +67,3 @@ public void Prepare() {
     AddCondiment();   // 子类定制：加糖奶 / 加柠檬
 }
 ```
-*（内容由AI生成，仅供参考）*

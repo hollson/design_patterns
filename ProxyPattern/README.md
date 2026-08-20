@@ -1,14 +1,3 @@
----
-AIGC:
-    Label: "1"
-    ContentProducer: 001191440300708461136T1XGW3
-    ProduceID: 6731a671e9c59b3546535911c94fc1c6_69c507639bf011f1a98a525400f8a581
-    ReservedCode1: /jxiln/q0s3erBA7NhjIgTlSYE1p62WYVqVONnWeK2UqXLkIsPeNlP4iHLw4Q23jwGVlKPHw07gaaEXbN3EINuRkcKeB2Ckjl9YdzAapszaku2mVfCjGV27RqCy99pzz++9TAuTyYJ9JY1VHvDcgQFoIJiBZ7U0YCVzqfth9rJxSZHQMEE552fo1E8w=
-    ContentPropagator: 001191440300708461136T1XGW3
-    PropagateID: 6731a671e9c59b3546535911c94fc1c6_69c507639bf011f1a98a525400f8a581
-    ReservedCode2: /jxiln/q0s3erBA7NhjIgTlSYE1p62WYVqVONnWeK2UqXLkIsPeNlP4iHLw4Q23jwGVlKPHw07gaaEXbN3EINuRkcKeB2Ckjl9YdzAapszaku2mVfCjGV27RqCy99pzz++9TAuTyYJ9JY1VHvDcgQFoIJiBZ7U0YCVzqfth9rJxSZHQMEE552fo1E8w=
----
-
 # 代理模式（Proxy Pattern）
 
 > **核心思想**：为真实对象提供一个**代理**，由代理控制对真实对象的访问。代理与真实对象实现**相同接口**，可在访问前后附加额外逻辑（如延迟加载、访问控制、日志等），对客户端透明。
@@ -78,4 +67,3 @@ public void display() {
     _realImage.display();
 }
 ```
-*（内容由AI生成，仅供参考）*

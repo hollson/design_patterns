@@ -1,14 +1,3 @@
----
-AIGC:
-    Label: "1"
-    ContentProducer: 001191440300708461136T1XGW3
-    ProduceID: 6731a671e9c59b3546535911c94fc1c6_616a63739bf011f18cca525400e6dd8f
-    ReservedCode1: xap0ZpdHy8Yn5igcEEYEf4OlePX+NbZqm/gYpM0eTmrMtvvoJumE2cIZqEDiO4dvcB5yYzaJQGOY2laFMNxmDJJInQzslktDuLjuJg1vXJbJmtsJULp04BE73NCp6ZQVOfEtwHlGHJZ0CPAZ4B6/f1D4OPhDoKj0FIh6LO5uUgDfX75YxleBnotfRBE=
-    ContentPropagator: 001191440300708461136T1XGW3
-    PropagateID: 6731a671e9c59b3546535911c94fc1c6_616a63739bf011f18cca525400e6dd8f
-    ReservedCode2: xap0ZpdHy8Yn5igcEEYEf4OlePX+NbZqm/gYpM0eTmrMtvvoJumE2cIZqEDiO4dvcB5yYzaJQGOY2laFMNxmDJJInQzslktDuLjuJg1vXJbJmtsJULp04BE73NCp6ZQVOfEtwHlGHJZ0CPAZ4B6/f1D4OPhDoKj0FIh6LO5uUgDfX75YxleBnotfRBE=
----
-
 # 建造者模式（Builder Pattern）
 
 > **核心思想**：将一个复杂对象的**构建过程**与它的**表示**分离，使同样的构建步骤可以组装出不同的产品。由"指挥者"控制构建步骤的顺序，"建造者"负责各步骤的具体实现。
@@ -83,4 +72,3 @@ var myHamburger = cook.Build();                 // Ingredients: Bread Meat Tomat
 cook.ChangeBuilder(new WifesHamburgerBuilder());
 var wifesHamburger = cook.Build();              // Ingredients: Bread Salad, Size: 6, Shape: Cuboid
 ```
-*（内容由AI生成，仅供参考）*

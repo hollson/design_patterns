@@ -1,14 +1,3 @@
----
-AIGC:
-    Label: "1"
-    ContentProducer: 001191440300708461136T1XGW3
-    ProduceID: 6731a671e9c59b3546535911c94fc1c6_622eddc29bf011f19467525400287e28
-    ReservedCode1: 7no85TtRJoWqDG6vGowZInbr3jTVRqnyxFMbQygpjhCa1vUm9jei6JfqsUFfhiw2dUI5PCD0hMQbwd9LINUnEi0s2frtA6KrfFoy1z73BjRTEQ5dmQ6jDMI6b+xvWUM1X+JiDZl7SkQ+4BAPl26YWCVfB0+XS7XpL4EnXdZBQ8t8t6uquAZdKrvxvp8=
-    ContentPropagator: 001191440300708461136T1XGW3
-    PropagateID: 6731a671e9c59b3546535911c94fc1c6_622eddc29bf011f19467525400287e28
-    ReservedCode2: 7no85TtRJoWqDG6vGowZInbr3jTVRqnyxFMbQygpjhCa1vUm9jei6JfqsUFfhiw2dUI5PCD0hMQbwd9LINUnEi0s2frtA6KrfFoy1z73BjRTEQ5dmQ6jDMI6b+xvWUM1X+JiDZl7SkQ+4BAPl26YWCVfB0+XS7XpL4EnXdZBQ8t8t6uquAZdKrvxvp8=
----
-
 # 职责链模式（Chain of Responsibility Pattern）
 
 > **核心思想**：将请求的发送者与接收者解耦，使**多个对象都有机会处理同一个请求**。这些处理对象被连成一条链，请求沿链传递，直到某个处理器能处理它为止。发送者无需知道具体由谁处理。
@@ -74,4 +63,3 @@ additionHandler.AddChain(subtractionHandler);   // 链：加法 → 减法 → �
 
 var divisionResult = additionHandler.Handle(numbers, "divide"); // 无人处理 → null
 ```
-*（内容由AI生成，仅供参考）*

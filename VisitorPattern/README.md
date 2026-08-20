@@ -1,14 +1,3 @@
----
-AIGC:
-    Label: "1"
-    ContentProducer: 001191440300708461136T1XGW3
-    ProduceID: 6731a671e9c59b3546535911c94fc1c6_6d1362fc9bf011f1a98a525400f8a581
-    ReservedCode1: SGM8mMQwYlsFHF0zKBu7GLm36tACE/wwHYF2xMeDO4mKsE6P2eSQi/sQ6cAckFlWAwL0Lb9dH4DTckCe/f25JoiUEape0n5kLXEt7Jeug2WWuy/fby7mVPRoaS4d009oYYXoRQKBIwAGk9kZFdqcEhKUGaGoP/NE/9SnB5S+bECLCjWA6uLGRNZ+8w4=
-    ContentPropagator: 001191440300708461136T1XGW3
-    PropagateID: 6731a671e9c59b3546535911c94fc1c6_6d1362fc9bf011f1a98a525400f8a581
-    ReservedCode2: SGM8mMQwYlsFHF0zKBu7GLm36tACE/wwHYF2xMeDO4mKsE6P2eSQi/sQ6cAckFlWAwL0Lb9dH4DTckCe/f25JoiUEape0n5kLXEt7Jeug2WWuy/fby7mVPRoaS4d009oYYXoRQKBIwAGk9kZFdqcEhKUGaGoP/NE/9SnB5S+bECLCjWA6uLGRNZ+8w4=
----
-
 # 访问者模式（Visitor Pattern）
 
 > **核心思想**：**将算法与对象结构分离**。在不修改现有类的前提下，为其增加新的操作——通过"访问者"在运行时对结构中每个元素执行相应操作（典型实现为**双重分派**）。
@@ -19,13 +8,13 @@ AIGC:
 
 ## 主要参与者
 
-| 角色 | 本示例类 | 职责 |
-| --- | --- | --- |
-| 元素 Element | `Unit` | 抽象元素，定义 `Accept(IUnitVisitor)` |
-| 具体元素 | `Apartment` / `Studio` / `Bedroom` / `LivingRoom` | 在 `Accept` 中调用 `visitor.Visit(this)`（第一重分派） |
-| 访问者 Visitor | `IUnitVisitor` | 为每种具体元素声明一个 `Visit` 重载 |
-| 具体访问者 | `Inspector` / `Cleaner` / `Owner` | 实现针对各房间的操作（第二重分派） |
-| 对象结构 | `CompositeUnit` | 组合并遍历子单元 |
+| 角色           | 本示例类                                          | 职责                                                   |
+| -------------- | ------------------------------------------------- | ------------------------------------------------------ |
+| 元素 Element   | `Unit`                                            | 抽象元素，定义 `Accept(IUnitVisitor)`                  |
+| 具体元素       | `Apartment` / `Studio` / `Bedroom` / `LivingRoom` | 在 `Accept` 中调用 `visitor.Visit(this)`（第一重分派） |
+| 访问者 Visitor | `IUnitVisitor`                                    | 为每种具体元素声明一个 `Visit` 重载                    |
+| 具体访问者     | `Inspector` / `Cleaner` / `Owner`                 | 实现针对各房间的操作（第二重分派）                     |
+| 对象结构       | `CompositeUnit`                                   | 组合并遍历子单元                                       |
 
 ## 类图
 
@@ -78,4 +67,3 @@ public override void Accept(IUnitVisitor visitor) {
     visitor.VisitBedroom(this);   // 双重分派：元素类型 → 访问者重载
 }
 ```
-*（内容由AI生成，仅供参考）*

@@ -1,14 +1,3 @@
----
-AIGC:
-    Label: "1"
-    ContentProducer: 001191440300708461136T1XGW3
-    ProduceID: 6731a671e9c59b3546535911c94fc1c6_664862029bf011f1a98a525400f8a581
-    ReservedCode1: /CsjluIacC3WqszPUTUVUUb0bIpTRPV99cfqNPYi3byraX93fcGL2+4Nid2DFGZJW9WOveeIcP2DNQPkgxubmWRX/isFjd5aAaEGu1V/iy0LkH6PfOYbV8LjGN6AqDW5y0VqmaEK9EcrJmoFF1eXwnE2GhOR6PIjCxli57yqWiVln6Wq6fOrsUygmFQ=
-    ContentPropagator: 001191440300708461136T1XGW3
-    PropagateID: 6731a671e9c59b3546535911c94fc1c6_664862029bf011f1a98a525400f8a581
-    ReservedCode2: /CsjluIacC3WqszPUTUVUUb0bIpTRPV99cfqNPYi3byraX93fcGL2+4Nid2DFGZJW9WOveeIcP2DNQPkgxubmWRX/isFjd5aAaEGu1V/iy0LkH6PfOYbV8LjGN6AqDW5y0VqmaEK9EcrJmoFF1eXwnE2GhOR6PIjCxli57yqWiVln6Wq6fOrsUygmFQ=
----
-
 # 享元模式（Flyweight Pattern）
 
 > **核心思想**：运用**共享技术**有效支持大量细粒度对象的复用。将对象的**内部状态**（可共享、不变）与**外部状态**（随场景变化）分离，通过工厂缓存共享实例，减少内存消耗与对象创建开销。
@@ -71,4 +60,3 @@ takeAwayOrders.Add(factory.MakeBeverage(BeverageType.BubbleMilk)); // 第1次创
 takeAwayOrders.Add(factory.MakeBeverage(BeverageType.BubbleMilk)); // 复用同一实例！
 // ... 6 杯订单，实际仅创建 4 个实例
 ```
-*（内容由AI生成，仅供参考）*

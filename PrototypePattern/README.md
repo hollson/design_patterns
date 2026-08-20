@@ -1,14 +1,3 @@
----
-AIGC:
-    Label: "1"
-    ContentProducer: 001191440300708461136T1XGW3
-    ProduceID: 6731a671e9c59b3546535911c94fc1c6_690b6a569bf011f18cca525400e6dd8f
-    ReservedCode1: kUqdj4NOD8w2WoZUpN63aDIbVmQ6VijoDTyM1YTSHd8a5pChM39paK4dDsnY54W1aagUK7VJMwG+eAvdhyG/i7QuDUGJy+lDsl4azj50RMth09yOWc6+R6dUCUBdzxE9cpHVtAki67M8gULGMlilOmk1zrzKaLhL6qrSmnt4h8GMvXPNKuSW5sbEtVo=
-    ContentPropagator: 001191440300708461136T1XGW3
-    PropagateID: 6731a671e9c59b3546535911c94fc1c6_690b6a569bf011f18cca525400e6dd8f
-    ReservedCode2: kUqdj4NOD8w2WoZUpN63aDIbVmQ6VijoDTyM1YTSHd8a5pChM39paK4dDsnY54W1aagUK7VJMwG+eAvdhyG/i7QuDUGJy+lDsl4azj50RMth09yOWc6+R6dUCUBdzxE9cpHVtAki67M8gULGMlilOmk1zrzKaLhL6qrSmnt4h8GMvXPNKuSW5sbEtVo=
----
-
 # 原型模式（Prototype Pattern）
 
 > **核心思想**：用**原型实例**指定创建对象的种类，并通过**拷贝**这些原型来创建新对象，从而避免重复执行昂贵的初始化过程。本示例基于 .NET 的 `ICloneable` 接口实现。
@@ -76,4 +65,3 @@ IFigure clonedFigure = (IFigure)figure.Clone();   // 克隆新对象
 figure.GetInfo();      // Rectangle height 40 and width 30
 clonedFigure.GetInfo();// 副本状态一致
 ```
-*（内容由AI生成，仅供参考）*

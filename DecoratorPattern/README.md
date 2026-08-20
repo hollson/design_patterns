@@ -1,14 +1,3 @@
----
-AIGC:
-    Label: "1"
-    ContentProducer: 001191440300708461136T1XGW3
-    ProduceID: 6731a671e9c59b3546535911c94fc1c6_642396e49bf011f18cca525400e6dd8f
-    ReservedCode1: HxoIb7b7inOzXzSgPkZwLgnZ2OIaT0wINGMbAuyzsD0Obd6PEb6BFFCWhoFDamPoZvvyuZA/HOEYt208P7jKE5KEleIHYYX+AdlEklg88plD82IGkZnWWfKdK5EkcJ6c5iY/7cFeAchUK2+ihuXENoaA6o1wE/FW9tw+t2Opr0XedNF4wDw3B09Dp0Q=
-    ContentPropagator: 001191440300708461136T1XGW3
-    PropagateID: 6731a671e9c59b3546535911c94fc1c6_642396e49bf011f18cca525400e6dd8f
-    ReservedCode2: HxoIb7b7inOzXzSgPkZwLgnZ2OIaT0wINGMbAuyzsD0Obd6PEb6BFFCWhoFDamPoZvvyuZA/HOEYt208P7jKE5KEleIHYYX+AdlEklg88plD82IGkZnWWfKdK5EkcJ6c5iY/7cFeAchUK2+ihuXENoaA6o1wE/FW9tw+t2Opr0XedNF4wDw3B09Dp0Q=
----
-
 # 装饰器模式（Decorator Pattern）
 
 > **核心思想**：**动态地**为对象添加额外职责，比继承更灵活。装饰器包装被装饰对象，并与其保持**相同的抽象类型**，因此可以像剥洋葱一样层层叠加，且对客户端透明。
@@ -80,4 +69,3 @@ beverage2 = new MochaCondiment(beverage2);   // 再+摩卡 → "Double Mocha Dar
 beverage2 = new WhipCondiment(beverage2);    // +奶泡
 Console.WriteLine(beverage2.Description + " $" + beverage2.Cost()); // Mocha Mocha Whip Dark Roast $1.99
 ```
-*（内容由AI生成，仅供参考）*

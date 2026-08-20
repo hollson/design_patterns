@@ -1,14 +1,3 @@
----
-AIGC:
-    Label: "1"
-    ContentProducer: 001191440300708461136T1XGW3
-    ProduceID: 6731a671e9c59b3546535911c94fc1c6_6593b06e9bf011f19bec525400826444
-    ReservedCode1: EuPo1B9L+hzgQNqB6+TlU+PIypDTA/2ogHyM5UVbqqhrJDi58HhrGAtm1DyYI1SpjEhszgb4VekSUF42nfa1qEXPMUw2bRrPNwnN+IZk2+l5b+9kLsExgKaBt4aQO7gQQsLG+9AU8Q+VxUHgr0Z8svO9kwAuR+hOhd0CFdxS9TGcI2ADvLhGA4TXy3o=
-    ContentPropagator: 001191440300708461136T1XGW3
-    PropagateID: 6731a671e9c59b3546535911c94fc1c6_6593b06e9bf011f19bec525400826444
-    ReservedCode2: EuPo1B9L+hzgQNqB6+TlU+PIypDTA/2ogHyM5UVbqqhrJDi58HhrGAtm1DyYI1SpjEhszgb4VekSUF42nfa1qEXPMUw2bRrPNwnN+IZk2+l5b+9kLsExgKaBt4aQO7gQQsLG+9AU8Q+VxUHgr0Z8svO9kwAuR+hOhd0CFdxS9TGcI2ADvLhGA4TXy3o=
----
-
 # 工厂模式（Factory Pattern）
 
 > **核心思想**：把"创建对象"的职责从客户端抽离，交给专门的工厂。本示例同时演示了两种工厂模式：
@@ -91,4 +80,3 @@ yankees.Order(PizzaType.Cheese);   // 纽约风味芝士披萨，蓝色盒
 var cubs = new ChicagoPizzaFactory();
 cubs.Order(PizzaType.Clam);        // 芝加哥风味蛤蜊披萨，红色盒
 ```
-*（内容由AI生成，仅供参考）*

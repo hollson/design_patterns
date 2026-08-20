@@ -1,14 +1,3 @@
----
-AIGC:
-    Label: "1"
-    ContentProducer: 001191440300708461136T1XGW3
-    ProduceID: 6731a671e9c59b3546535911c94fc1c6_6a66e7dc9bf011f19467525400287e28
-    ReservedCode1: zjxGkDRUH4BZTng/PYmBxkElBZXSX/mmYfTT939Ot5c50aRYtZC18Hc8d747Kjwh/crH4DEEP0ZfTVYH8vkjUBCaH/mdGdVqssy8wYZNdf7mtph1UemL9/L+CG2WFDzsdAfTBXcC0ExB6RGxQNavBrfIXdoLx4vjHKfsURUx4lFBwWm1w+wKBcAD4yc=
-    ContentPropagator: 001191440300708461136T1XGW3
-    PropagateID: 6731a671e9c59b3546535911c94fc1c6_6a66e7dc9bf011f19467525400287e28
-    ReservedCode2: zjxGkDRUH4BZTng/PYmBxkElBZXSX/mmYfTT939Ot5c50aRYtZC18Hc8d747Kjwh/crH4DEEP0ZfTVYH8vkjUBCaH/mdGdVqssy8wYZNdf7mtph1UemL9/L+CG2WFDzsdAfTBXcC0ExB6RGxQNavBrfIXdoLx4vjHKfsURUx4lFBwWm1w+wKBcAD4yc=
----
-
 # 单例模式（Singleton Pattern）
 
 > **核心思想**：保证一个类**只有一个实例**，并提供一个**全局访问点**。本示例用 .NET 的 `Lazy<T>` 实现线程安全且高性能的单例。
@@ -68,4 +57,3 @@ boiler1.Fill();                       // 填充
 boiler2.Boil();                       // 同一实例 → 煮沸
 Console.WriteLine(boiler1 == boiler2); // True
 ```
-*（内容由AI生成，仅供参考）*
