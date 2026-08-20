@@ -1,67 +1,227 @@
-# 原型模式（Prototype Pattern）
+# 原型模式教程
 
-> **核心思想**：用**原型实例**指定创建对象的种类，并通过**拷贝**这些原型来创建新对象，从而避免重复执行昂贵的初始化过程。本示例基于 .NET 的 `ICloneable` 接口实现。
+[TOC]
 
-## 解决什么问题
+## 一、📖 概述
 
-当创建对象的成本较高（或构造参数复杂）时，每次都 `new` 并重新初始化不划算。原型模式以"已有实例"为模板，通过 `Clone()` 复制出新实例。本示例中 `Circle` / `Rectangle` 只需实现 `Clone()` 返回同类型新对象，客户端统一通过 `IFigure` 接口克隆，无需关心具体类型。
+原型模式是**创建型设计模式**，用**原型实例**指定创建对象的种类，并通过**拷贝**这些原型来创建新对象，从而避免重复执行昂贵的初始化过程。
 
-## 主要参与者
+核心思想：以已有对象为模板，通过 `Clone()` 复制出新实例，客户端无需关心具体类型。
 
-| 角色 | 本示例类 | 职责 |
-| --- | --- | --- |
-| 原型 Prototype | `IFigure` | 继承 `ICloneable`，定义 `GetInfo()` 与 `Clone()` |
-| 具体原型 ConcretePrototype | `Circle` / `Rectangle` | 实现克隆逻辑，复制自身状态 |
-| 客户端 Client | `Program` | 通过原型实例的 `Clone()` 创建新对象 |
+### 核心特性
 
-## 类图
+- **高效创建**：避免重复执行复杂的构造和初始化过程
+
+- **类型统一**：客户端通过接口克隆，无需关心具体实现类
+
+- **状态复制**：克隆副本与原型保持一致的内部状态
+
+- **符合开闭原则**：新增原型类型无需修改客户端代码
+
+<br/>
+
+## 二、📐 结构图解
+
+### 2.1 整体结构
 
 ```mermaid
-%%{init: {"classDiagram": {"useMarkdownLabels": true}} }%%
-classDiagram
-    direction LR
+flowchart TD
+    A["客户端"] -->|"依赖"| B["原型接口 ICloneable"]
+    B -->|"实现"| C["具体原型 Circle"]
+    B -->|"实现"| D["具体原型 Rectangle"]
+    C -->|"Clone()"| E["克隆副本 Circle"]
+    D -->|"Clone()"| F["克隆副本 Rectangle"]
 
-    class Prototype["🧬IFigure<<interface>>"]:::strategyCls{
-        <<interface>>
-        +Clone():object
-        +GetInfo():void
-    }
-    class ConcretePrototype["🔵Circle"]:::concreteCls{
-        -radius:int
-        +Clone():object
-        +GetInfo():void
-    }
-    class ConcretePrototype2["🔶Rectangle"]:::concreteCls{
-        -width:int
-        -height:int
-        +Clone():object
-        +GetInfo():void
-    }
-    class Client["🧑‍💻Program"]:::contextCls{
-        +Main()
-    }
-
-    Prototype <|.. ConcretePrototype : 实现
-    Prototype <|.. ConcretePrototype2 : 实现
-    Client ..> Prototype : 克隆原型
-
-    classDef contextCls fill:#fff3cd,stroke:#856404,stroke-width:2px
-    classDef strategyCls fill:#f3e5ff,stroke:#6b2d91,stroke-width:2px
-    classDef concreteCls fill:#e5faef,stroke:#177048,stroke-width:2px
+    style A fill:#4A90D9,color:#fff
+    style B fill:#E67E22,color:#fff
+    style C fill:#7B68EE,color:#fff
+    style D fill:#7B68EE,color:#fff
+    style E fill:#27AE60,color:#fff
+    style F fill:#27AE60,color:#fff
 ```
 
-## 源码结构
+### 2.2 类关系
 
-目录下源码文件与职责对应：
+```mermaid
+classDiagram
+    class IFigure {
+        <<interface>>
+        +Clone() object
+        +GetInfo() void
+    }
+    class Circle {
+        -radius int
+        +Clone() object
+        +GetInfo() void
+    }
+    class Rectangle {
+        -width int
+        -height int
+        +Clone() object
+        +GetInfo() void
+    }
+    class Client {
+        +Main() void
+    }
 
-- **IFigure.cs**：原型接口，继承 `ICloneable` 并声明 `GetInfo()`。
-- **Circle.cs / Rectangle.cs**：具体原型，`Clone()` 读取自身字段构造并返回同类型新对象，实现浅拷贝（本示例字段均为值类型）。
-- **Program.cs**：先创建 `Rectangle(30, 40)` 并克隆，再创建 `Circle(30)` 并克隆，通过 `GetInfo()` 验证克隆副本状态一致。
+    IFigure <|.. Circle
+    IFigure <|.. Rectangle
+    Client ..> IFigure : 克隆原型
+```
+
+<br/>
+
+## 三、💻 代码实现
+
+以图形克隆为例：`Circle` 和 `Rectangle` 实现 `IFigure` 接口，通过 `Clone()` 复制自身状态。
+
+### 3.1 原型接口
 
 ```csharp
-// Program.cs 核心代码
-IFigure figure = new Rectangle(30, 40);
-IFigure clonedFigure = (IFigure)figure.Clone();   // 克隆新对象
-figure.GetInfo();      // Rectangle height 40 and width 30
-clonedFigure.GetInfo();// 副本状态一致
+// 原型接口，继承 ICloneable
+public interface IFigure : ICloneable
+{
+    void GetInfo();
+}
 ```
+
+### 3.2 具体原型
+
+```csharp
+public class Circle : IFigure
+{
+    private int _radius;
+
+    public Circle(int radius) => _radius = radius;
+
+    public object Clone()
+    {
+        return new Circle(_radius); // 复制自身状态
+    }
+
+    public void GetInfo()
+    {
+        Console.WriteLine($"Circle radius {_radius}");
+    }
+}
+
+public class Rectangle : IFigure
+{
+    private int _width;
+    private int _height;
+
+    public Rectangle(int width, int height)
+    {
+        _width = width;
+        _height = height;
+    }
+
+    public object Clone()
+    {
+        return new Rectangle(_width, _height); // 复制自身状态
+    }
+
+    public void GetInfo()
+    {
+        Console.WriteLine($"Rectangle height {_height} and width {_width}");
+    }
+}
+```
+
+### 3.3 客户端使用
+
+```csharp
+public class Program
+{
+    public static void Main()
+    {
+        IFigure figure = new Rectangle(30, 40);
+        IFigure clonedFigure = (IFigure)figure.Clone(); // 克隆
+
+        figure.GetInfo();       // Rectangle height 40 and width 30
+        clonedFigure.GetInfo(); // 副本状态一致
+
+        IFigure circle = new Circle(30);
+        IFigure clonedCircle = (IFigure)circle.Clone(); // 克隆
+
+        circle.GetInfo();       // Circle radius 30
+        clonedCircle.GetInfo(); // 副本状态一致
+    }
+}
+```
+
+**运行结果**：
+```
+Rectangle height 40 and width 30
+Rectangle height 40 and width 30
+Circle radius 30
+Circle radius 30
+```
+
+<br/>
+
+## 四、🔍 核心解析
+
+### 4.1 原型接口
+
+`IFigure` 继承 `ICloneable`，声明 `Clone()` 和 `GetInfo()` 方法。客户端仅依赖此接口进行克隆操作。
+
+### 4.2 克隆实现
+
+每个具体原型在 `Clone()` 中读取自身字段，构造并返回同类型新对象。本示例为浅拷贝，适用于值类型字段场景。
+
+### 4.3 客户端调用
+
+客户端通过原型实例的 `Clone()` 创建新对象，无需 `new` 和复杂初始化，统一通过接口操作。
+
+<br/>
+
+## 五、🎯 应用场景
+
+### 5.1 适用场景
+
+- 创建对象成本较高，构造参数复杂
+
+- 需要大量相似对象，且状态差异在运行时确定
+
+- 对象创建过程涉及资源密集操作（数据库、网络等）
+
+### 5.2 实际案例
+
+- **.NET `ICloneable`**：框架内置原型克隆接口
+
+- **缓存对象池**：通过克隆已有实例快速创建新对象
+
+- **文档编辑器**：克隆已有图形元素生成新元素
+
+<br/>
+
+## 六、⚖️ 优缺点分析
+
+### 6.1 优点
+
+- **高效**：避免重复执行复杂的构造和初始化
+
+- **解耦**：客户端不依赖具体类，只依赖原型接口
+
+- **灵活**：运行时动态决定克隆哪种对象
+
+### 6.2 缺点
+
+- **浅拷贝风险**：引用类型字段可能共享同一实例，需注意深拷贝
+
+- **类数量增多**：每新增一种原型需实现对应的 `Clone()` 方法
+
+- **实现复杂**：包含循环引用的对象克隆逻辑较复杂
+
+<br/>
+
+## 七、📝 总结
+
+- **核心思想**：通过拷贝已有原型实例创建新对象，避免昂贵的初始化
+
+- **关键角色**：原型接口、具体原型、客户端
+
+- **适用场景**：创建成本高、需要大量相似对象、运行时动态决定类型
+
+- **注意事项**：关注浅拷贝与深拷贝的区别，引用类型字段需谨慎处理

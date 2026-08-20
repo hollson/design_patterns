@@ -1,71 +1,228 @@
-# 装饰器模式（Decorator Pattern）
+# 装饰器模式教程
 
-> **核心思想**：**动态地**为对象添加额外职责，比继承更灵活。装饰器包装被装饰对象，并与其保持**相同的抽象类型**，因此可以像剥洋葱一样层层叠加，且对客户端透明。
+[TOC]
 
-## 解决什么问题
 
-星巴克咖啡的"饮品"与"调料"是多维组合：浓缩/深焙/混合咖啡 × 摩卡/奶泡……若用继承穷举所有组合，会产生类爆炸。装饰器模式把每种调料做成装饰器，包装在饮品外层，通过递归叠加计算价格与描述，新增调料只需新增一个装饰器类，无需改动饮品类，符合**开闭原则**。
+## 一、📖 概述
 
-## 主要参与者
+装饰器模式是**结构型设计模式**，**动态地**为对象添加额外职责，比继承更灵活。装饰器包装被装饰对象，并与其保持**相同的抽象类型**，因此可以像剥洋葱一样层层叠加，且对客户端透明。
 
-| 角色 | 本示例类 | 职责 |
-| --- | --- | --- |
-| 抽象组件 Component | `Beverage` | 定义 `Description` 与 `Cost()` |
-| 具体组件 ConcreteComponent | `Espresso` / `DarkRoast` / `HouseBlend` | 基础饮品，被装饰的对象 |
-| 抽象装饰器 Decorator | `CondimentDecorator` | 继承 `Beverage`，是"调料"的抽象父类 |
-| 具体装饰器 | `MochaCondiment` / `WhipCondiment` | 包装一个 `Beverage`，增强描述与价格 |
+核心思想：将附加职责封装到独立的装饰器类中，通过组合而非继承实现功能扩展，运行时自由组合行为。
 
-## 类图
+### 核心特性
+
+- **动态扩展**：运行时为对象添加职责，无需修改原始类
+
+- **透明叠加**：装饰器与被装饰者共享相同接口，客户端无感知
+
+- **符合开闭原则**：新增功能只需新增装饰器类，无需改动已有代码
+
+- **避免类爆炸**：多维组合不再需要为每种组合创建子类
+
+<br/>
+
+## 二、📐 结构图解
+
+### 2.1 装饰流程
 
 ```mermaid
-%%{init: {"classDiagram": {"useMarkdownLabels": true}} }%%
-classDiagram
-    direction LR
+flowchart TD
+    A["客户端请求"] --> B{"需要额外功能 ?"}
+    B -- 是 --> C["创建装饰器"]
+    C --> D["包装被装饰对象"]
+    D --> E["返回增强后的对象"]
+    B -- 否 --> F["直接使用原对象"]
+    E --> G["调用功能"]
+    F --> G
 
-    class Component["☕Beverage<<abstract>>"]:::strategyCls{
+    style A fill:#4A90D9,color:#fff
+    style B fill:#E67E22,color:#fff
+    style C fill:#7B68EE,color:#fff
+    style D fill:#7B68EE,color:#fff
+    style E fill:#27AE60,color:#fff
+    style F fill:#27AE60,color:#fff
+    style G fill:#27AE60,color:#fff
+```
+
+### 2.2 类关系
+
+```mermaid
+classDiagram
+    class Beverage {
         <<abstract>>
         +Description:string
         +Cost():double
     }
-    class ConcreteComponent["🥤DarkRoast"]:::concreteCls{
+    class DarkRoast {
         +Description:string
         +Cost():double
     }
-    class Decorator["🎨CondimentDecorator<<abstract>>"]:::strategyCls{
+    class Espresso {
+        +Description:string
+        +Cost():double
+    }
+    class CondimentDecorator {
         <<abstract>>
         +Description:string
     }
-    class ConcreteDecorator["🧀MochaCondiment"]:::concreteCls{
+    class MochaCondiment {
+        -beverage:Beverage
+        +Description:string
+        +Cost():double
+    }
+    class WhipCondiment {
         -beverage:Beverage
         +Description:string
         +Cost():double
     }
 
-    Component <|-- ConcreteComponent : 继承
-    Component <|-- Decorator : 继承
-    Decorator <|-- ConcreteDecorator : 继承
-    Decorator o-- Component : 包装被装饰对象
-
-    classDef contextCls fill:#fff3cd,stroke:#856404,stroke-width:2px
-    classDef strategyCls fill:#f3e5ff,stroke:#6b2d91,stroke-width:2px
-    classDef concreteCls fill:#e5faef,stroke:#177048,stroke-width:2px
+    Beverage <|-- DarkRoast
+    Beverage <|-- Espresso
+    Beverage <|-- CondimentDecorator
+    CondimentDecorator <|-- MochaCondiment
+    CondimentDecorator <|-- WhipCondiment
+    CondimentDecorator o-- Beverage : 包装
 ```
 
-## 源码结构
+<br/>
 
-目录下源码文件与职责对应：
+## 三、💻 代码实现
 
-- **Beverage.cs**：抽象组件，定义 `Description` 与 `Cost()`。
-- **Espresso.cs / DarkRoast.cs / HouseBlend.cs**：三种基础饮品，固定价格。
-- **CondimentDecorator.cs**：抽象装饰器，确保装饰器与被装饰者是同一抽象类型（都继承 `Beverage`），这样外层还能再套装饰器。
-- **MochaCondiment.cs / WhipCondiment.cs**：具体装饰器，主构造函数注入 `Beverage`；`Cost()` 在基础价格上累加调料费，`Description` 自动追加调料名（相同调料第二次时显示 "Double"）。
-- **Program.cs**：演示"深焙 + 双层摩卡 + 奶泡"与"混合 + 摩卡 + 奶泡"的叠加组合，价格与描述逐层递归计算。
+以星巴克咖啡为例：基础饮品（浓缩、深焙、混合）通过装饰器叠加调料（摩卡、奶泡），动态计算价格与描述。
+
+### 3.1 抽象组件
 
 ```csharp
-// Program.cs 核心代码
-Beverage beverage2 = new DarkRoast();
-beverage2 = new MochaCondiment(beverage2);   // +摩卡
-beverage2 = new MochaCondiment(beverage2);   // 再+摩卡 → "Double Mocha Dark Roast"
-beverage2 = new WhipCondiment(beverage2);    // +奶泡
-Console.WriteLine(beverage2.Description + " $" + beverage2.Cost()); // Mocha Mocha Whip Dark Roast $1.99
+// 抽象饮品
+public abstract class Beverage
+{
+    public virtual string Description { get; set; } = "未知饮品";
+    public abstract double Cost();
+}
 ```
+
+### 3.2 具体组件
+
+```csharp
+// 基础饮品
+public class DarkRoast : Beverage
+{
+    public override string Description => "深焙咖啡";
+    public override double Cost() => 0.99;
+}
+
+public class Espresso : Beverage
+{
+    public override string Description => "浓缩咖啡";
+    public override double Cost() => 1.99;
+}
+```
+
+### 3.3 装饰器
+
+```csharp
+// 抽象装饰器：继承Beverage，持有Beverage引用
+public abstract class CondimentDecorator : Beverage
+{
+    protected Beverage _beverage;
+}
+
+// 摩卡装饰器
+public class MochaCondiment : CondimentDecorator
+{
+    public MochaCondiment(Beverage beverage) => _beverage = beverage;
+
+    public override string Description => _beverage.Description + " + 摩卡";
+    public override double Cost() => _beverage.Cost() + 0.20;
+}
+
+// 奶泡装饰器
+public class WhipCondiment : CondimentDecorator
+{
+    public WhipCondiment(Beverage beverage) => _beverage = beverage;
+
+    public override string Description => _beverage.Description + " + 奶泡";
+    public override double Cost() => _beverage.Cost() + 0.15;
+}
+```
+
+### 3.4 客户端使用
+
+```csharp
+// 深焙 + 双层摩卡 + 奶泡
+Beverage order = new DarkRoast();
+order = new MochaCondiment(order);    // +摩卡
+order = new MochaCondiment(order);    // +摩卡（双份）
+order = new WhipCondiment(order);     // +奶泡
+
+Console.WriteLine($"{order.Description} ¥{order.Cost():F2}");
+// 输出: 深焙咖啡 + 摩卡 + 摩卡 + 奶泡 ¥1.54
+```
+
+<br/>
+
+## 四、🔍 核心解析
+
+### 4.1 统一类型
+
+`CondimentDecorator` 继承 `Beverage`，使装饰器与被装饰者保持相同抽象类型。这样外层还可以继续套装饰器，实现无限叠加。
+
+### 4.2 委托转发
+
+具体装饰器持有 `_beverage` 引用，`Cost()` 先递归调用内部对象的价格，再加上自身费用。描述同理逐层拼接。
+
+### 4.3 动态组合
+
+客户端在运行时决定叠加哪些装饰器，顺序可变，数量不限。相比继承的编译期固定组合，装饰器提供了极大的灵活性。
+
+<br/>
+
+## 五、🎯 应用场景
+
+### 5.1 适用场景
+
+- 需要动态、透明地为对象添加职责
+
+- 通过继承扩展会导致类数量爆炸性增长
+
+- 功能可以自由组合，且组合方式在运行时确定
+
+### 5.2 实际案例
+
+- **Java I/O流**：`BufferedInputStream` 装饰 `FileInputStream`，层层包装增加缓冲、加密等功能
+
+- **中间件管道**：ASP.NET Core 的中间件链本质是装饰器模式的变体
+
+- **UI组件增强**：为控件动态添加滚动条、边框、阴影等视觉装饰
+
+<br/>
+
+## 六、⚖️ 优缺点分析
+
+### 6.1 优点
+
+- **灵活扩展**：运行时动态添加职责，无需修改已有类
+
+- **符合开闭原则**：新增装饰器不影响现有代码
+
+- **细粒度组合**：可按需叠加功能，避免创建大量子类
+
+### 6.2 缺点
+
+- **小对象增多**：大量装饰器会产生许多小对象，增加理解成本
+
+- **排序敏感**：装饰器的叠加顺序可能影响最终结果
+
+- **移除困难**：从嵌套的装饰器链中移除特定装饰器不够直观
+
+<br/>
+
+## 七、📝 总结
+
+- **核心思想**：动态地为对象添加额外职责，比继承更灵活
+
+- **关键角色**：抽象组件、具体组件、抽象装饰器、具体装饰器
+
+- **适用场景**：功能需要自由组合，且组合方式在运行时确定
+
+- **注意事项**：装饰器数量过多会增加复杂度，应适度使用

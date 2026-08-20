@@ -1,69 +1,272 @@
-# 访问者模式（Visitor Pattern）
+# 访问者模式教程
 
-> **核心思想**：**将算法与对象结构分离**。在不修改现有类的前提下，为其增加新的操作——通过"访问者"在运行时对结构中每个元素执行相应操作（典型实现为**双重分派**）。
+[TOC]
 
-## 解决什么问题
 
-房间（卧室/客厅/公寓）需要被不同角色"访问"（检查员/清洁工/业主），若给每个房间类都加一套访问逻辑，类会膨胀且难以扩展新角色。访问者模式让元素类只暴露 `Accept(IUnitVisitor)`，具体操作集中在访问者中；新增一种访问者即可为所有房间增加一种全新操作，而**无需改动元素类**，符合**开闭原则**。
+## 一、📖 概述
 
-## 主要参与者
+访问者模式是**行为型设计模式**，在**不修改现有类的前提下**为其增加新的操作，通过"访问者"在运行时对结构中每个元素执行相应操作。
 
-| 角色           | 本示例类                                          | 职责                                                   |
-| -------------- | ------------------------------------------------- | ------------------------------------------------------ |
-| 元素 Element   | `Unit`                                            | 抽象元素，定义 `Accept(IUnitVisitor)`                  |
-| 具体元素       | `Apartment` / `Studio` / `Bedroom` / `LivingRoom` | 在 `Accept` 中调用 `visitor.Visit(this)`（第一重分派） |
-| 访问者 Visitor | `IUnitVisitor`                                    | 为每种具体元素声明一个 `Visit` 重载                    |
-| 具体访问者     | `Inspector` / `Cleaner` / `Owner`                 | 实现针对各房间的操作（第二重分派）                     |
-| 对象结构       | `CompositeUnit`                                   | 组合并遍历子单元                                       |
+核心思想：将算法与对象结构分离，元素类只暴露 `Accept` 方法，具体操作集中在访问者中。典型实现为**双重分派**——元素接受访问者时调用访问者的对应重载方法。
 
-## 类图
+### 核心特性
+
+- **开闭原则**：新增访问者无需修改元素类
+
+- **关注点分离**：每种操作封装在独立的访问者中
+
+- **双重分派**：运行时根据元素类型和访问者类型共同决定执行逻辑
+
+- **结构稳定**：适用于元素类型不常变化，但操作频繁增加的场景
+
+<br/>
+
+## 二、📐 结构图解
+
+### 2.1 整体流程
 
 ```mermaid
-%%{init: {"classDiagram": {"useMarkdownLabels": true}} }%%
-classDiagram
-    direction LR
+flowchart TD
+    A["客户端"] -->|"调用"| B["元素.接受(访问者)"]
+    B -->|"第一重分派"| C{"元素类型 ?"}
+    C -->|"卧室"| D["访问者.访问卧室(this)"]
+    C -->|"客厅"| E["访问者.访问客厅(this)"]
+    C -->|"公寓"| F["访问者.访问公寓(this)"]
+    D -->|"第二重分派"| G{"访问者类型 ?"}
+    G -->|"检查员"| H["执行检查"]
+    G -->|"清洁工"| I["执行清洁"]
+    G -->|"业主"| J["执行参观"]
 
-    class Visitor["🧑‍🔬IUnitVisitor<<interface>>"]:::strategyCls{
-        <<interface>>
-        +VisitApartment(apartment:Apartment):void
-        +VisitBedroom(bedroom:Bedroom):void
-    }
-    class ConcreteVisitor["🧹Cleaner"]:::concreteCls{
-        +VisitApartment(apartment:Apartment):void
-        +VisitBedroom(bedroom:Bedroom):void
-    }
-    class Element["🏠Unit<<abstract>>"]:::strategyCls{
-        <<abstract>>
-        +Accept(visitor:IUnitVisitor):void
-    }
-    class ConcreteElement["🛏️Bedroom"]:::concreteCls{
-        +Accept(visitor:IUnitVisitor):void
-    }
-
-    Visitor <|.. ConcreteVisitor : 实现
-    Element <|-- ConcreteElement : 继承
-    ConcreteElement ..> Visitor : 调用 visitor.Visit(this)
-    ConcreteVisitor ..> ConcreteElement : 访问具体元素
-
-    classDef contextCls fill:#fff3cd,stroke:#856404,stroke-width:2px
-    classDef strategyCls fill:#f3e5ff,stroke:#6b2d91,stroke-width:2px
-    classDef concreteCls fill:#e5faef,stroke:#177048,stroke-width:2px
+    style A fill:#4A90D9,color:#fff
+    style C fill:#E67E22,color:#fff
+    style D fill:#7B68EE,color:#fff
+    style E fill:#7B68EE,color:#fff
+    style F fill:#7B68EE,color:#fff
+    style H fill:#27AE60,color:#fff
+    style I fill:#27AE60,color:#fff
+    style J fill:#27AE60,color:#fff
 ```
 
-## 源码结构
+### 2.2 类关系
 
-目录下源码文件与职责对应：
+```mermaid
+classDiagram
+    class IUnitVisitor {
+        <<interface>>
+        +VisitApartment(apartment: Apartment): void
+        +VisitBedroom(bedroom: Bedroom): void
+        +VisitLivingRoom(livingRoom: LivingRoom): void
+    }
+    class Inspector {
+        +VisitApartment(apartment: Apartment): void
+        +VisitBedroom(bedroom: Bedroom): void
+        +VisitLivingRoom(livingRoom: LivingRoom): void
+    }
+    class Cleaner {
+        +VisitApartment(apartment: Apartment): void
+        +VisitBedroom(bedroom: Bedroom): void
+        +VisitLivingRoom(livingRoom: LivingRoom): void
+    }
+    class Unit {
+        <<abstract>>
+        +Accept(visitor: IUnitVisitor): void
+    }
+    class Bedroom {
+        +Accept(visitor: IUnitVisitor): void
+    }
+    class LivingRoom {
+        +Accept(visitor: IUnitVisitor): void
+    }
+    class Apartment {
+        +Accept(visitor: IUnitVisitor): void
+    }
 
-- **Unit.cs**：抽象元素，声明 `Accept(IUnitVisitor visitor)`。
-- **Apartment.cs / Studio.cs / Bedroom.cs / LivingRoom.cs**：具体元素，`Accept` 中调用 `visitor.VisitApartment(this)` 等——运行时由实际元素类型决定调用哪个重载（**第一重分派**）。
-- **IUnitVisitor.cs**：访问者接口，为每个具体元素类型声明独立的 `Visit` 重载。
-- **Inspector.cs / Cleaner.cs / Owner.cs**：具体访问者，分别针对每种房间实现"检查 / 清扫 / 参观"操作（**第二重分派**）。
-- **CompositeUnit.cs**：组合结构，`Accept` 时先访问自身子节点，支持对整棵树应用访问者。
-- **Program.cs**：构建房间树，依次让 `Inspector` / `Cleaner` / `Owner` 访问，观察每种访问者在不修改房间类的前提下为全部房间添加了独立操作。
+    IUnitVisitor <|.. Inspector
+    IUnitVisitor <|.. Cleaner
+    Unit <|-- Bedroom
+    Unit <|-- LivingRoom
+    Unit <|-- Apartment
+    Apartment ..> Unit : contains
+    Bedroom ..> IUnitVisitor : Accept
+```
+
+<br/>
+
+## 三、💻 代码实现
+
+以房间检查/清洁/参观为例：卧室、客厅、公寓等房间类型接受不同角色的访问。
+
+### 3.1 元素接口与具体元素
 
 ```csharp
-// Bedroom.Accept() 核心代码
-public override void Accept(IUnitVisitor visitor) {
-    visitor.VisitBedroom(this);   // 双重分派：元素类型 → 访问者重载
+// 抽象元素
+public abstract class Unit
+{
+    public abstract void Accept(IUnitVisitor visitor);
+}
+
+// 具体元素：卧室
+public class Bedroom : Unit
+{
+    public override void Accept(IUnitVisitor visitor)
+    {
+        visitor.VisitBedroom(this);  // 第一重分派
+    }
+}
+
+// 具体元素：公寓（组合元素）
+public class Apartment : Unit
+{
+    private readonly List<Unit> _children = new();
+
+    public void Add(Unit unit) => _children.Add(unit);
+
+    public override void Accept(IUnitVisitor visitor)
+    {
+        visitor.VisitApartment(this);
+        foreach (var child in _children)
+            child.Accept(visitor);  // 遍历子元素
+    }
 }
 ```
+
+### 3.2 访问者接口与具体访问者
+
+```csharp
+// 访问者接口：为每种元素声明一个 Visit 重载
+public interface IUnitVisitor
+{
+    void VisitBedroom(Bedroom bedroom);
+    void VisitLivingRoom(LivingRoom livingRoom);
+    void VisitApartment(Apartment apartment);
+}
+
+// 具体访问者：检查员
+public class Inspector : IUnitVisitor
+{
+    public void VisitBedroom(Bedroom bedroom)
+        => Console.WriteLine("检查卧室的安全设施");
+
+    public void VisitLivingRoom(LivingRoom livingRoom)
+        => Console.WriteLine("检查客厅的消防通道");
+
+    public void VisitApartment(Apartment apartment)
+        => Console.WriteLine("检查公寓的整体结构");
+}
+
+// 具体访问者：清洁工
+public class Cleaner : IUnitVisitor
+{
+    public void VisitBedroom(Bedroom bedroom)
+        => Console.WriteLine("清洁卧室地面");
+
+    public void VisitLivingRoom(LivingRoom livingRoom)
+        => Console.WriteLine("清洁客厅窗户");
+
+    public void VisitApartment(Apartment apartment)
+        => Console.WriteLine("清洁公寓公共区域");
+}
+```
+
+### 3.3 客户端使用
+
+```csharp
+public class Program
+{
+    public static void Main()
+    {
+        // 构建房间树
+        var apartment = new Apartment();
+        apartment.Add(new Bedroom());
+        apartment.Add(new LivingRoom());
+
+        // 不同访问者访问同一结构，产生不同操作
+        apartment.Accept(new Inspector());
+        apartment.Accept(new Cleaner());
+    }
+}
+```
+
+**运行结果**：
+```
+检查公寓的整体结构
+检查卧室的安全设施
+检查客厅的消防通道
+清洁公寓公共区域
+清洁卧室地面
+清洁客厅窗户
+```
+
+<br/>
+
+## 四、🔍 核心解析
+
+### 4.1 双重分派
+
+双重分派是访问者模式的核心机制：元素的 `Accept` 方法接收访问者后，调用 `visitor.VisitXxx(this)`，将自身作为参数传回。此时方法的执行路径由**元素类型**和**访问者类型**共同决定。
+
+```csharp
+// 第一重：元素类型决定调用哪个 Visit 重载
+visitor.VisitBedroom(this);
+// 第二重：访问者类型决定具体执行逻辑
+```
+
+### 4.2 开闭原则
+
+新增一种操作（如"消毒"）只需创建新的访问者类，无需修改任何房间类。新增房间类型则需修改访问者接口和所有实现——这正是访问者模式的代价。
+
+### 4.3 组合结构遍历
+
+`CompositeUnit` / `Apartment` 在 `Accept` 中先访问自身，再递归遍历子元素，使访问者能对整棵对象树执行操作。
+
+<br/>
+
+## 五、🎯 应用场景
+
+### 5.1 适用场景
+
+- 对象结构稳定，但需要对其执行多种不同操作
+
+- 需要在不修改已有类的前提下增加新操作
+
+- 操作涉及多个不同类型，且各类型的处理逻辑不同
+
+### 5.2 实际案例
+
+- **编译器**：AST节点类型固定，但需要执行类型检查、代码生成、优化等多种操作
+
+- **文档处理**：文档元素（段落、图片、表格）接受渲染、导出、统计等不同访问者
+
+- **UI事件处理**：控件树接受鼠标点击、键盘输入、无障碍访问等不同访问者
+
+<br/>
+
+## 六、⚖️ 优缺点分析
+
+### 6.1 优点
+
+- **符合开闭原则**：新增操作无需修改元素类
+
+- **关注点分离**：每种操作封装在独立访问者中，职责清晰
+
+- **可以访问组合对象内部**：访问者可访问元素的内部状态和结构
+
+### 6.2 缺点
+
+- **扩展元素困难**：新增元素类型需修改所有访问者接口和实现
+
+- **破坏封装**：访问者可能需要访问元素内部细节，暴露元素私有成员
+
+- **双重分派开销**：运行时存在额外的方法调用开销
+
+<br/>
+
+## 七、📝 总结
+
+- **核心思想**：将算法与对象结构分离，通过双重分派实现运行时多态
+
+- **关键角色**：抽象元素、具体元素、访问者接口、具体访问者
+
+- **适用场景**：元素类型稳定但操作频繁增加的场景
+
+- **注意事项**：新增元素类型成本高，设计时需评估元素类型的稳定性

@@ -1,74 +1,252 @@
-# 建造者模式（Builder Pattern）
+# 建造者模式教程
 
-> **核心思想**：将一个复杂对象的**构建过程**与它的**表示**分离，使同样的构建步骤可以组装出不同的产品。由"指挥者"控制构建步骤的顺序，"建造者"负责各步骤的具体实现。
+[TOC]
 
-## 解决什么问题
 
-当产品有很多可选属性（配料、形状、尺寸等）且构造参数组合繁杂时，直接构造函数会产生大量重载或参数混乱。建造者模式把"组装步骤"固定为算法骨架，把"每一步怎么做"交给不同建造者，从而用同一套流程产出风格迥异的对象，代码更清晰、可读性更强。
+## 一、📖 概述
 
-## 主要参与者
+建造者模式是**创建型设计模式**，将复杂对象的**构建过程**与**表示**分离，使同样的构建步骤可以组装出不同的产品。
 
-| 角色 | 本示例类 | 职责 |
-| --- | --- | --- |
-| 产品 Product | `Hamburger` | 最终构建出的复杂对象（Size/Shape/Ingredients） |
-| 抽象建造者 Builder | `IBuilder` | 定义构建步骤接口：`AddIngredients` / `AddShape` / `AddSize` / `Reset` / `Build` |
-| 具体建造者 ConcreteBuilder | `MyHamburgerBuilder` / `WifesHamburgerBuilder` | 各自实现步骤细节，产出不同汉堡 |
-| 指挥者 Director | `Cook` | 按固定顺序调用建造者步骤完成组装 |
+核心思想：由"指挥者"控制构建步骤的顺序，"建造者"负责各步骤的具体实现。客户端无需了解内部组装细节，即可创建不同表示的对象。
 
-## 类图
+### 核心特性
+
+- **步骤固定**：构建流程由指挥者统一编排，算法骨架不变
+
+- **实现分离**：每个建造者独立实现构建细节，互不干扰
+
+- **灵活扩展**：新增产品表示只需新增建造者类，无需修改指挥者
+
+- **符合开闭原则**：对扩展开放，对修改关闭
+
+<br/>
+
+## 二、📐 结构图解
+
+### 2.1 整体流程
 
 ```mermaid
-%%{init: {"classDiagram": {"useMarkdownLabels": true}} }%%
-classDiagram
-    direction LR
+flowchart TD
+    A["客户端"] -->|"调用"| B["指挥者 Cook"]
+    B -->|"按顺序执行步骤"| C["建造者 IBuilder"]
+    C -->|"AddIngredients"| D["配料"]
+    C -->|"AddShape"| E["形状"]
+    C -->|"AddSize"| F["尺寸"]
+    D --> G["Hamburger 产品"]
+    E --> G
+    F --> G
 
-    class Director["👨‍🍳Cook"]:::contextCls{
-        -builder:IBuilder
-        +Build():Hamburger
-        +ChangeBuilder(IBuilder):void
-    }
-    class Builder["🏗️IBuilder<<interface>>"]:::strategyCls{
-        <<interface>>
-        +AddIngredients():void
-        +AddShape():void
-        +AddSize():void
-        +Build():Hamburger
-    }
-    class ConcreteBuilder["🛠️MyHamburgerBuilder"]:::concreteCls{
-        +AddIngredients():void
-        +AddShape():void
-        +AddSize():void
-        +Build():Hamburger
-    }
-    class Product["🍔Hamburger"]:::concreteCls{
-        +Size:int
-        +Shape:string
-        +Ingredients:string[]
-    }
-
-    Director o-- Builder : 指挥者持有建造者
-    Builder <|.. ConcreteBuilder : 实现
-    Builder ..> Product : 构建产出
-
-    classDef contextCls fill:#fff3cd,stroke:#856404,stroke-width:2px
-    classDef strategyCls fill:#f3e5ff,stroke:#6b2d91,stroke-width:2px
-    classDef concreteCls fill:#e5faef,stroke:#177048,stroke-width:2px
+    style A fill:#4A90D9,color:#fff
+    style B fill:#E67E22,color:#fff
+    style C fill:#7B68EE,color:#fff
+    style D fill:#7B68EE,color:#fff
+    style E fill:#7B68EE,color:#fff
+    style F fill:#7B68EE,color:#fff
+    style G fill:#27AE60,color:#fff
 ```
 
-## 源码结构
+### 2.2 类关系
 
-目录下源码文件与职责对应：
+```mermaid
+classDiagram
+    class Cook {
+        -builder: IBuilder
+        +Build() Hamburger
+        +ChangeBuilder(IBuilder) void
+    }
+    class IBuilder {
+        <<interface>>
+        +AddIngredients() void
+        +AddShape() void
+        +AddSize() void
+        +Build() Hamburger
+    }
+    class MyHamburgerBuilder {
+        +AddIngredients() void
+        +AddShape() void
+        +AddSize() void
+        +Build() Hamburger
+    }
+    class WifesHamburgerBuilder {
+        +AddIngredients() void
+        +AddShape() void
+        +AddSize() void
+        +Build() Hamburger
+    }
+    class Hamburger {
+        +Size int
+        +Shape string
+        +Ingredients string[]
+    }
 
-- **IBuilder.cs**：建造者接口，定义"加配料→加形状→加尺寸→产出"的步骤契约。
-- **Hamburger.cs**：产品类，纯数据对象。
-- **MyHamburgerBuilder.cs / WifesHamburgerBuilder.cs**：两个具体建造者，`MyHamburgerBuilder` 组装 5 种配料的风筝形大汉堡，`WifesHamburgerBuilder` 组装 2 种配料的长方体小汉堡——同一套步骤、不同细节。
-- **Cook.cs**：指挥者，`Build()` 固定按 `AddIngredients → AddShape → AddSize → Build` 顺序执行，并通过 `ChangeBuilder` 支持中途更换建造者。
-- **Program.cs**：先让 `Cook` 使用 `MyHamburgerBuilder` 做汉堡，再换 `WifesHamburgerBuilder` 做另一个，展示"相同构建过程、不同表示"。
+    Cook o-- IBuilder : 持有
+    IBuilder <|.. MyHamburgerBuilder
+    IBuilder <|.. WifesHamburgerBuilder
+    IBuilder ..> Hamburger : 构建产出
+```
+
+<br/>
+
+## 三、💻 代码实现
+
+以汉堡制作为例：指挥者 Cook 按固定顺序调用建造者步骤，不同建造者产出不同风格的汉堡。
+
+### 3.1 产品类
 
 ```csharp
-// Program.cs 核心代码
-var cook = new Cook(new MyHamburgerBuilder());
-var myHamburger = cook.Build();                 // Ingredients: Bread Meat Tomato Salad Mayonnaise, Size: 10, Shape: Kite
-cook.ChangeBuilder(new WifesHamburgerBuilder());
-var wifesHamburger = cook.Build();              // Ingredients: Bread Salad, Size: 6, Shape: Cuboid
+public class Hamburger
+{
+    public int Size { get; set; }
+    public string Shape { get; set; }
+    public string[] Ingredients { get; set; }
+}
 ```
+
+### 3.2 建造者接口
+
+```csharp
+public interface IBuilder
+{
+    void AddIngredients();
+    void AddShape();
+    void AddSize();
+    Hamburger Build();
+}
+```
+
+### 3.3 具体建造者
+
+```csharp
+// 我的汉堡：5种配料、风筝形、大尺寸
+public class MyHamburgerBuilder : IBuilder
+{
+    private Hamburger _hamburger = new Hamburger();
+
+    public void AddIngredients()
+        => _hamburger.Ingredients = new[] { "Bread", "Meat", "Tomato", "Salad", "Mayonnaise" };
+    public void AddShape() => _hamburger.Shape = "Kite";
+    public void AddSize() => _hamburger.Size = 10;
+    public Hamburger Build() => _hamburger;
+}
+
+// 妻子的汉堡：2种配料、长方体、小尺寸
+public class WifesHamburgerBuilder : IBuilder
+{
+    private Hamburger _hamburger = new Hamburger();
+
+    public void AddIngredients()
+        => _hamburger.Ingredients = new[] { "Bread", "Salad" };
+    public void AddShape() => _hamburger.Shape = "Cuboid";
+    public void AddSize() => _hamburger.Size = 6;
+    public Hamburger Build() => _hamburger;
+}
+```
+
+### 3.4 指挥者
+
+```csharp
+public class Cook
+{
+    private IBuilder _builder;
+
+    public Cook(IBuilder builder) => _builder = builder;
+
+    // 固定构建顺序
+    public Hamburger Build()
+    {
+        _builder.AddIngredients();
+        _builder.AddShape();
+        _builder.AddSize();
+        return _builder.Build();
+    }
+
+    public void ChangeBuilder(IBuilder builder) => _builder = builder;
+}
+```
+
+### 3.5 客户端使用
+
+```csharp
+var cook = new Cook(new MyHamburgerBuilder());
+var myHamburger = cook.Build();
+// Ingredients: Bread Meat Tomato Salad Mayonnaise, Size: 10, Shape: Kite
+
+cook.ChangeBuilder(new WifesHamburgerBuilder());
+var wifesHamburger = cook.Build();
+// Ingredients: Bread Salad, Size: 6, Shape: Cuboid
+```
+
+**运行结果**：
+
+```
+我的汉堡: 5种配料, 风筝形, 尺寸10
+妻子的汉堡: 2种配料, 长方体, 尺寸6
+```
+
+<br/>
+
+## 四、🔍 核心解析
+
+### 4.1 建造者接口
+
+`IBuilder` 定义了构建步骤的契约：`AddIngredients` → `AddShape` → `AddSize` → `Build`。所有具体建造者遵循同一套接口，保证步骤一致性。
+
+### 4.2 指挥者
+
+`Cook` 固定执行构建顺序，不关心每步的具体实现。通过 `ChangeBuilder` 可在运行时切换建造者，实现同一流程产出不同产品。
+
+### 4.3 产品
+
+`Hamburger` 是纯数据对象，不包含构建逻辑。构建细节全部封装在建造者中，产品与构建过程完全解耦。
+
+<br/>
+
+## 五、🎯 应用场景
+
+### 5.1 适用场景
+
+- 对象有多种属性组合，构造函数参数过多
+
+- 需要同一套构建流程产出不同表示的对象
+
+- 构建过程包含多个步骤，且顺序固定
+
+### 5.2 实际案例
+
+- **StringBuilder**：逐步构建字符串，最终 `ToString()` 产出结果
+
+- **Director模式在游戏开发中**：统一角色创建流程，不同建造者生成不同属性的角色
+
+- **文档生成器**：同一模板流程，不同建造者产出 HTML/PDF/Markdown 文档
+
+<br/>
+
+## 六、⚖️ 优缺点分析
+
+### 6.1 优点
+
+- **构建与表示分离**：同一流程可产出不同产品
+
+- **代码清晰**：构建步骤逐步执行，逻辑一目了然
+
+- **符合开闭原则**：新增产品只需新增建造者类
+
+- **精细控制**：可逐步检查构建过程的每个阶段
+
+### 6.2 缺点
+
+- **类数量增多**：每个产品变体需要一个具体建造者类
+
+- **仅适用复杂对象**：简单对象使用建造者模式会增加不必要的复杂度
+
+<br/>
+
+## 七、📝 总结
+
+- **核心思想**：将复杂对象的构建过程与表示分离，同一流程产出不同产品
+
+- **关键角色**：建造者（定义步骤）、具体建造者（实现细节）、指挥者（编排流程）、产品（最终对象）
+
+- **适用场景**：对象属性组合多、构建步骤固定、需要多种表示
+
+- **注意事项**：仅在对象确实复杂时使用，避免对简单对象过度设计
