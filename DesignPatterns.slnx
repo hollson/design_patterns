@@ -1,0 +1,26 @@
+<Solution>
+  <Configurations>
+    <Platform Name="Any CPU" />
+    <Platform Name="x64" />
+    <Platform Name="x86" />
+  </Configurations>
+  <Project Path="AdapterPattern/AdapterPattern.csproj" />
+  <Project Path="BridgePattern/BridgePattern.csproj" />
+  <Project Path="BuilderPattern/BuilderPattern.csproj" />
+  <Project Path="CommandPattern/CommandPattern.csproj" />
+  <Project Path="CompositePattern/CompositePattern.csproj" />
+  <Project Path="DecoratorPattern/DecoratorPattern.csproj" />
+  <Project Path="FacadePattern/FacadePattern.csproj" />
+  <Project Path="FactoryPattern/FactoryPattern.csproj" />
+  <Project Path="FlyweightPattern/FlyweightPattern.csproj" />
+  <Project Path="IteratorPattern/IteratorPattern.csproj" />
+  <Project Path="MediatorPattern/MediatorPattern.csproj" />
+  <Project Path="ObserverPattern/ObserverPattern.csproj" />
+  <Project Path="PrototypePattern/PrototypePattern.csproj" />
+  <Project Path="ProxyPattern/ProxyPattern.csproj" />
+  <Project Path="SingletonPattern/SingletonPattern.csproj" />
+  <Project Path="StatePattern/StatePattern.csproj" />
+  <Project Path="StrategyPattern/StrategyPattern.csproj" />
+  <Project Path="TemplatePattern/TemplatePattern.csproj" />
+  <Project Path="VisitorPattern/VisitorPattern.csproj" />
+</Solution>
