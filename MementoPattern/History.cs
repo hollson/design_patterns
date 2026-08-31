@@ -3,10 +3,7 @@ public class History
 {
     private readonly List<EditorMemento> _mementos = new();
 
-    public void Push(EditorMemento memento)
-    {
-        _mementos.Add(memento);
-    }
+    public void Push(EditorMemento memento) => _mementos.Add(memento);
 
     public EditorMemento Pop()
     {

@@ -1,12 +1,9 @@
 // 具体工厂：芝加哥披萨店
 public class ChicagoPizzaFactory : IPizzaFactory
 {
-    public IPizza CreatePizza(string type)
+    public IPizza CreatePizza(string type) => type switch
     {
-        return type switch
-        {
-            "clam" => new ChicagoClamPizza(),
-            _ => throw new ArgumentException($"未知类型: {type}")
-        };
-    }
+        "clam" => new ChicagoClamPizza(),
+        _ => throw new ArgumentException($"未知类型: {type}")
+    };
 }

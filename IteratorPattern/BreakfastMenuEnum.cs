@@ -1,4 +1,4 @@
-﻿using System.Collections;
+using System.Collections;
 
 namespace IteratorPattern;
 
@@ -26,10 +26,7 @@ public class BreakfastMenuEnum : IEnumerator
         return _position < _items.Count;
     }
 
-    public void Reset()
-    {
-        _position = -1;
-    }
+    public void Reset() => _position = -1;
 
     object IEnumerator.Current => Current;
 

@@ -1,4 +1,4 @@
-﻿namespace StatePattern;
+namespace StatePattern;
 
 /// <summary>
 /// 出货状态——释放一颗糖果后转入 NoQuarterState 或 SoldOutState
@@ -7,25 +7,13 @@ public class SoldState : IState
 {
     private GumballMachine Machine { get; }
 
-    public SoldState(GumballMachine gumballMachine)
-    {
-        Machine = gumballMachine;
-    }
+    public SoldState(GumballMachine gumballMachine) => Machine = gumballMachine;
 
-    public void InsertQuarter()
-    {
-        Console.WriteLine("Please wait, already in progress");
-    }
+    public void InsertQuarter() => Console.WriteLine("Please wait, already in progress");
 
-    public void EjectQuarter()
-    {
-        Console.WriteLine("Can't eject, already turned the crank");
-    }
+    public void EjectQuarter() => Console.WriteLine("Can't eject, already turned the crank");
 
-    public void TurnCrank()
-    {
-        Console.WriteLine("Turning twice achieves nothing");
-    }
+    public void TurnCrank() => Console.WriteLine("Turning twice achieves nothing");
 
     public void Dispense()
     {

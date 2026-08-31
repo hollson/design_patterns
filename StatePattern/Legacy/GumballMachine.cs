@@ -1,4 +1,4 @@
-﻿// Legacy 版本：所有逻辑集中在一个类中，通过 switch 判断当前状态
+// Legacy 版本：所有逻辑集中在一个类中，通过 switch 判断当前状态
 // 缺点：每增加一种状态或操作，都需要修改所有 switch 分支，违反开闭原则
 
 namespace StatePattern.Legacy;
@@ -6,15 +6,10 @@ namespace StatePattern.Legacy;
 /// <summary>
 /// 旧式糖果机——状态逻辑与机器耦合，不利于扩展
 /// </summary>
-public class GumballMachine
+public class GumballMachine(int count)
 {
-    private int _count;
+    private int _count = count;
     private State _state = State.NoQuarters;
-
-    public GumballMachine(int count)
-    {
-        _count = count;
-    }
 
     public void InsertQuarter()
     {

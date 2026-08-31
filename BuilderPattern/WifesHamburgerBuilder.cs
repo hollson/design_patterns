@@ -7,28 +7,13 @@ public class WifesHamburgerBuilder : IBuilder
 {
     private Hamburger _hamburger = null!;
 
-    public void AddIngredients()
-    {
-        _hamburger.Ingredients = ["Bread", "Salad"];
-    }
+    public void AddIngredients() => _hamburger.Ingredients = ["Bread", "Salad"];
 
-    public void AddShape()
-    {
-        _hamburger.Shape = "Cuboid";
-    }
+    public void AddShape() => _hamburger.Shape = "Cuboid";
 
-    public void AddSize()
-    {
-        _hamburger.Size = 6; //inches
-    }
+    public void AddSize() => _hamburger.Size = 6; //inches
 
-    public void Reset()
-    {
-        _hamburger = new Hamburger();
-    }
+    public void Reset() => _hamburger = new Hamburger();
 
-    public Hamburger Build()
-    {
-        return _hamburger;
-    }
+    public Hamburger Build() => _hamburger;
 }

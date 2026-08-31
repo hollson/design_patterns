@@ -1,4 +1,4 @@
-﻿namespace ProxyPattern;
+namespace ProxyPattern;
 
 /// <summary>
 /// 真实图片类，负责实际的磁盘加载和显示操作。
@@ -13,13 +13,7 @@ public class RealImage : Image
         loadFromDisk(_fileName);
     }
 
-    public void display()
-    {
-        Console.WriteLine("Displaying " + _fileName);
-    }
+    public void display() => Console.WriteLine("Displaying " + _fileName);
 
-    private void loadFromDisk(string fileName)
-    {
-        Console.WriteLine("Loading " + fileName);
-    }
+    private void loadFromDisk(string fileName) => Console.WriteLine("Loading " + fileName);
 }

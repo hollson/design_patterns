@@ -1,34 +1,12 @@
-﻿namespace FactoryPattern
+namespace FactoryPattern
 {
     internal class ChicagoIngredientsFactory : IIngredientsFactory
     {
-        ICheese IIngredientsFactory.CreateCheese()
-        {
-            return new Parmesan();
-        }
+        ICheese IIngredientsFactory.CreateCheese() => new Parmesan();
+        IClam IIngredientsFactory.CreateClam() => new FreshClam();
+        IDough IIngredientsFactory.CreateDough() => new DeepDish();
+        ISauce IIngredientsFactory.CreateSauce() => new PlumTomato();
 
-        IClam IIngredientsFactory.CreateClam()
-        {
-            return new FreshClam();
-        }
-
-        IDough IIngredientsFactory.CreateDough()
-        {
-            return new DeepDish();
-        }
-
-        ISauce IIngredientsFactory.CreateSauce()
-        {
-            return new PlumTomato();
-        }
-
-        IEnumerable<IVeggies> IIngredientsFactory.CreateVeggies()
-        {
-            var oni = new Onion();
-            var ccm = new Cucumber();
-            var ppr = new Pepper();
-            IVeggies[] arr = { oni, ccm, ppr };
-            return arr;
-        }
+        IEnumerable<IVeggies> IIngredientsFactory.CreateVeggies() => [new Onion(), new Cucumber(), new Pepper()];
     }
 }

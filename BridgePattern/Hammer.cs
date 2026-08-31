@@ -7,23 +7,15 @@ public class Hammer(IEnchantment enchantment) : IWeapon
 {
     private readonly IEnchantment _enchantment = enchantment;
 
-    public void Wield()
-    {
-        Console.WriteLine("The hammer is wielded.");
-        _enchantment.OnActivate();
-    }
-
-    public void Swing()
-    {
-        Console.WriteLine("The hammer is swinged.");
-        _enchantment.Apply();
-    }
-
-    public void Unwield()
-    {
-        Console.WriteLine("The hammer is unwielded.");
-        _enchantment.OnDeactivate();
-    }
+    public void Wield() => DoAction("The hammer is wielded.", _enchantment.OnActivate);
+    public void Swing() => DoAction("The hammer is swinged.", _enchantment.Apply);
+    public void Unwield() => DoAction("The hammer is unwielded.", _enchantment.OnDeactivate);
 
     public IEnchantment GetEnchantment() => _enchantment;
+
+    private static void DoAction(string message, Action action)
+    {
+        Console.WriteLine(message);
+        action();
+    }
 }

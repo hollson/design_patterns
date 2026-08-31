@@ -5,20 +5,11 @@ namespace VisitorPattern;
 /// </summary>
 public class BedroomVisitor : IUnitVisitor
 {
-    public void VisitApartment(Apartment apartment)
-    {
-    }
+    public void VisitApartment(Apartment apartment) { }
 
-    public void VisitStudio(Studio studio)
-    {
-    }
+    public void VisitStudio(Studio studio) { }
 
-    public void VisitBedroom(Bedroom bedroom)
-    {
-        Console.WriteLine("Here is a bedroom");
-    }
+    public void VisitBedroom(Bedroom bedroom) => Console.WriteLine("Here is a bedroom");
 
-    public void VisitLivingRoom(LivingRoom livingRoom)
-    {
-    }
+    public void VisitLivingRoom(LivingRoom livingRoom) { }
 }

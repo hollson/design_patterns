@@ -7,23 +7,15 @@ public class Sword(IEnchantment enchantment) : IWeapon
 {
     private readonly IEnchantment _enchantment = enchantment;
 
-    public void Wield()
-    {
-        Console.WriteLine("The sword is wielded.");
-        _enchantment.OnActivate();
-    }
-
-    public void Swing()
-    {
-        Console.WriteLine("The sword is swinged.");
-        _enchantment.Apply();
-    }
-
-    public void Unwield()
-    {
-        Console.WriteLine("The sword is unwielded.");
-        _enchantment.OnDeactivate();
-    }
+    public void Wield() => DoAction("The sword is wielded.", _enchantment.OnActivate);
+    public void Swing() => DoAction("The sword is swinged.", _enchantment.Apply);
+    public void Unwield() => DoAction("The sword is unwielded.", _enchantment.OnDeactivate);
 
     public IEnchantment GetEnchantment() => _enchantment;
+
+    private static void DoAction(string message, Action action)
+    {
+        Console.WriteLine(message);
+        action();
+    }
 }

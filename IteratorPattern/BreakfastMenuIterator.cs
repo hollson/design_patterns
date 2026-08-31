@@ -1,18 +1,13 @@
-﻿using System.Collections;
+using System.Collections;
 
 namespace IteratorPattern;
 
 /// <summary>
 /// 早餐菜单迭代器，封装 List 的遍历逻辑。
 /// </summary>
-class BreakfastMenuIterator : IEnumerable
+class BreakfastMenuIterator(List<Menu> items) : IEnumerable
 {
-    private readonly List<Menu> _items;
-
-    public BreakfastMenuIterator(List<Menu> items)
-    {
-        _items = items;
-    }
+    private readonly List<Menu> _items = items;
 
     IEnumerator IEnumerable.GetEnumerator() => GetEnumerator();
 

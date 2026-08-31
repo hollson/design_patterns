@@ -5,14 +5,7 @@ namespace FlyweightPattern;
 /// </summary>
 public class FoamMilkTea : IBeverage
 {
+    public FoamMilkTea() => Console.WriteLine("Initializing a Foam Milk Tea instance");
 
-    public FoamMilkTea()
-    {
-        Console.WriteLine("Initializing a Foam Milk Tea instance");
-    }
-
-    public void Drink()
-    {
-        Console.WriteLine("hmmm... this is foam milk tea");
-    }
+    public void Drink() => Console.WriteLine("hmmm... this is foam milk tea");
 }

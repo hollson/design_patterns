@@ -12,10 +12,7 @@ public class Cook
         AcceptBuilder(builder);
     }
 
-    public void ChangeBuilder(IBuilder builder)
-    {
-        AcceptBuilder(builder);
-    }
+    public void ChangeBuilder(IBuilder builder) => AcceptBuilder(builder);
 
     public Hamburger Build()
     {

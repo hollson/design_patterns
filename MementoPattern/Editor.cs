@@ -12,14 +12,8 @@ public class Editor
     public string GetContent() => _content;
 
     // 创建备忘录：保存当前状态
-    public EditorMemento CreateMemento()
-    {
-        return new EditorMemento(_content);
-    }
+    public EditorMemento CreateMemento() => new(_content);
 
     // 从备忘录恢复状态
-    public void Restore(EditorMemento memento)
-    {
-        _content = memento.Content;
-    }
+    public void Restore(EditorMemento memento) => _content = memento.Content;
 }

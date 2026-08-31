@@ -1,12 +1,7 @@
 // 终结符表达式：数字
-public class NumberExpression : IExpression
+public class NumberExpression(int number) : IExpression
 {
-    private readonly int _number;
-
-    public NumberExpression(int number)
-    {
-        _number = number;
-    }
+    private readonly int _number = number;
 
     public int Interpret() => _number;
 }

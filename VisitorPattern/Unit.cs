@@ -8,10 +8,7 @@ public abstract class Unit
 {
     private readonly Unit[] _units;
 
-    public Unit(params Unit[] units)
-    {
-        _units = units;
-    }
+    public Unit(params Unit[] units) => _units = units;
 
     public virtual void Accept(IUnitVisitor visitor)
     {

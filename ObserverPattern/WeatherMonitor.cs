@@ -18,20 +18,11 @@ sealed class WeatherMonitor : IObserver<Weather>
         _cancellation = provider.Subscribe(this);
     }
 
-    public void Unsubscribe()
-    {
-        _cancellation.Dispose();
-    }
+    public void Unsubscribe() => _cancellation.Dispose();
 
-    public void OnCompleted()
-    {
-        throw new NotImplementedException();
-    }
+    public void OnCompleted() => throw new NotImplementedException();
 
-    public void OnError(Exception error)
-    {
-        Console.WriteLine("Error has occured");
-    }
+    public void OnError(Exception error) => Console.WriteLine("Error has occured");
 
     public void OnNext(Weather value)
     {

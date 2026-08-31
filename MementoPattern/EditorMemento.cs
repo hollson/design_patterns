@@ -1,10 +1,5 @@
 // 备忘录：存储编辑器状态
-public class EditorMemento
+public class EditorMemento(string content)
 {
-    public string Content { get; }
-
-    public EditorMemento(string content)
-    {
-        Content = content;
-    }
+    public string Content { get; } = content;
 }

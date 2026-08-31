@@ -1,16 +1,11 @@
-﻿namespace CommandPattern;
+namespace CommandPattern;
 
 /// <summary>
 /// 宏命令，将多个命令组合成一个复合命令，可批量执行和撤销
 /// </summary>
-internal class MacroCommand : ICommand
+internal class MacroCommand(ICommand[] commands) : ICommand
 {
-    private readonly ICommand[] _commands;
-
-    public MacroCommand(ICommand[] commands)
-    {
-        _commands = commands;
-    }
+    private readonly ICommand[] _commands = commands;
 
     public void Execute()
     {

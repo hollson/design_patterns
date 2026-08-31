@@ -1,21 +1,14 @@
-﻿namespace FacadePattern;
+namespace FacadePattern;
 
 /// <summary>
 /// 家庭影院外观类，封装了调光器、DVD播放器等子系统的复杂操作，
 /// 提供统一的观影、暂停、恢复接口。
 /// </summary>
-public class HomeTheatreFacade
+public class HomeTheatreFacade(Dimmer dimmer, Dvd dvd, DvdPlayer dvdPlayer)
 {
-    private Dimmer _dimmer;
-    private Dvd _dvd;
-    private DvdPlayer _dvdPlayer;
-
-    public HomeTheatreFacade(Dimmer dimmer, Dvd dvd, DvdPlayer dvdPlayer)
-    {
-        _dvd = dvd;
-        _dimmer = dimmer;
-        _dvdPlayer = dvdPlayer;
-    }
+    private readonly Dimmer _dimmer = dimmer;
+    private readonly Dvd _dvd = dvd;
+    private readonly DvdPlayer _dvdPlayer = dvdPlayer;
 
     public void WatchMovie()
     {

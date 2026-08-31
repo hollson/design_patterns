@@ -29,15 +29,9 @@ public class GumballMachine
         }
     }
 
-    public void InsertQuarter()
-    {
-        State.InsertQuarter();
-    }
+    public void InsertQuarter() => State.InsertQuarter();
 
-    public void EjectQuarter()
-    {
-        State.EjectQuarter();
-    }
+    public void EjectQuarter() => State.EjectQuarter();
 
     public void TurnCrank()
     {

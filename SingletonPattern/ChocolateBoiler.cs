@@ -1,4 +1,4 @@
-﻿namespace SingletonPattern;
+namespace SingletonPattern;
 
 /// <summary>
 /// 巧克力锅炉单例类，使用 Lazy&lt;T&gt; 实现线程安全的延迟初始化。
@@ -28,25 +28,17 @@ internal class ChocolateBoiler
         _boiler = Status.Empty;
     }
 
-    public void Fill()
-    {
-        if (!IsEmpty) return;
-        Console.WriteLine("Filling...");
-        _boiler = Status.InProgress;
-    }
+    public void Fill() => Transition(() => IsEmpty, "Filling...", Status.InProgress);
 
-    public void Drain()
-    {
-        if (!IsBoiled) return;
-        Console.WriteLine("Draining...");
-        _boiler = Status.Empty;
-    }
+    public void Drain() => Transition(() => IsBoiled, "Draining...", Status.Empty);
 
-    public void Boil()
+    public void Boil() => Transition(() => !IsBoiled && !IsEmpty, "Boiling...", Status.Boiled);
+
+    private void Transition(Func<bool> canTransition, string message, Status newStatus)
     {
-        if (IsBoiled || IsEmpty) return;
-        Console.WriteLine("Boiling...");
-        _boiler = Status.Boiled;
+        if (!canTransition()) return;
+        Console.WriteLine(message);
+        _boiler = newStatus;
     }
 
     private bool IsEmpty => _boiler == Status.Empty;

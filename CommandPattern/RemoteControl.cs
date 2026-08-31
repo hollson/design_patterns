@@ -1,4 +1,4 @@
-﻿namespace CommandPattern;
+namespace CommandPattern;
 
 /// <summary>
 /// 遥控器调用者，负责存储和触发命令，支持开/关/撤销操作
@@ -44,8 +44,5 @@ internal class RemoteControl
         _undoCommand = _onCommand[slot];
     }
 
-    public void PushUndo()
-    {
-        _undoCommand.Execute();
-    }
+    public void PushUndo() => _undoCommand.Execute();
 }

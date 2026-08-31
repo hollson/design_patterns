@@ -5,9 +5,7 @@ namespace VisitorPattern;
 /// </summary>
 public class Studio : Unit
 {
-    public Studio(params Unit[] units) : base(units)
-    {
-    }
+    public Studio(params Unit[] units) : base(units) { }
 
     public override void Accept(IUnitVisitor visitor)
     {
@@ -15,8 +13,5 @@ public class Studio : Unit
         base.Accept(visitor);
     }
 
-    public override string ToString()
-    {
-        return "Studio";
-    }
+    public override string ToString() => "Studio";
 }

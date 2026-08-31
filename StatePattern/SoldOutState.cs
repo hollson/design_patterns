@@ -1,4 +1,4 @@
-﻿namespace StatePattern;
+namespace StatePattern;
 
 /// <summary>
 /// 售罄状态——所有操作均不可用
@@ -7,28 +7,13 @@ public class SoldOutState : IState
 {
     public GumballMachine Machine { get; }
 
-    public SoldOutState(GumballMachine gumballMachine)
-    {
-        Machine = gumballMachine;
-    }
+    public SoldOutState(GumballMachine gumballMachine) => Machine = gumballMachine;
 
-    public void InsertQuarter()
-    {
-        Console.WriteLine("Sorry! Sold Out");
-    }
+    public void InsertQuarter() => Console.WriteLine("Sorry! Sold Out");
 
-    public void EjectQuarter()
-    {
-        Console.WriteLine("Can't eject when sold out");
-    }
+    public void EjectQuarter() => Console.WriteLine("Can't eject when sold out");
 
-    public void TurnCrank()
-    {
-        Console.WriteLine("turning crank achieves nothing");
-    }
+    public void TurnCrank() => Console.WriteLine("turning crank achieves nothing");
 
-    public void Dispense()
-    {
-        Console.WriteLine("Can't dispense when out of stock");
-    }
+    public void Dispense() => Console.WriteLine("Can't dispense when out of stock");
 }

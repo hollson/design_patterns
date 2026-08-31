@@ -1,4 +1,4 @@
-﻿namespace TemplatePattern;
+namespace TemplatePattern;
 
 /// <summary>
 /// 饮品抽象基类 —— 模板方法模式的核心。
@@ -23,15 +23,9 @@ public abstract class Beverage
 
     protected abstract void Brew();
 
-    private void Boil()
-    {
-        Console.WriteLine("Boling Water");
-    }
+    private void Boil() => Console.WriteLine("Boling Water");
 
-    private void Pour()
-    {
-        Console.WriteLine("Pouring in Cup");
-    }
+    private void Pour() => Console.WriteLine("Pouring in Cup");
 
     protected abstract void AddCondiments();
 

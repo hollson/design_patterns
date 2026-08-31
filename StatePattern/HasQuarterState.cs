@@ -1,4 +1,4 @@
-﻿namespace StatePattern;
+namespace StatePattern;
 
 /// <summary>
 /// 有硬币状态——转动摇杆后可能中奖或正常出货
@@ -8,15 +8,9 @@ public class HasQuarterState : IState
     private GumballMachine Machine { get; }
     readonly Random _random = Random.Shared;
 
-    public HasQuarterState(GumballMachine gumballMachine)
-    {
-        Machine = gumballMachine;
-    }
+    public HasQuarterState(GumballMachine gumballMachine) => Machine = gumballMachine;
 
-    public void InsertQuarter()
-    {
-        Console.WriteLine("Can't insert more than one");
-    }
+    public void InsertQuarter() => Console.WriteLine("Can't insert more than one");
 
     public void EjectQuarter()
     {

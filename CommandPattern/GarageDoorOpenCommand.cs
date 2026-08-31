@@ -1,4 +1,4 @@
-﻿namespace CommandPattern;
+namespace CommandPattern;
 
 /// <summary>
 /// 打开车库门命令，封装车库的打开动作
@@ -7,18 +7,9 @@ internal class GarageDoorOpenCommand : ICommand
 {
     private readonly Garage _garage;
 
-    public GarageDoorOpenCommand(Garage g)
-    {
-        _garage = g;
-    }
+    public GarageDoorOpenCommand(Garage g) => _garage = g;
 
-    public void Execute()
-    {
-        _garage.Open();
-    }
+    public void Execute() => _garage.Open();
 
-    public void Undo()
-    {
-        _garage.Close();
-    }
+    public void Undo() => _garage.Close();
 }

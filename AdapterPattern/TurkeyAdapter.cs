@@ -1,4 +1,4 @@
-﻿namespace AdapterPattern;
+namespace AdapterPattern;
 
 /// <summary>
 /// 适配器，将火鸡(Turkey)的接口适配为鸭子(Duck)的接口。
@@ -13,10 +13,7 @@ public class TurkeyAdapter : IDuck
         _turkey = turkey;
     }
 
-    public void Quack()
-    {
-        _turkey.Gobble();
-    }
+    public void Quack() => _turkey.Gobble();
 
     public void Fly()
     {

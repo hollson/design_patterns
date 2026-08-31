@@ -1,4 +1,4 @@
-﻿namespace StatePattern;
+namespace StatePattern;
 
 /// <summary>
 /// 中奖状态——免费多出一颗糖果
@@ -7,25 +7,13 @@ public class WinnerState : IState
 {
     private GumballMachine Machine { get; }
 
-    public WinnerState(GumballMachine gumballMachine)
-    {
-        Machine = gumballMachine;
-    }
+    public WinnerState(GumballMachine gumballMachine) => Machine = gumballMachine;
 
-    public void InsertQuarter()
-    {
-        Console.WriteLine("Please wait, already in progress");
-    }
+    public void InsertQuarter() => Console.WriteLine("Please wait, already in progress");
 
-    public void EjectQuarter()
-    {
-        Console.WriteLine("Can't eject, already turned the crank");
-    }
+    public void EjectQuarter() => Console.WriteLine("Can't eject, already turned the crank");
 
-    public void TurnCrank()
-    {
-        Console.WriteLine("Turning twice achieves nothing");
-    }
+    public void TurnCrank() => Console.WriteLine("Turning twice achieves nothing");
 
 
     public void Dispense()
