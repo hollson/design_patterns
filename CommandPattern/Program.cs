@@ -1,6 +1,8 @@
-﻿// 命令模式（Command Pattern）
+// 命令模式（Command Pattern）
 // 将请求封装为对象，从而使你可以用不同的请求参数化客户端，
 // 支持请求的排队、日志记录以及撤销操作。
+
+using CommandPattern;
 
 // 创建遥控器（调用者）
 var remote = new RemoteControl(3);

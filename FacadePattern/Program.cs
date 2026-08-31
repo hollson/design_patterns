@@ -1,5 +1,7 @@
-﻿// 外观模式（Facade Pattern）：为子系统中的一组接口提供一个一致的高层接口，
+// 外观模式（Facade Pattern）：为子系统中的一组接口提供一个一致的高层接口，
 // 将复杂系统的多个接口统一成一个简单接口，降低客户端使用复杂度。
+
+using FacadePattern;
 
 var dimmer = new Dimmer();
 var dvdPlayer = new DvdPlayer();

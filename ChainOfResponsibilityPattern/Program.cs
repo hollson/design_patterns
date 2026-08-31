@@ -1,6 +1,8 @@
-﻿// 职责链模式（Chain of Responsibility Pattern）
+// 职责链模式（Chain of Responsibility Pattern）
 // 将请求的发送者和接收者解耦，让多个对象都有机会处理请求。
 // 这些对象连接成一条链，并沿着这条链传递请求，直到有一个对象处理它为止。
+
+using ChainOfResponsibilityPattern;
 
 // 创建处理器
 var additionHandler = new AdditionHandler();

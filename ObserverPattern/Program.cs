@@ -1,5 +1,7 @@
-﻿// 观察者模式：定义对象间的一对多依赖关系，当一个对象状态改变时，所有依赖者自动收到通知。
+// 观察者模式：定义对象间的一对多依赖关系，当一个对象状态改变时，所有依赖者自动收到通知。
 // 天气供应者作为被观察者，气象站作为观察者订阅天气变化并更新显示。
+
+using ObserverPattern;
 
 var provider = new WeatherSupplier();
 var observer1 = new WeatherMonitor("TP");

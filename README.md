@@ -41,7 +41,7 @@
 
 | ID  | 模式                                                        | 难易 | 描述                   | 核心概念                |
 | --- | ----------------------------------------------------------- | ---- | ---------------------- | ----------------------- |
-| 01  | [单例模式 (Singleton)](./SingletonPattern)                  | 🟢   | 确保类只有一个实例     | 全局访问点，线程安全    |
+| 01  | [单例模式 (Singleton)](./SingletonPattern/README.md)                  | 🟢   | 确保类只有一个实例     | 全局访问点，线程安全    |
 | 02  | [工厂方法模式 (Factory Method)](./FactoryMethodPattern)     | 🔵   | 由子类决定创建哪种对象 | 工厂方法，延迟创建      |
 | 03  | [抽象工厂模式 (Abstract Factory)](./AbstractFactoryPattern) | 🟠   | 创建一族相关产品的接口 | 产品族一致性            |
 | 04  | [建造者模式 (Builder)](./BuilderPattern)                    | 🔵   | 分步骤构建复杂对象     | `Director` 控制构建流程 |
