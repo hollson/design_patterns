@@ -5,9 +5,9 @@ namespace MediatorPattern;
 /// </summary>
 class ManagerMediator : Mediator
 {
-    public Colleague Customer { get; set; }
-    public Colleague Programmer { get; set; }
-    public Colleague Tester { get; set; }
+    public Colleague Customer { get; set; } = null!;
+    public Colleague Programmer { get; set; } = null!;
+    public Colleague Tester { get; set; } = null!;
 
     public override void Send(string message, Colleague colleague)
     {

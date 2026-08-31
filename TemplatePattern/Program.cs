@@ -1,8 +1,9 @@
-﻿// 模板方法模式示例
+// 模板方法模式示例
 // 展示了 Beverage 抽象基类定义的算法骨架（煮水→冲泡→倒杯→加料），
 // 子类只需覆写 Brew() 和 AddCondiments() 即可产生不同的饮品行为。
 // 同时演示了 IComparable 接口在集合排序中的应用。
 
+using TemplatePattern;
 using TemplatePattern.Comparable;
 
 var tea = new Tea();

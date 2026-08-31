@@ -1,13 +1,13 @@
-﻿namespace FactoryPattern
+namespace FactoryPattern
 {
     /// <summary>
     /// 披萨抽象基类，定义披萨的通用操作流程
     /// </summary>
     abstract class Pizza
     {
-        public string Name { protected get; set; }
+        public string Name { protected get; set; } = null!;
 
-        public string Color;
+        public string Color = null!;
 
         internal abstract void Prepare();
 

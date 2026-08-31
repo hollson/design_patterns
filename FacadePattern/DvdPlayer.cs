@@ -5,7 +5,7 @@
 /// </summary>
 public class DvdPlayer
 {
-    private Dvd _dvd;
+    private Dvd? _dvd;
     private int _time = 0;
     public void On() => Console.WriteLine("DVD Player powered on");
 
@@ -16,7 +16,7 @@ public class DvdPlayer
 
     }
 
-    public void Play() => Console.WriteLine($"Playing {_dvd.Movie}");
+    public void Play() => Console.WriteLine($"Playing {_dvd?.Movie}");
 
     public void Pause()
     {

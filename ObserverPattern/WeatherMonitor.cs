@@ -1,11 +1,11 @@
-﻿namespace ObserverPattern;
+namespace ObserverPattern;
 
 /// <summary>
 /// 气象站，作为观察者订阅天气供应者并根据名称显示对应的天气指标。
 /// </summary>
 sealed class WeatherMonitor : IObserver<Weather>
 {
-    private IDisposable _cancellation;
+    private IDisposable _cancellation = null!;
     private readonly string _name;
 
     public WeatherMonitor(string name)

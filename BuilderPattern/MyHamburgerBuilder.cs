@@ -5,7 +5,7 @@
 /// </summary>
 public class MyHamburgerBuilder : IBuilder
 {
-    private Hamburger _hamburger;
+    private Hamburger _hamburger = null!;
 
     public void AddIngredients()
     {

@@ -1,4 +1,4 @@
-﻿namespace StatePattern;
+namespace StatePattern;
 
 /// <summary>
 /// 糖果机，维护当前状态并委托行为给状态对象
@@ -13,7 +13,7 @@ public class GumballMachine
     public IState SoldState;
     public IState WinnerState;
 
-    public IState State { get; set; }
+    public IState State { get; set; } = null!;
 
     public GumballMachine(int count)
     {

@@ -1,11 +1,11 @@
-﻿namespace BuilderPattern;
+namespace BuilderPattern;
 
 /// <summary>
 /// 厨师类，作为指挥者(Director)协调建造者按步骤构建汉堡。
 /// </summary>
 public class Cook
 {
-    private IBuilder _builder;
+    private IBuilder _builder = null!;
 
     public Cook(IBuilder builder)
     {

@@ -1,4 +1,6 @@
-﻿namespace IteratorPattern;
+using System.Collections;
+
+namespace IteratorPattern;
 
 /// <summary>
 /// 早餐菜单，使用 List 动态存储菜单项。

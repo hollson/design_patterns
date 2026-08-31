@@ -1,11 +1,11 @@
-﻿namespace BuilderPattern;
+﻿﻿namespace BuilderPattern;
 
 /// <summary>
 /// 妻子的汉堡建造者，构建一个较小的长方形汉堡。
 /// </summary>
 public class WifesHamburgerBuilder : IBuilder
 {
-    private Hamburger _hamburger;
+    private Hamburger _hamburger = null!;
 
     public void AddIngredients()
     {
