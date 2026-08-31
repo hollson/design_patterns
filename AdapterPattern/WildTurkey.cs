@@ -5,7 +5,7 @@ namespace AdapterPattern;
 /// </summary>
 class WildTurkey : ITurkey
 {
-    public void Gobble() => Console.WriteLine("Gobble Gobble Gobble");
+    public void Gobble() => Console.WriteLine("咯咯咯");
 
-    public void Fly() => Console.WriteLine("Flies 100 Metres");
+    public void Fly() => Console.WriteLine("飞行 100 米");
 }

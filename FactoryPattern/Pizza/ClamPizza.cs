@@ -1,4 +1,4 @@
-﻿namespace FactoryPattern
+namespace FactoryPattern
 {
     class ClamPizza : Pizza
     {
@@ -11,8 +11,8 @@
 
         internal override void Prepare()
         {
-            Console.WriteLine("Preparing " + Name + " Using");
-            Console.Write("Dough: " + _ingredients.CreateDough().Name + ", Clam: " + _ingredients.CreateClam().Name + ", Sauce: " + _ingredients.CreateSauce().Name + ", Cheese: " + _ingredients.CreateCheese().Name);
+            Console.WriteLine("准备 " + Name + "，使用");
+            Console.Write("面团：" + _ingredients.CreateDough().Name + "，蛤蜊：" + _ingredients.CreateClam().Name + "，酱料：" + _ingredients.CreateSauce().Name + "，奶酪：" + _ingredients.CreateCheese().Name);
             Console.WriteLine();
 
         }

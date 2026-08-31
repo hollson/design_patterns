@@ -13,7 +13,7 @@ public class RealImage : Image
         loadFromDisk(_fileName);
     }
 
-    public void display() => Console.WriteLine("Displaying " + _fileName);
+    public void display() => Console.WriteLine("显示 " + _fileName);
 
-    private void loadFromDisk(string fileName) => Console.WriteLine("Loading " + fileName);
+    private void loadFromDisk(string fileName) => Console.WriteLine("加载 " + fileName);
 }

@@ -7,7 +7,7 @@ internal class Garage(string name)
 {
     private readonly string _name = name;
 
-    internal void Open() => Console.WriteLine($"{_name} Garage Opened");
+    internal void Open() => Console.WriteLine($"{_name} 车库已打开");
 
-    internal void Close() => Console.WriteLine($"{_name} Garage Closed");
+    internal void Close() => Console.WriteLine($"{_name} 车库已关闭");
 }

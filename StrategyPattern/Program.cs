@@ -3,6 +3,9 @@
 
 using Ducks;
 
+Console.WriteLine("\n========== 策略模式 (Strategy Pattern) ==========");
+Console.WriteLine("定义一系列算法，将每一个封装起来，并使它们可互相替换\n");
+
 var mallard = new MallardDuck { Quacker = new QuackNormal() };
 mallard.Display();
 mallard.Flyer = new FlyWings();

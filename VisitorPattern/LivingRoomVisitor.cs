@@ -11,5 +11,5 @@ public class LivingRoomVisitor : IUnitVisitor
 
     public void VisitBedroom(Bedroom bedroom) { }
 
-    public void VisitLivingRoom(LivingRoom livingRoom) => Console.WriteLine("This is the living room");
+    public void VisitLivingRoom(LivingRoom livingRoom) => Console.WriteLine("这是客厅");
 }

@@ -4,6 +4,9 @@
 
 using AdapterPattern;
 
+Console.WriteLine("\n========== 适配器模式 (Adapter Pattern) ==========");
+Console.WriteLine("将一个类的接口转换成客户期望的另一个接口，使不兼容的类可协同工作\n");
+
 var turkey = new WildTurkey();
 var adapter = new TurkeyAdapter(turkey);
 Tester(adapter);

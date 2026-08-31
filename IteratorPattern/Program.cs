@@ -3,6 +3,9 @@
 
 using IteratorPattern;
 
+Console.WriteLine("\n========== 迭代器模式 (Iterator Pattern) ==========");
+Console.WriteLine("提供一种方法顺序访问聚合对象中的元素，而不暴露其内部表示\n");
+
 var breakfast = new BreakfastMenu();
 var dinner = new DinnerMenu();
 var waiter = new Client(breakfast, dinner);

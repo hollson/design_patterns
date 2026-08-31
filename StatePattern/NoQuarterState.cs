@@ -11,13 +11,13 @@ public class NoQuarterState : IState
 
     public void InsertQuarter()
     {
-        Console.WriteLine("Inserted a quarter");
+        Console.WriteLine("已投入硬币");
         Machine.State = Machine.HasQuarterState;
     }
 
-    public void EjectQuarter() => Console.Write("Can't eject anything");
+    public void EjectQuarter() => Console.Write("无法退币");
 
-    public void TurnCrank() => Console.WriteLine("Can't turn crank without a quarter");
+    public void TurnCrank() => Console.WriteLine("未投币无法转动摇杆");
 
-    public void Dispense() => Console.WriteLine("Can't dispense");
+    public void Dispense() => Console.WriteLine("无法出货");
 }

@@ -8,6 +8,6 @@ namespace PrototypePattern
 
         public object Clone() => new Circle(_radius);
 
-        public void GetInfo() => Console.WriteLine($"Circle with radius {_radius}");
+        public void GetInfo() => Console.WriteLine($"半径为 {_radius} 的圆形");
     }
 }

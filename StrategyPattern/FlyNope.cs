@@ -5,5 +5,5 @@ namespace Ducks;
 /// </summary>
 class FlyNope : IFlyBehaviour
 {
-    public void Fly() => Console.WriteLine("I can't fly");
+    public void Fly() => Console.WriteLine("我不会飞");
 }

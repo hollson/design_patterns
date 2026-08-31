@@ -29,17 +29,17 @@ sealed class WeatherMonitor : IObserver<Weather>
         Console.WriteLine(_name);
         if (_name.Contains("T"))
         {
-            string op = $"| Temperature : {value.Temperature} Celsius |";
+            string op = $"| 温度: {value.Temperature} 摄氏度 |";
             Console.Write(op);
         }
         if (_name.Contains("P"))
         {
-            string op = $"| Pressure : {value.Pressure} atm |";
+            string op = $"| 气压: {value.Pressure} 大气压 |";
             Console.Write(op);
         }
         if (_name.Contains("H"))
         {
-            string op = $"| Humidity : {value.Humidity * 100} % |";
+            string op = $"| 湿度: {value.Humidity * 100} % |";
             Console.Write(op);
         }
         if (!(_name.Contains("T") || _name.Contains("P") || _name.Contains("H")))

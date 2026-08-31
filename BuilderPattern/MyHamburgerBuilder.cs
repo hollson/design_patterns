@@ -1,4 +1,4 @@
-﻿namespace BuilderPattern;
+namespace BuilderPattern;
 
 /// <summary>
 /// 我的汉堡建造者，构建一个较大的风筝形汉堡。
@@ -7,9 +7,9 @@ public class MyHamburgerBuilder : IBuilder
 {
     private Hamburger _hamburger = null!;
 
-    public void AddIngredients() => _hamburger.Ingredients = ["Bread", "Meat", "Tomato", "Salad", "Mayonnaise"];
+    public void AddIngredients() => _hamburger.Ingredients = ["面包", "肉", "番茄", "沙拉", "蛋黄酱"];
 
-    public void AddShape() => _hamburger.Shape = "Kite";
+    public void AddShape() => _hamburger.Shape = "风筝形";
 
     public void AddSize() => _hamburger.Size = 10; //inches
 

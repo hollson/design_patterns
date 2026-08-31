@@ -7,7 +7,7 @@ public class StudioVisitor : IUnitVisitor
 {
     public void VisitApartment(Apartment apartment) { }
 
-    public void VisitStudio(Studio studio) => Console.WriteLine("This is a studio");
+    public void VisitStudio(Studio studio) => Console.WriteLine("这是单间公寓");
 
     public void VisitBedroom(Bedroom bedroom) { }
 

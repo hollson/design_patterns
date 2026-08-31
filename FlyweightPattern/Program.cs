@@ -3,5 +3,8 @@
 
 using FlyweightPattern;
 
+Console.WriteLine("\n========== 享元模式 (Flyweight Pattern) ==========");
+Console.WriteLine("运用共享技术有效地支持大量细粒度对象\n");
+
 var teaShop = new BubbleTeaShop();
 teaShop.Enumerate();

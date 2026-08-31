@@ -9,11 +9,11 @@ public class SoldOutState : IState
 
     public SoldOutState(GumballMachine gumballMachine) => Machine = gumballMachine;
 
-    public void InsertQuarter() => Console.WriteLine("Sorry! Sold Out");
+    public void InsertQuarter() => Console.WriteLine("抱歉！已售罄");
 
-    public void EjectQuarter() => Console.WriteLine("Can't eject when sold out");
+    public void EjectQuarter() => Console.WriteLine("售罄时无法退币");
 
-    public void TurnCrank() => Console.WriteLine("turning crank achieves nothing");
+    public void TurnCrank() => Console.WriteLine("转动摇杆无效");
 
-    public void Dispense() => Console.WriteLine("Can't dispense when out of stock");
+    public void Dispense() => Console.WriteLine("缺货时无法出货");
 }

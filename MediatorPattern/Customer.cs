@@ -7,5 +7,5 @@ class Customer : Colleague
 {
     public Customer(Mediator mediator) : base(mediator) { }
 
-    public override void Notify(string message) => Console.WriteLine($"Message to customer: {message}");
+    public override void Notify(string message) => Console.WriteLine($"客户收到消息：{message}");
 }

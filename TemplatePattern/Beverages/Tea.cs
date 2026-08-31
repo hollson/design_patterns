@@ -5,15 +5,15 @@ namespace TemplatePattern;
 /// </summary>
 class Tea : Beverage
 {
-    protected override void Brew() => Console.WriteLine("Adding tea leaves to water and boil");
+    protected override void Brew() => Console.WriteLine("将茶叶加入水中煮沸");
 
     protected override void AddCondiments()
     {
-        Console.WriteLine("Adding Lemon and Sugar");
+        Console.WriteLine("加入柠檬和糖");
         Sugar();
     }
 
-    private new void Sugar() => Console.WriteLine($"adding {_sugar} spoons of sugar");
+    private new void Sugar() => Console.WriteLine($"加入 {_sugar} 勺糖");
 
     public new int AddSugar { set => _sugar = value; }
 }

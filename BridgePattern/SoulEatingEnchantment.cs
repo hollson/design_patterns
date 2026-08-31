@@ -5,9 +5,9 @@ namespace BridgePattern;
 /// </summary>
 public class SoulEatingEnchantment : IEnchantment
 {
-    public void OnActivate() => Console.WriteLine("The item spreads bloodlust.");
+    public void OnActivate() => Console.WriteLine("物品散发嗜血气息。");
 
-    public void Apply() => Console.WriteLine("The item eats the soul of enemies.");
+    public void Apply() => Console.WriteLine("物品吞噬敌人的灵魂。");
 
-    public void OnDeactivate() => Console.WriteLine("Bloodlust slowly disappears.");
+    public void OnDeactivate() => Console.WriteLine("嗜血气息慢慢消散。");
 }

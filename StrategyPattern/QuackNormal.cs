@@ -5,5 +5,5 @@ namespace Ducks;
 /// </summary>
 class QuackNormal : IQuackBehaviour
 {
-    public void Quack() => Console.WriteLine("Quack Quack");
+    public void Quack() => Console.WriteLine("嘎嘎叫");
 }

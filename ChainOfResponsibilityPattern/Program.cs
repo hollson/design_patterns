@@ -4,6 +4,9 @@
 
 using ChainOfResponsibilityPattern;
 
+Console.WriteLine("\n========== 责任链模式 (Chain of Responsibility Pattern) ==========");
+Console.WriteLine("将请求沿处理者链传递，每个处理者决定处理或转发\n");
+
 // 创建处理器
 var additionHandler = new AdditionHandler();
 var subtractionHandler = new SubtractionHandler();
@@ -20,7 +23,7 @@ var subtractionResult = additionHandler.Handle(numbers, "Minus");
 var multResult = additionHandler.Handle(numbers, "Multiply");
 var divisionResult = additionHandler.Handle(numbers, "divide"); // 除法不在链中，返回 null
 
-Console.WriteLine($"Addition = {additionResult}");
-Console.WriteLine($"Subtraction = {subtractionResult}");
-Console.WriteLine($"Multiplication = {multResult}");
-Console.WriteLine($"Division = {divisionResult}");
+Console.WriteLine($"加法 = {additionResult}");
+Console.WriteLine($"减法 = {subtractionResult}");
+Console.WriteLine($"乘法 = {multResult}");
+Console.WriteLine($"除法 = {divisionResult}");

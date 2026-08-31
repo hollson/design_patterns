@@ -41,7 +41,7 @@ public class GumballMachine
 
     public void ReleaseBall()
     {
-        Console.WriteLine("A ball comes rolling down");
+        Console.WriteLine("一颗糖果滚落出来");
         if (Count == 0) return;
         Count--;
     }

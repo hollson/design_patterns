@@ -4,6 +4,9 @@
 
 using CompositePattern;
 
+Console.WriteLine("\n========== 组合模式 (Composite Pattern) ==========");
+Console.WriteLine("将对象组合成树形结构以表示部分-整体的层次结构\n");
+
 var breakfast = new Menu("Breakfast", "Pancake House");
 var lunch = new Menu("Lunch", "Deli Diner");
 var dinner = new Menu("Dinner", "Dinneroni");

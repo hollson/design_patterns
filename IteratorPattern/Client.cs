@@ -21,7 +21,7 @@ public class Client(BreakfastMenu breakfast, DinnerMenu dinner)
         foreach (var item in iter)
         {
             var i = (Menu)item;
-            Console.WriteLine($"{i.Name}  Rs. {i.Price} {(i.Vegetarian ? "*" : "x")} \n {i.Description} ");
+            Console.WriteLine($"{i.Name}  ￥{i.Price} {(i.Vegetarian ? "*" : "x")} \n {i.Description} ");
         }
     }
 }

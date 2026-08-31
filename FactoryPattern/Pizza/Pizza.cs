@@ -13,17 +13,17 @@ namespace FactoryPattern
 
         internal void Bake()
         {
-            Console.WriteLine("Baking at 135 degree Celsius for 20 minutes");
+            Console.WriteLine("在135摄氏度下烘烤20分钟");
         }
 
         internal void Cut()
         {
-            Console.WriteLine("Cutting into diagonal pieces");
+            Console.WriteLine("切成对角块");
         }
 
         internal void Box()
         {
-            Console.WriteLine("Putting pizza in " + Color + " coloured box");
+            Console.WriteLine("将披萨放入" + Color + "色盒子");
         }
     }
 }

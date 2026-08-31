@@ -27,7 +27,7 @@ public class BubbleTeaShop
 
     public void Enumerate()
     {
-        Console.WriteLine("Enumerating take away orders\n");
+        Console.WriteLine("列举外带订单\n");
         foreach (var beverage in takeAwayOrders)
         {
             beverage.Drink();

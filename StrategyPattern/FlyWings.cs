@@ -5,5 +5,5 @@ namespace Ducks;
 /// </summary>
 class FlyWings : IFlyBehaviour
 {
-    public void Fly() => Console.WriteLine("Flap Flap");
+    public void Fly() => Console.WriteLine("扑翅扑翅");
 }

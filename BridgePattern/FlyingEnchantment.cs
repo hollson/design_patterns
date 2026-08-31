@@ -5,9 +5,9 @@ namespace BridgePattern;
 /// </summary>
 public class FlyingEnchantment : IEnchantment
 {
-    public void OnActivate() => Console.WriteLine("The item begins to glow faintly.");
+    public void OnActivate() => Console.WriteLine("物品开始发出微光。");
 
-    public void Apply() => Console.WriteLine("The item flies and strikes the enemies finally returning to owner's hand.");
+    public void Apply() => Console.WriteLine("物品飞出击中敌人后回到主人手中。");
 
-    public void OnDeactivate() => Console.WriteLine("The item's glow fades.");
+    public void OnDeactivate() => Console.WriteLine("物品的光芒消退。");
 }

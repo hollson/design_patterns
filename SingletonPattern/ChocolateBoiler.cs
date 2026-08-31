@@ -24,15 +24,15 @@ internal class ChocolateBoiler
 
     private ChocolateBoiler()
     {
-        Console.WriteLine("Starting");
+        Console.WriteLine("启动中");
         _boiler = Status.Empty;
     }
 
-    public void Fill() => Transition(() => IsEmpty, "Filling...", Status.InProgress);
+    public void Fill() => Transition(() => IsEmpty, "加料中...", Status.InProgress);
 
-    public void Drain() => Transition(() => IsBoiled, "Draining...", Status.Empty);
+    public void Drain() => Transition(() => IsBoiled, "排空...", Status.Empty);
 
-    public void Boil() => Transition(() => !IsBoiled && !IsEmpty, "Boiling...", Status.Boiled);
+    public void Boil() => Transition(() => !IsBoiled && !IsEmpty, "煮沸中...", Status.Boiled);
 
     private void Transition(Func<bool> canTransition, string message, Status newStatus)
     {

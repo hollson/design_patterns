@@ -20,7 +20,7 @@ public class TurkeyAdapter : IDuck
         for (var i = 0; i < 5; i++)
         {
             _turkey.Fly();
-            Console.WriteLine("Resting..");
+            Console.WriteLine("休息中..");
         }
     }
 }

@@ -7,7 +7,7 @@ internal class Light(string name)
 {
     private readonly string _name = name;
 
-    internal void On() => Console.WriteLine($"{_name} Light On");
+    internal void On() => Console.WriteLine($"{_name} 灯已打开");
 
-    internal void Off() => Console.WriteLine($"{_name} Light Off");
+    internal void Off() => Console.WriteLine($"{_name} 灯已关闭");
 }

@@ -1,5 +1,8 @@
 // 备忘录模式示例：文本编辑器撤销/重做功能
 
+Console.WriteLine("\n========== 备忘录模式 (Memento Pattern) ==========");
+Console.WriteLine("在不破坏封装性的前提下，捕获对象的内部状态并保存\n");
+
 var editor = new Editor();
 var history = new History();
 

@@ -1,8 +1,11 @@
-﻿// 装饰器模式（Decorator Pattern）
+// 装饰器模式（Decorator Pattern）
 // 动态地给对象添加额外职责，比继承更灵活的功能扩展方式。
 // 装饰器和被装饰对象具有相同的接口，可以透明地叠加行为。
 
 using DecoratorPattern;
+
+Console.WriteLine("\n========== 装饰器模式 (Decorator Pattern) ==========");
+Console.WriteLine("动态地给对象添加额外的职责，比生成子类更灵活\n");
 
 Beverage beverage = new Espresso();
 Console.WriteLine(beverage.Description + " $" + beverage.Cost());

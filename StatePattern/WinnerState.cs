@@ -9,21 +9,21 @@ public class WinnerState : IState
 
     public WinnerState(GumballMachine gumballMachine) => Machine = gumballMachine;
 
-    public void InsertQuarter() => Console.WriteLine("Please wait, already in progress");
+    public void InsertQuarter() => Console.WriteLine("请等待，正在出货");
 
-    public void EjectQuarter() => Console.WriteLine("Can't eject, already turned the crank");
+    public void EjectQuarter() => Console.WriteLine("无法退币，已转动摇杆");
 
-    public void TurnCrank() => Console.WriteLine("Turning twice achieves nothing");
+    public void TurnCrank() => Console.WriteLine("重复转动无效");
 
 
     public void Dispense()
     {
-        Console.WriteLine("You Won!! 2 gumballs for the price of one");
+        Console.WriteLine("中奖了！买一送一");
         Machine.ReleaseBall();
         if (Machine.Count == 0)
         {
             Machine.State = Machine.SoldOutState;
-            Console.WriteLine("Oops! No more gumballs");
+            Console.WriteLine("糟糕！糖果售罄");
         }
         else
         {

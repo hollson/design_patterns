@@ -17,16 +17,16 @@ public class GumballMachine(int count)
         {
             case State.NoQuarters:
                 _state = State.HasQuarters;
-                Console.WriteLine("Inserted a quarter");
+                Console.WriteLine("已投入硬币");
                 break;
             case State.Sold:
-                Console.WriteLine("Please wait for current gumball to come out");
+                Console.WriteLine("请等待当前糖果出货");
                 break;
             case State.HasQuarters:
-                Console.WriteLine("Can't add more quarters");
+                Console.WriteLine("不能投入更多硬币");
                 break;
             case State.NoGumballs:
-                Console.WriteLine("Out of Stock");
+                Console.WriteLine("缺货");
                 break;
             default:
                 throw new ArgumentOutOfRangeException();
@@ -38,17 +38,17 @@ public class GumballMachine(int count)
         switch (_state)
         {
             case State.NoQuarters:
-                Console.WriteLine("Nothing to eject");
+                Console.WriteLine("无可退币");
                 break;
             case State.Sold:
-                Console.WriteLine("Sorry, you have already turned the crank");
+                Console.WriteLine("抱歉，您已转动摇杆");
                 break;
             case State.HasQuarters:
-                Console.WriteLine("Ejecting..");
+                Console.WriteLine("退币中..");
                 _state = State.NoQuarters;
                 break;
             case State.NoGumballs:
-                Console.WriteLine("Can't eject, never accepted quarters");
+                Console.WriteLine("无法退币，未接受过硬币");
                 break;
             default:
                 throw new ArgumentOutOfRangeException();
@@ -60,18 +60,18 @@ public class GumballMachine(int count)
         switch (_state)
         {
             case State.NoQuarters:
-                Console.WriteLine("Insert quarter First");
+                Console.WriteLine("请先投币");
                 break;
             case State.Sold:
-                Console.WriteLine("Turning twice won't get you a gumball");
+                Console.WriteLine("重复转动无法获得糖果");
                 break;
             case State.HasQuarters:
-                Console.WriteLine("Getting gumball...");
+                Console.WriteLine("正在出货...");
                 _state = State.Sold;
                 Dispense();
                 break;
             case State.NoGumballs:
-                Console.WriteLine("Out of Stock");
+                Console.WriteLine("缺货");
                 break;
             default:
                 throw new ArgumentOutOfRangeException();
@@ -83,16 +83,16 @@ public class GumballMachine(int count)
         switch (_state)
         {
             case State.NoQuarters:
-                Console.WriteLine("You need to pay first");
+                Console.WriteLine("请先投币");
                 break;
             case State.Sold:
-                Console.WriteLine("A Gumball comes rolling out");
+                Console.WriteLine("一颗糖果滚落出来");
                 _count--;
                 _state = _count == 0 ? _state = State.NoGumballs : State.NoQuarters;
                 break;
             case State.HasQuarters:
             case State.NoGumballs:
-                Console.WriteLine("Can't dispense");
+                Console.WriteLine("无法出货");
                 break;
             default:
                 throw new ArgumentOutOfRangeException();

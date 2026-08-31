@@ -10,17 +10,17 @@ public class HasQuarterState : IState
 
     public HasQuarterState(GumballMachine gumballMachine) => Machine = gumballMachine;
 
-    public void InsertQuarter() => Console.WriteLine("Can't insert more than one");
+    public void InsertQuarter() => Console.WriteLine("不能投入更多硬币");
 
     public void EjectQuarter()
     {
-        Console.WriteLine("Quarter returned");
+        Console.WriteLine("硬币已退回");
         Machine.State = Machine.NoQuarterState;
     }
 
     public void TurnCrank()
     {
-        Console.WriteLine("You turned the crank");
+        Console.WriteLine("您转动了摇杆");
         var winner = _random.Next(10);
         if ((winner == 5) && (Machine.Count > 1))
             Machine.State = Machine.WinnerState;
@@ -32,6 +32,6 @@ public class HasQuarterState : IState
 
     public void Dispense()
     {
-        Console.WriteLine("Can't do that");
+        Console.WriteLine("无法执行此操作");
     }
 }

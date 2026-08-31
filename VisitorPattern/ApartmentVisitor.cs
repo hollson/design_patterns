@@ -5,7 +5,7 @@ namespace VisitorPattern;
 /// </summary>
 public class ApartmentVisitor : IUnitVisitor
 {
-    public void VisitApartment(Apartment apartment) => Console.WriteLine("This is an apartment");
+    public void VisitApartment(Apartment apartment) => Console.WriteLine("这是公寓");
 
     public void VisitStudio(Studio studio) { }
 

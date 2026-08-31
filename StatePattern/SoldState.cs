@@ -9,11 +9,11 @@ public class SoldState : IState
 
     public SoldState(GumballMachine gumballMachine) => Machine = gumballMachine;
 
-    public void InsertQuarter() => Console.WriteLine("Please wait, already in progress");
+    public void InsertQuarter() => Console.WriteLine("请等待，正在出货");
 
-    public void EjectQuarter() => Console.WriteLine("Can't eject, already turned the crank");
+    public void EjectQuarter() => Console.WriteLine("无法退币，已转动摇杆");
 
-    public void TurnCrank() => Console.WriteLine("Turning twice achieves nothing");
+    public void TurnCrank() => Console.WriteLine("重复转动无效");
 
     public void Dispense()
     {
@@ -24,7 +24,7 @@ public class SoldState : IState
         }
         else
         {
-            Console.WriteLine("Oops! No more gumballs");
+            Console.WriteLine("糟糕！糖果售罄");
             Machine.State = Machine.SoldOutState;
         }
     }

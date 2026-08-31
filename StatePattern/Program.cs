@@ -3,6 +3,9 @@
 
 using StatePattern;
 
+Console.WriteLine("\n========== 状态模式 (State Pattern) ==========");
+Console.WriteLine("允许对象在内部状态改变时改变其行为\n");
+
 LegacyTest();
 Console.WriteLine();
 var gumballmachine = new GumballMachine(5);

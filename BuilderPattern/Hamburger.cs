@@ -17,6 +17,6 @@ public class Hamburger
     public override string ToString()
     {
         var hamburger = string.Join(" ", Ingredients);
-        return $"Ingredients: {hamburger}, Size: {Size}, Shape: {Shape}";
+        return $"配料: {hamburger}, 尺寸: {Size}, 形状: {Shape}";
     }
 }

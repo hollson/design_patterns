@@ -7,9 +7,9 @@ public class Hammer(IEnchantment enchantment) : IWeapon
 {
     private readonly IEnchantment _enchantment = enchantment;
 
-    public void Wield() => DoAction("The hammer is wielded.", _enchantment.OnActivate);
-    public void Swing() => DoAction("The hammer is swinged.", _enchantment.Apply);
-    public void Unwield() => DoAction("The hammer is unwielded.", _enchantment.OnDeactivate);
+    public void Wield() => DoAction("锤子已挥起。", _enchantment.OnActivate);
+    public void Swing() => DoAction("锤子已挥动。", _enchantment.Apply);
+    public void Unwield() => DoAction("锤子已放下。", _enchantment.OnDeactivate);
 
     public IEnchantment GetEnchantment() => _enchantment;
 

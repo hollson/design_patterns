@@ -9,14 +9,17 @@
 
 using VisitorPattern;
 
+Console.WriteLine("\n========== 访问者模式 (Visitor Pattern) ==========");
+Console.WriteLine("表示一个作用于某对象结构中各元素的操作\n");
+
 var apartment = new Apartment(new LivingRoom(), new Bedroom(), new Bedroom());
 var studio = new Studio(new LivingRoom(), new Bedroom());
-Console.WriteLine("Visiting an Apartment");
+Console.WriteLine("访问公寓");
 apartment.Accept(new ApartmentVisitor());
 apartment.Accept(new LivingRoomVisitor());
 apartment.Accept(new BedroomVisitor());
 
-Console.WriteLine("Visiting a Studio");
+Console.WriteLine("访问单间");
 studio.Accept(new StudioVisitor());
 studio.Accept(new LivingRoomVisitor());
 studio.Accept(new BedroomVisitor());

@@ -9,6 +9,6 @@ namespace PrototypePattern
 
         public object Clone() => new Rectangle(_width, _height);
 
-        public void GetInfo() => Console.WriteLine($"Rectangle height {_height} and width {_width}");
+        public void GetInfo() => Console.WriteLine($"矩形高度 {_height} 宽度 {_width}");
     }
 }

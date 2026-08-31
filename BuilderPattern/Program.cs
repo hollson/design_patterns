@@ -5,6 +5,9 @@
 
 using BuilderPattern;
 
+Console.WriteLine("\n========== 建造者模式 (Builder Pattern) ==========");
+Console.WriteLine("将复杂对象的构造与表示分离，同样的构造过程可创建不同表示\n");
+
 var builder = new MyHamburgerBuilder();
 var cook = new Cook(builder);
 var myHamburger = cook.Build();
@@ -12,5 +15,5 @@ var myHamburger = cook.Build();
 cook.ChangeBuilder(new WifesHamburgerBuilder());
 var wifesHamburger = cook.Build();
 
-Console.WriteLine($"My Hamburger: {myHamburger}");
-Console.WriteLine($"My Wife's Hamburger: {wifesHamburger}");
+Console.WriteLine($"我的汉堡: {myHamburger}");
+Console.WriteLine($"妻子的汉堡: {wifesHamburger}");

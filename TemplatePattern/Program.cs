@@ -6,6 +6,9 @@
 using TemplatePattern;
 using TemplatePattern.Comparable;
 
+Console.WriteLine("\n========== 模板方法模式 (Template Method Pattern) ==========");
+Console.WriteLine("定义一个操作中的算法骨架，将步骤延迟到子类中\n");
+
 var tea = new Tea();
 var coffee = new Coffee();
 tea.WantsCondiments = true;

@@ -5,7 +5,7 @@ namespace CommandPattern;
 /// </summary>
 internal class NoCommand : ICommand
 {
-    public void Execute() => Console.WriteLine("No Command Assigned");
+    public void Execute() => Console.WriteLine("未分配命令");
 
     public void Undo() => Execute();
 }

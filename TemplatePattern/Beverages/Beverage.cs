@@ -23,9 +23,9 @@ public abstract class Beverage
 
     protected abstract void Brew();
 
-    private void Boil() => Console.WriteLine("Boling Water");
+    private void Boil() => Console.WriteLine("烧水中");
 
-    private void Pour() => Console.WriteLine("Pouring in Cup");
+    private void Pour() => Console.WriteLine("倒入杯中");
 
     protected abstract void AddCondiments();
 

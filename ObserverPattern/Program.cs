@@ -3,6 +3,9 @@
 
 using ObserverPattern;
 
+Console.WriteLine("\n========== 观察者模式 (Observer Pattern) ==========");
+Console.WriteLine("定义对象间的一对多依赖关系，当对象状态变化时通知所有依赖者\n");
+
 var provider = new WeatherSupplier();
 var observer1 = new WeatherMonitor("TP");
 var observer2 = new WeatherMonitor("H");

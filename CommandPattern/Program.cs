@@ -4,6 +4,9 @@
 
 using CommandPattern;
 
+Console.WriteLine("\n========== 命令模式 (Command Pattern) ==========");
+Console.WriteLine("将请求封装为对象，使你可用不同请求对客户进行参数化\n");
+
 // 创建遥控器（调用者）
 var remote = new RemoteControl(3);
 
@@ -47,5 +50,5 @@ try
 }
 catch (Exception)
 {
-    Console.WriteLine("Oops");
+    Console.WriteLine("糟糕");
 }
