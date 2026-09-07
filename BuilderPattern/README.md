@@ -1,4 +1,4 @@
-# 建造者模式（Builder Pattern）教程
+# 建造者模式（Builder Pattern）
 
 [TOC]
 
