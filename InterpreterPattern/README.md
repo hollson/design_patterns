@@ -1,240 +1,180 @@
-# 解释器模式 (Interpreter) 教程
+# 解释器模式（Interpreter Pattern）
 
 [TOC]
 
 ## 一、📖 概述
 
-解释器模式是**行为型设计模式**，给定一个语言，定义它的文法的一种表示，并定义一个**解释器**，这个解释器使用该表示来解释语言中的句子。
+解释器是**行为型设计模式**，给定一门语言，定义其文法的一种表示，并定义一个**解释器**，该解释器使用该表示来解释语言中的句子。
 
-核心思想：将文法规则映射为类结构，每个文法规则对应一个类，通过组合这些类来解释整个语言。典型应用如数学表达式求值、SQL 解析、正则表达式。
-
-### 核心特性
-
-- **语法映射**：每个文法规则对应一个解释器类
-
-- **组合性**：通过组合简单表达式构建复杂表达式
-
-- **易于扩展**：新增文法规则只需新增类
-
-- **符合开闭原则**：对扩展开放，对修改关闭
+核心思想：**每条文法规则映射为一个类**——终结符是叶子节点，非终结符持有子表达式并递归解释；客户端把规则类组装成一棵**表达式树**，对根节点调用一次即完成解释。典型应用：数学表达式求值、规则引擎、正则、SQL、配置 DSL。
 
 <br/>
 
-## 二、📐 结构图解
+## 二、🧩 模式解析
 
-### 2.1 整体流程
-
-```mermaid
-flowchart TD
-    A["客户端"] -->|"解析表达式"| B["抽象表达式"]
-    B -->|"实现"| C["终结符表达式"]
-    B -->|"实现"| D["非终结符表达式"]
-    C -->|"解释"| E["上下文"]
-    D -->|"组合解释"| E
-
-    style A fill:#4A90D9,color:#fff
-    style B fill:#E67E22,color:#fff
-    style C fill:#7B68EE,color:#fff
-    style D fill:#7B68EE,color:#fff
-    style E fill:#27AE60,color:#fff
-```
-
-### 2.2 类关系
+### 2.1 类关系图
 
 ```mermaid
 classDiagram
+    direction LR
+    class Client
     class IExpression {
         <<interface>>
-        +Interpret(): int
+        +Interpret(Context)
     }
-    class NumberExpression {
-        -number: int
-        +Interpret(): int
+    class TerminalExpression {
+        +Interpret(Context) 从上下文取值
     }
-    class AddExpression {
-        -left: IExpression
-        -right: IExpression
-        +Interpret(): int
+    class NonterminalExpression {
+        -left, right
+        +Interpret(Context) 递归组合
     }
-    class SubtractExpression {
-        -left: IExpression
-        -right: IExpression
-        +Interpret(): int
+    class Context {
+        求值所需的全局信息
     }
 
-    IExpression <|.. NumberExpression
-    IExpression <|.. AddExpression
-    IExpression <|.. SubtractExpression
-    AddExpression o-- IExpression : left
-    AddExpression o-- IExpression : right
-    SubtractExpression o-- IExpression : left
-    SubtractExpression o-- IExpression : right
+    Client --> IExpression : 组装并解释表达式树
+    IExpression <|.. TerminalExpression
+    IExpression <|.. NonterminalExpression
+    NonterminalExpression o--> IExpression : 组合子表达式
+    IExpression ..> Context : 读取
 ```
 
-### 2.3 关键角色
+| 关键角色 | 说明 |
+| --- | --- |
+| **抽象表达式（Expression）** | 统一的解释入口 `Interpret(Context)` |
+| **终结符表达式（Terminal）** | 叶子节点，解释在此触底（数字字面量、角色查询） |
+| **非终结符表达式（Nonterminal）** | 内部节点，每条文法规则一个类，递归解释子式（加减乘除、与或非） |
+| **上下文（Context）** | 求值所需的全局信息（变量表、用户角色集合） |
 
-| 角色                                    | 说明                                       |
-| --------------------------------------- | ------------------------------------------ |
-| 抽象表达式 (IExpression)                | 声明解释操作的接口                         |
-| 终结符表达式 (NumberExpression)         | 实现与终结符相关的解释操作                 |
-| 非终结符表达式 (Add/SubtractExpression) | 实现与非终结符相关的解释操作，组合子表达式 |
-
-<br/>
-
-## 三、💻 代码实现
-
-以数学表达式求值为例：支持加法、减法和数字的表达式求值。
-
-### 3.1 抽象表达式
+### 2.2 核心代码
 
 ```csharp
-// 抽象表达式：所有表达式的接口
-public interface IExpression
+// 抽象表达式：统一解释入口
+interface IExpression
 {
-    int Interpret();
+    int Interpret(Context ctx);
+}
+
+// 终结符表达式：叶子，直接持有值或从上下文取值
+class NumberExpression(int value) : IExpression
+{
+    public int Interpret() => value;
+}
+
+// 非终结符表达式：一条文法规则一个类，递归组合
+class AddExpression(IExpression left, IExpression right) : IExpression
+{
+    public int Interpret() => left.Interpret() + right.Interpret();
 }
 ```
 
-### 3.2 终结符表达式
+> 协作方式：客户端把终结符/非终结符组装成一棵表达式树，对根节点调用一次 `Interpret()`；每个非终结符递归解释自己的子式，终结符触底返回——"一文法规则一类，组合成树，递归解释"。
 
-```csharp
-// 终结符表达式：数字
-public class NumberExpression : IExpression
-{
-    private readonly int _number;
+### 2.3 关键解析
 
-    public NumberExpression(int number)
-    {
-        _number = number;
-    }
+**解释 ≠ 解析**：本模式只负责"解释"**已构建好的**表达式树；从字符串构建树需要词法/语法分析器（Parser），不属于本模式职责。
 
-    public int Interpret() => _number;
-}
+| 表达式类型 | 树中位置 | 求值方式 | 本模式示例 |
+| --- | --- | --- | --- |
+| 终结符 Terminal | 叶子 | 直接返回 / 查上下文 | `NumberExpression`、`RoleExpression` |
+| 非终结符 Nonterminal | 内部节点 | 递归组合子式 | `Add/Multiply`、`And/Or/Not` |
+
+- **表达式树本质是组合模式**的应用（见 [../CompositePattern](../CompositePattern/README.md)）——树形递归结构完全一致
+- **适用边界**：文法简单、性能要求不高时用解释器；复杂语言应使用解析器生成器（ANTLR）或编译方案
+- **BCL 中的身影**：`System.Linq.Expressions` 表达式树 + `Compile()`，LINQ 就是"解释器 → 编译器"的进化版
+
+<br/>
+
+## 三、💻 代码示例
+
+### 3.1 经典场景：算术表达式求值
+
+> 场景：把 `(10 + 5) × (8 - 3)` 组装成表达式树——非终结符递归求值、终结符触底返回；整棵树还能作为子表达式复用。
+
+```mermaid
+flowchart LR
+    M["× Multiply"] --> A["+ Add"]
+    M --> S["− Subtract"]
+    A --> N1["10"]
+    A --> N2["5"]
+    S --> N3["8"]
+    S --> N4["3"]
+
+    style M fill:#E67E22,color:#fff
+    style A fill:#7B68EE,color:#fff
+    style S fill:#7B68EE,color:#fff
+    style N1 fill:#27AE60,color:#fff
+    style N2 fill:#27AE60,color:#fff
+    style N3 fill:#27AE60,color:#fff
+    style N4 fill:#27AE60,color:#fff
 ```
 
-### 3.3 非终结符表达式
+| 角色 | 文件 |
+| --- | --- |
+| 抽象表达式 | [`Arithmetic/IExpression.cs`](Arithmetic/IExpression.cs) |
+| 终结符表达式 | [`Arithmetic/NumberExpression.cs`](Arithmetic/NumberExpression.cs) |
+| 非终结符表达式 | [`Arithmetic/AddExpression.cs`](Arithmetic/AddExpression.cs)、[`SubtractExpression.cs`](Arithmetic/SubtractExpression.cs)、[`MultiplyExpression.cs`](Arithmetic/MultiplyExpression.cs) |
+| 客户端 | [`Program.cs`](Program.cs) |
 
-```csharp
-// 非终结符表达式：加法
-public class AddExpression : IExpression
-{
-    private readonly IExpression _left;
-    private readonly IExpression _right;
+### 3.2 软件项目：权限规则引擎
 
-    public AddExpression(IExpression left, IExpression right)
-    {
-        _left = left;
-        _right = right;
-    }
+> 场景：发布权限规则 `(admin 或 editor) 且 未被封禁` 组装成布尔表达式树，规则只组装一次，可对任意用户上下文反复求值——GoF 原著的布尔表达式领域，也是规则引擎的核心机制。
 
-    public int Interpret() => _left.Interpret() + _right.Interpret();
-}
+```mermaid
+flowchart LR
+    AND["AND 且"] --> OR["OR 或"]
+    AND --> NOT["NOT 非"]
+    OR --> R1["admin?"]
+    OR --> R2["editor?"]
+    NOT --> R3["banned?"]
 
-// 非终结符表达式：减法
-public class SubtractExpression : IExpression
-{
-    private readonly IExpression _left;
-    private readonly IExpression _right;
-
-    public SubtractExpression(IExpression left, IExpression right)
-    {
-        _left = left;
-        _right = right;
-    }
-
-    public int Interpret() => _left.Interpret() - _right.Interpret();
-}
+    style AND fill:#E67E22,color:#fff
+    style OR fill:#7B68EE,color:#fff
+    style NOT fill:#7B68EE,color:#fff
+    style R1 fill:#27AE60,color:#fff
+    style R2 fill:#27AE60,color:#fff
+    style R3 fill:#27AE60,color:#fff
 ```
 
-### 3.4 客户端使用
+| 角色 | 文件 |
+| --- | --- |
+| 抽象表达式 | [`AccessControl/IBooleanExpression.cs`](AccessControl/IBooleanExpression.cs) |
+| 终结符表达式 | [`AccessControl/RoleExpression.cs`](AccessControl/RoleExpression.cs) |
+| 非终结符表达式 | [`AccessControl/AndExpression.cs`](AccessControl/AndExpression.cs)、[`OrExpression.cs`](AccessControl/OrExpression.cs)、[`NotExpression.cs`](AccessControl/NotExpression.cs) |
+| 上下文 | [`AccessControl/RoleContext.cs`](AccessControl/RoleContext.cs) |
+| 客户端 | [`Program.cs`](Program.cs) |
 
-```csharp
-// 构建表达式: (5 + 3) - 2
-var expression = new SubtractExpression(
-    new AddExpression(
-        new NumberExpression(5),
-        new NumberExpression(3)
-    ),
-    new NumberExpression(2)
-);
+### 3.3 运行结果
 
-int result = expression.Interpret();
-Console.WriteLine($"(5 + 3) - 2 = {result}");
-```
+```bash
+========== 解释器模式 (Interpreter Pattern) ==========
+给定一门语言，定义其文法表示与解释器
 
-**运行结果**：
+--- 经典场景: 算术表达式求值 ---
+>> 构建表达式树：(10 + 5) × (8 - 3)
+[求值] (10 + 5) × (8 - 3) = 75
 
-```
-(5 + 3) - 2 = 6
+>> 整棵树当作子表达式复用，再 +1：
+[求值] (10 + 5) × (8 - 3) + 1 = 76
+
+--- 软件项目: 权限规则引擎 ---
+>> 规则：(admin 或 editor) 且 未被封禁
+
+>> Alice（角色：admin）
+[通过] 允许发布文章
+>> Bob（角色：editor）
+[通过] 允许发布文章
+>> Eve（角色：editor、banned）
+[拒绝] 已被封禁，禁止发布
 ```
 
 <br/>
 
-## 四、🔍 核心解析
+## 四、📝 小结
 
-### 4.1 文法规则映射
+- **核心思想**：文法规则类化，终结符/非终结符组装成表达式树，一次调用递归解释
 
-每条文法规则（如"加法表达式"、"数字"）对应一个类。客户端通过组合这些类来构建表达式树，解释器遍历树来解释整个表达式。
+- **两个示例**：算术求值展示树形递归与子树复用，权限规则引擎展示上下文求值与"规则只组装一次、反复求值"的工程价值
 
-### 4.2 终结符与非终结符
-
-- **终结符**：不可再分的基本元素（如数字），直接返回结果
-- **非终结符**：可继续分解的组合元素（如加法），递归解释子表达式
-
-### 4.3 适用性
-
-解释器模式适用于文法规则简单的场景。如果文法复杂（如完整编程语言），应使用 parser generator（如 ANTLR）而非手动实现。
-
-<br/>
-
-## 五、🎯 应用场景
-
-### 5.1 适用场景
-
-- 语言文法简单，规则数量有限
-
-- 需要解释执行语言中的句子
-
-- 文法变化频繁，需要灵活扩展
-
-### 5.2 实际案例
-
-- **SQL 解析器**：将 SQL 语句解析为执行计划
-
-- **正则表达式**：匹配字符串模式
-
-- **数学表达式**：计算器、公式引擎
-
-- **模板引擎**：解析模板语法生成输出
-
-<br/>
-
-## 六、⚖️ 优缺点分析
-
-### 6.1 优点
-
-- **易于扩展**：新增文法规则只需新增类
-
-- **实现简单**：每条规则对应一个类，结构清晰
-
-- **符合开闭原则**：修改文法无需修改现有类
-
-### 6.2 缺点
-
-- **类数量膨胀**：复杂文法会导致大量类
-
-- **维护困难**：文法变更可能影响多个类
-
-- **性能问题**：递归解释可能有性能损耗
-
-<br/>
-
-## 七、📝 总结
-
-- **核心思想**：为文法定义类结构，通过组合类来解释语言
-
-- **关键角色**：抽象表达式、终结符表达式、非终结符表达式
-
-- **适用场景**：文法规则简单且稳定的场景
-
-- **注意事项**：复杂文法应使用专业 parser，避免类数量爆炸
+- **注意事项**：文法复杂时类数量爆炸、递归性能受限，应改用解析器生成器；日常开发中遇到"规则 DSL"需求时，本模式是第一步
