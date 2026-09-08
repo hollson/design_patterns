@@ -92,7 +92,7 @@
 
 ```bash
 # 1. 克隆仓库
-git clone https://github.com/yourusername/design_patterns.git
+git clone https://github.com/hollson/design_patterns.git
 cd design_patterns
 
 # 2. 运行示例（以工厂模式为例）
