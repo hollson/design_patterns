@@ -1,4 +1,4 @@
-# 外观模式（Facade Pattern）教程
+# 外观模式（Facade Pattern）
 
 [TOC]
 
@@ -6,31 +6,75 @@
 
 外观模式是**结构型设计模式**，为子系统中的一组接口提供**统一的高层接口**，降低客户端与子系统的耦合度。
 
-核心思想：将复杂的子系统调用封装在一个高层接口之后，客户端只需调用外观提供的简单方法，无需了解子系统内部的调用顺序和协作细节。
-
-### 核心特性
-
-- **简化接口**：将多个子系统调用封装为一个高层方法
-
-- **降低耦合**：客户端只依赖外观类，不直接接触子系统
-
-- **遵循迪米特法则**：客户端只与外观交互，减少不必要的依赖
-
-- **灵活性保留**：客户端仍可直接使用子系统，外观不强制封装
+核心思想：将复杂的子系统调用封装在一个高层接口之后，客户端只需调用外观提供的简单方法，无需了解子系统内部的调用顺序和协作细节——**一键搞定复杂系统**。
 
 <br/>
 
-## 二、📐 结构图解
+## 二、🧩 模式解析
 
-### 2.1 整体结构
+### 2.1 类关系图
+
+```mermaid
+classDiagram
+    class Facade {
+        +OperationA()
+        +OperationB()
+    }
+    class SubsystemA {
+        +MethodA1()
+        +MethodA2()
+    }
+    class SubsystemB {
+        +MethodB1()
+    }
+    class SubsystemC {
+        +MethodC1()
+    }
+    class Client
+
+    Facade --> SubsystemA : 协调
+    Facade --> SubsystemB : 协调
+    Facade --> SubsystemC : 协调
+    Client --> Facade : 依赖
+```
+
+### 2.2 三大角色
+
+| 角色 | 职责 | 设计要点 |
+| --- | --- | --- |
+| **外观 Facade** | 封装子系统复杂度，提供统一高层接口 | 单向依赖，不感知客户端具体需求 |
+| **子系统 Subsystem** | 实际执行业务逻辑的组件 | 各自独立，不感知外观存在 |
+| **客户端 Client** | 只与外观交互，不直接依赖子系统 | 遵循**迪米特法则**（最少知识原则） |
+
+### 2.3 关键解析
+
+**迪米特法则（Law of Demeter）**：外观模式是迪米特法则的典型应用——客户端只需认识外观，无需了解子系统的存在、调用顺序和协作细节。这大幅降低了客户端的认知负担和耦合度。
+
+**外观 vs 中介者**：
+
+| 维度 | 外观模式 | 中介者模式 |
+| --- | --- | --- |
+| 方向 | 单向：客户端 → 外观 → 子系统 | 双向：子系统 ↔ 中介者 ↔ 子系统 |
+| 职责 | 简化调用入口 | 协调多个平等对象之间的交互 |
+| 子系统关系 | 子系统之间无感知 | 子系统通过中介者互相通信 |
+| 典型场景 | 封装复杂库/框架的 API | GUI 组件间的消息分发 |
+
+**灵活性保留**：外观不强制封装——客户端仍可绕过外观直接使用子系统，外观只是提供了一个"快捷方式"。
+
+<br/>
+
+## 三、💻 代码示例
+
+### 3.1 编译器（GoF 经典）
+
+> 场景：编译一个程序要经历词法分析 → 语法分析 → 代码生成，客户端不想逐个调用，`Compiler` 外观一行搞定。
 
 ```mermaid
 flowchart TD
-    A["客户端 Client"] -->|"调用"| B["外观 Facade"]
-    B -->|"协调调用"| C["子系统A Dimmer"]
-    B -->|"协调调用"| D["子系统B Dvd"]
-    B -->|"协调调用"| E["子系统C DvdPlayer"]
-    B -->|"返回结果"| A
+    A["客户端"] -->|"Compile(hello.cs)"| B["Compiler"]
+    B -->|"Scan()"| C["Scanner"]
+    B -->|"Parse()"| D["Parser"]
+    B -->|"Generate()"| E["CodeGenerator"]
 
     style A fill:#4A90D9,color:#fff
     style B fill:#E67E22,color:#fff
@@ -39,174 +83,81 @@ flowchart TD
     style E fill:#7B68EE,color:#fff
 ```
 
-### 2.2 类关系
+| 角色 | 文件 |
+| --- | --- |
+| 子系统 | [`CompilerDemo/Scanner.cs`](CompilerDemo/Scanner.cs) · [`CompilerDemo/Parser.cs`](CompilerDemo/Parser.cs) · [`CompilerDemo/CodeGenerator.cs`](CompilerDemo/CodeGenerator.cs) |
+| 外观 | [`CompilerDemo/Compiler.cs`](CompilerDemo/Compiler.cs) |
+| 客户端 | [`Program.cs`](Program.cs) |
+
+### 3.2 家庭影院（Head First 经典）
+
+> 场景：看一部电影需要依次操作灯光、幕布、投影仪、功放，`HomeTheaterFacade` 一键观影、一键结束。
 
 ```mermaid
-classDiagram
-    class HomeTheatreFacade {
-        -Dimmer dimmer
-        -Dvd dvd
-        -DvdPlayer dvdPlayer
-        +WatchMovie() void
-        +Pause() void
-        +Resume() void
-    }
-    class Dimmer {
-        +Dim(int val) void
-        +Off() void
-    }
-    class Dvd {
-        // DVD数据载体
-    }
-    class DvdPlayer {
-        +On() void
-        +Insert(Dvd dvd) void
-        +Play() void
-        +Pause() void
-    }
+flowchart TD
+    A["客户端"] -->|"WatchMovie()"| B["HomeTheaterFacade"]
+    B -->|"灯光调暗"| C["Lights"]
+    B -->|"幕布降下"| D["Screen"]
+    B -->|"开机+宽屏"| E["Projector"]
+    B -->|"开机+音量"| F["Amplifier"]
 
-    HomeTheatreFacade o-- Dimmer
-    HomeTheatreFacade o-- Dvd
-    HomeTheatreFacade o-- DvdPlayer
+    style A fill:#4A90D9,color:#fff
+    style B fill:#E67E22,color:#fff
+    style C fill:#7B68EE,color:#fff
+    style D fill:#7B68EE,color:#fff
+    style E fill:#7B68EE,color:#fff
+    style F fill:#7B68EE,color:#fff
 ```
 
-### 2.3 关键角色
+| 角色 | 文件 |
+| --- | --- |
+| 子系统 | [`HomeTheaterDemo/Lights.cs`](HomeTheaterDemo/Lights.cs) · [`HomeTheaterDemo/Screen.cs`](HomeTheaterDemo/Screen.cs) · [`HomeTheaterDemo/Projector.cs`](HomeTheaterDemo/Projector.cs) · [`HomeTheaterDemo/Amplifier.cs`](HomeTheaterDemo/Amplifier.cs) |
+| 外观 | [`HomeTheaterDemo/HomeTheaterFacade.cs`](HomeTheaterDemo/HomeTheaterFacade.cs) |
+| 客户端 | [`Program.cs`](Program.cs) |
 
-| 角色                | 说明                               |
-| ------------------- | ---------------------------------- |
-| 外观（Facade）      | 封装子系统复杂度，提供统一高层接口 |
-| 子系统（Subsystem） | 实际执行业务逻辑的组件             |
-| 客户端（Client）    | 只与外观交互，不直接依赖子系统     |
+### 3.3 运行结果
 
-<br/>
+```
+========== 外观模式 (Facade Pattern) ==========
+为子系统中的一组接口提供一个统一的接口
 
-## 三、💻 代码实现
+--- 编译器 (Compiler Demo) ---
+[Scanner] 词法分析: hello.cs
+[Parser] 语法分析: 构建 AST
+[CodeGen] 代码生成: 输出目标代码
+编译完成
 
-以家庭影院为例：看一部电影需要依次操作调光器、DVD播放器，外观模式封装出一个"遥控器"式的高层接口。
+--- 家庭影院 (Home Theater Demo) ---
+灯光调暗至 10%
+幕布降下
+投影仪开机
+投影仪切换宽屏模式
+功放开机
+音量调至 5
+正在播放: 流浪地球
 
-### 3.1 子系统类
-
-```csharp
-// 调光器子系统
-public class Dimmer
-{
-    public void Dim(int val) => Console.WriteLine($"灯光调至 {val}%");
-    public void Off() => Console.WriteLine("灯光关闭");
-}
-
-// DVD播放器子系统
-public class DvdPlayer
-{
-    public void On() => Console.WriteLine("DVD播放器开机");
-    public void Insert(Dvd dvd) => Console.WriteLine($"插入DVD: {dvd.Title}");
-    public void Play() => Console.WriteLine("开始播放");
-    public void Pause() => Console.WriteLine("暂停播放");
-}
+功放关机
+投影仪关机
+幕布升起
+灯光全亮
+观影结束
 ```
 
-### 3.2 外观类
+编译器说明：
+- 客户端只调 `Compile("hello.cs")` 一行，内部按序协调 Scanner → Parser → CodeGenerator
 
-```csharp
-// 家庭影院外观 - 封装所有子系统操作
-public class HomeTheatreFacade
-{
-    private readonly Dimmer _dimmer;
-    private readonly DvdPlayer _dvdPlayer;
-
-    public HomeTheatreFacade(Dimmer dimmer, Dvd dvd, DvdPlayer dvdPlayer)
-    {
-        _dimmer = dimmer;
-        _dvdPlayer = dvdPlayer;
-    }
-
-    // 一键观看电影：按正确顺序协调所有子系统
-    public void WatchMovie(Dvd dvd)
-    {
-        _dimmer.Dim(30);           // 1. 调暗灯光
-        _dvdPlayer.On();           // 2. 开启播放器
-        _dvdPlayer.Insert(dvd);    // 3. 插入DVD
-        _dvdPlayer.Play();         // 4. 开始播放
-    }
-
-    public void Pause()  => _dvdPlayer.Pause();
-    public void Resume() => _dvdPlayer.Play();
-}
-```
-
-### 3.3 客户端使用
-
-```csharp
-// 客户端只需调用外观，无需了解子系统细节
-var facade = new HomeTheatreFacade(dimmer, dvd, dvdPlayer);
-facade.WatchMovie(dvd);   // 一行搞定：调光→开机→插碟→播放
-facade.Pause();
-facade.Resume();
-```
+家庭影院说明：
+- `WatchMovie`：灯光 → 幕布 → 投影仪 → 功放，按正确顺序一键开启
+- `EndMovie`：按相反顺序一键关闭，客户端无需记住操作顺序
 
 <br/>
 
-## 四、🔍 核心解析
-
-### 4.1 外观类的职责
-
-`HomeTheatreFacade` 在构造时接收所有子系统引用，对外提供 `WatchMovie` / `Pause` / `Resume` 三个高层方法，内部按正确顺序编排子系统调用。
-
-### 4.2 子系统的独立性
-
-`Dimmer`、`DvdPlayer` 等子系统各自独立，不感知外观的存在。它们可以被单独使用，也可以被多个外观封装。
-
-### 4.3 客户端解耦
-
-`Program` 只依赖 `HomeTheatreFacade`，全程不直接触碰子系统类。子系统的增减、调用顺序的变化对外观透明。
-
-<br/>
-
-## 五、🎯 应用场景
-
-### 5.1 适用场景
-
-- 多个子系统需要按特定顺序协作完成一个复杂操作
-
-- 希望为复杂库或框架提供一个简单的使用入口
-
-- 需要分层架构中定义子系统的入口点
-
-### 5.2 实际案例
-
-- **.NET EF Core**：`DbContext` 作为外观封装数据库连接、变更追踪、查询等子系统
-
-- **前端SDK**：支付SDK将鉴权、下单、回调等多个接口封装为一个 `Pay()` 方法
-
-- **微服务网关**：API Gateway 作为外观，将多个微服务的调用聚合为一个接口
-
-<br/>
-
-## 六、⚖️ 优缺点分析
-
-### 6.1 优点
-
-- **使用简单**：客户端只需调用外观方法，无需了解子系统细节
-
-- **降低耦合**：客户端与子系统解耦，子系统变化不影响客户端
-
-- **分层清晰**：在分层系统中定义入口点，每层只与相邻层交互
-
-### 6.2 缺点
-
-- **过度封装**：如果子系统本身很简单，引入外观反而增加复杂度
-
-- **违反开闭原则**：新增子系统可能需要修改外观类
-
-- **性能开销**：多一层间接调用，极端场景下有微小性能损耗
-
-<br/>
-
-## 七、📝 总结
+## 四、📝 小结
 
 - **核心思想**：为子系统提供统一的高层接口，简化客户端调用
 
-- **关键角色**：外观（Facade）、子系统（Subsystem）、客户端（Client）
+- **迪米特法则**：客户端只与外观交互，减少不必要的依赖，是该模式的理论基石
 
-- **适用场景**：多个子系统需要协作完成复杂操作，且希望简化调用入口
+- **适用场景**：复杂库/框架的简化入口、分层架构的层间入口、多子系统按序协作
 
-- **注意事项**：不要过度封装简单系统，外观不应替代子系统的全部功能
+- **注意事项**：子系统本身很简单时不要强行加外观；外观不替代子系统的全部功能，客户端仍可绕过外观直接使用子系统
