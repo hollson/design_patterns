@@ -12,7 +12,7 @@
 
 ## 📖 概述
 
-基于 `C#` / `.NET 11` 系统实现 GoF 23 种设计模式，兼顾**可运行代码**与**深度讲解**，助你从"知道"走向"会用"。
+基于 `C#` / `.NET 10+` 系统实现 GoF 23 种设计模式，兼顾**可运行代码**与**深度讲解**，助你从"知道"走向"会用"。
 
 ### ✨ 核心特性
 
@@ -85,7 +85,7 @@
 
 **依赖环境**
 
-- [.NET 11.0 SDK](https://dotnet.microsoft.com/download) 或更高版本
+- [.NET 10.0 SDK](https://dotnet.microsoft.com/download) 或更高版本
 - 任意 C# IDE（Visual Studio、VS Code + C# 扩展、Rider）
 
 **运行示例**
