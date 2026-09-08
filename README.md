@@ -5,7 +5,7 @@
 <a href="https://en.wikipedia.org/wiki/Software_design_pattern"><img src="https://img.shields.io/badge/GoF-23%20Patterns-orange" /></a>
 <a href="https://refactoring.guru/design-patterns"><img src="https://img.shields.io/badge/Refactoring.Guru-Visual%20Guide-blue" /></a>
 <a href="https://opensource.org/licenses/MIT"><img src="https://img.shields.io/badge/License-MIT-green" /></a>
-<p>设计模式 - 可复用面向对象软件的基础</p>
+<p>设计模式：可复用面向对象软件的基础</p>
 </div>
 
 <br/>

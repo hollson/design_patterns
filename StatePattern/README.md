@@ -1,276 +1,217 @@
-# 状态模式（State Pattern）教程
+# 状态模式（State Pattern）
 
 [TOC]
 
 ## 一、📖 概述
 
-状态模式是**行为型设计模式**，允许对象在其**内部状态改变时改变自身行为**，看起来像对象换了一个类。
+状态模式是**行为型设计模式**，允许对象在**内部状态改变时改变自身行为**，看起来就像对象换了一个类。
 
-核心思想：将状态封装为独立的状态对象，上下文对象将动作委托给当前状态对象，由状态对象自身决定下一步切换到哪个状态。状态转换逻辑分散在各状态类中，避免了大量条件判断。
-
-### 核心特性
-
-- **状态封装**：每个状态是一个独立的类，持有自己的行为逻辑
-
-- **行为随状态变化**：同一动作在不同状态下表现不同
-
-- **职责清晰**：状态转换逻辑分散到各状态类，而非集中在一个类中
-
-- **符合开闭原则**：新增状态只需新增状态类，无需修改已有状态
+核心思想：把每个状态封装成独立的状态对象，上下文把动作委托给当前状态对象，由状态对象自己决定"做什么、下一步切到哪"。转换逻辑分散在各状态类中，用多态替代大量 `if-else`/`switch` 分支。
 
 <br/>
 
-## 二、📐 结构图解
+## 二、🧩 模式解析
 
-### 2.1 状态转换流程
-
-```mermaid
-flowchart TD
-    A["客户端调用动作"] --> B{"当前状态 ?"}
-    B -->|"NoQuarterState"| C["提示投币"]
-    B -->|"HasQuarterState"| D["处理转把"]
-    B -->|"SoldState"| E["出糖果"]
-    B -->|"SoldOutState"| F["拒绝操作"]
-    D --> G{"10%概率中奖 ?"}
-    G -->|"是"| H["WinnerState"]
-    G -->|"否"| E
-    H --> I["出两颗糖果"]
-    E --> J{"糖果售罄 ?"}
-    J -->|"是"| K["SoldOutState"]
-    J -->|"否"| L["NoQuarterState"]
-
-    style A fill:#4A90D9,color:#fff
-    style B fill:#E67E22,color:#fff
-    style C fill:#7B68EE,color:#fff
-    style D fill:#7B68EE,color:#fff
-    style E fill:#7B68EE,color:#fff
-    style F fill:#7B68EE,color:#fff
-    style G fill:#E67E22,color:#fff
-    style H fill:#7B68EE,color:#fff
-    style I fill:#27AE60,color:#fff
-    style J fill:#E67E22,color:#fff
-    style K fill:#95A5A6,color:#fff
-    style L fill:#27AE60,color:#fff
-```
-
-### 2.2 类关系
+### 2.1 类关系图
 
 ```mermaid
 classDiagram
-    class GumballMachine {
-        -state: IState
-        +InsertQuarter()
-        +EjectQuarter()
-        +TurnCrank()
-        +Dispense()
+    direction LR
+    class Context {
+        +state: IState
+        +Request() 委托当前状态
     }
     class IState {
         <<interface>>
-        +InsertQuarter()
-        +EjectQuarter()
-        +TurnCrank()
-        +Dispense()
+        +Handle(Context)
     }
-    class NoQuarterState {
-        +InsertQuarter()
+    class ConcreteStateA {
+        +Handle(Context)
     }
-    class HasQuarterState {
-        +TurnCrank()
+    class ConcreteStateB {
+        +Handle(Context)
     }
-    class SoldState {
-        +Dispense()
-    }
-    class SoldOutState {
-        +InsertQuarter()
-    }
-    class WinnerState {
-        +Dispense()
-    }
+    class Client
 
-    GumballMachine o--> IState : 当前状态
-    IState <|.. NoQuarterState
-    IState <|.. HasQuarterState
-    IState <|.. SoldState
-    IState <|.. SoldOutState
-    IState <|.. WinnerState
+    Client --> Context : 只调上下文
+    Context o--> IState : 持有当前状态
+    IState <|.. ConcreteStateA : 实现
+    IState <|.. ConcreteStateB : 实现
+    ConcreteStateA ..> Context : 改写状态
+    ConcreteStateB ..> Context : 改写状态
 ```
 
-### 2.3 关键角色
+| 关键角色 | 说明 |
+| --- | --- |
+| **上下文（Context）** | 持有当前状态对象引用，将所有动作委托给它，自身不含状态判断 |
+| **状态接口（State）** | 定义所有可能动作的契约 |
+| **具体状态类（Concrete State）** | 实现特定状态下的行为，并决定切换到哪个状态 |
 
-| 角色                             | 说明                                           |
-| -------------------------------- | ---------------------------------------------- |
-| **上下文（Context）**            | 持有当前状态对象引用，将所有动作委托给状态对象 |
-| **状态接口（State）**            | 定义所有可能动作的契约                         |
-| **具体状态类（Concrete State）** | 实现特定状态下的行为逻辑，并决定状态转换目标   |
-
-<br/>
-
-## 三、💻 代码实现
-
-以糖果机为例：糖果机有四个状态（无币、有币、售出、售罄），每个状态下可执行的动作和转换规则不同。
-
-### 3.1 状态接口
+### 2.2 核心代码
 
 ```csharp
-// 状态接口，定义所有可能的动作
-public interface IState
+// 上下文 Context：持有当前状态，动作全部委托，自身零分支
+class Context
 {
-    void InsertQuarter();   // 投币
-    void EjectQuarter();    // 退币
-    void TurnCrank();       // 转把
-    void Dispense();        // 出糖
+    internal State _state;                       // 当前状态对象
+
+    void Request() => _state.Handle(this);       // 委托给当前状态
 }
-```
 
-### 3.2 具体状态类
-
-```csharp
-// 无币状态：投币后切换到有币状态
-public class NoQuarterState : IState
+// 状态接口：定义所有动作的契约
+interface State
 {
-    public void InsertQuarter()
+    void Handle(Context ctx);
+}
+
+// 具体状态 A：实现本状态行为，并决定切换到哪
+class ConcreteStateA : State
+{
+    void Handle(Context ctx)
     {
-        Console.WriteLine("投币成功");
-        _machine.SetState(_machine.HasQuarterState); // 状态切换
+        // ... 本状态下的行为
+        ctx._state = ctx.StateB;                 // 状态对象自行改写上下文状态
     }
-
-    public void EjectQuarter() => Console.WriteLine("还没投币");
-    public void TurnCrank()    => Console.WriteLine("请先投币");
-    public void Dispense()     => Console.WriteLine("请先投币");
 }
+```
 
-// 有币状态：转把有10%概率中奖
-public class HasQuarterState : IState
+> 协作方式：客户端只调 `Context.Request()`；上下文转手交给当前状态对象，状态对象执行行为后回写 `ctx._state` 完成流转——"状态决定行为，行为决定下一状态"。
+
+### 2.3 与传统 switch 写法对比
+
+传统写法把所有状态的分支集中在一个类里，状态越多越臃肿：
+
+```csharp
+// 传统写法：每加一种状态，所有 switch 都要改（违反开闭原则）
+public void InsertQuarter()
 {
-    public void TurnCrank()
+    switch (_state)
     {
-        if (rnd.NextDouble() < 0.1)
-            _machine.SetState(_machine.WinnerState);  // 10%中奖
-        else
-            _machine.SetState(_machine.SoldState);    // 正常售出
+        case State.NoQuarter: _state = State.HasQuarter; break;
+        case State.HasQuarter: Console.WriteLine("不能多投"); break;
+        case State.Sold:       Console.WriteLine("正在出货"); break;
+        case State.SoldOut:    Console.WriteLine("已售罄");   break;
     }
 }
 ```
 
-### 3.3 上下文类
+状态模式下每个状态只关心自己的行为，新增状态 = 新增一个类，已有代码零改动。
 
-```csharp
-// 糖果机：持有当前状态，委托动作给状态对象
-public class GumballMachine
-{
-    private IState _state;
+### 2.4 与策略模式的区别
 
-    public IState NoQuarterState  { get; }
-    public IState HasQuarterState { get; }
-    public IState SoldState       { get; }
-    public IState SoldOutState    { get; }
-    public IState WinnerState     { get; }
+两者结构几乎相同（上下文 + 接口 + 多实现），但意图截然不同：
 
-    public void InsertQuarter() => _state.InsertQuarter();
-    public void EjectQuarter()  => _state.EjectQuarter();
-    public void TurnCrank()     => _state.TurnCrank();
-    public void Dispense()      => _state.Dispense();
-}
+| 对比维度 | 状态模式 State | 策略模式 Strategy |
+| --- | --- | --- |
+| 核心目的 | 行为随**内部状态**自动变化 | 客户端**主动选择**算法并替换 |
+| 切换驱动者 | 状态对象自己改写上下文状态 | 外部调用者显式 Set |
+| 状态间感知 | 知道可切换到哪些状态（流转图） | 策略之间互不知道（平级替换） |
+| 判断口诀 | 对象内部事件驱动 → 状态 | 外部调用者决定 → 策略 |
+
+<br/>
+
+## 三、💻 代码示例
+
+### 3.1 经典场景：自动糖果机
+
+> 场景：糖果机有未投币、已投币、出货、售罄四种状态，同一动作在不同状态下结果不同——未投币转把被拒绝，出货后视库存自动切回或售罄。
+
+```mermaid
+stateDiagram-v2
+    direction LR
+    [*] --> NoQuarter : 装填糖果
+    NoQuarter --> HasQuarter : InsertQuarter 投币
+    HasQuarter --> NoQuarter : EjectQuarter 退币
+    HasQuarter --> Sold : TurnCrank 转把
+    Sold --> NoQuarter : Dispense 还有库存
+    Sold --> SoldOut : Dispense 售罄
 ```
 
-### 3.4 客户端使用
+| 角色 | 文件 |
+| --- | --- |
+| 状态接口 | [`GumballMachine/IState.cs`](GumballMachine/IState.cs) |
+| 上下文 | [`GumballMachine/GumballMachine.cs`](GumballMachine/GumballMachine.cs) |
+| 具体状态 | [`GumballMachine/NoQuarterState.cs`](GumballMachine/NoQuarterState.cs) 等 4 个 |
+| 客户端 | [`Program.cs`](Program.cs) |
 
-```csharp
-// 客户端只需操作糖果机，不感知状态细节
-var machine = new GumballMachine();
-machine.InsertQuarter();  // 投币
-machine.TurnCrank();      // 转把
-machine.Dispense();       // 出糖
+### 3.2 软件项目：电商订单流转
+
+> 场景：订单在待支付 → 已支付 → 已发货 → 已完成间流转，可随时取消；未支付发货被拒、已发货无法取消、取消/完成后是终结态——电商系统中最典型的状态机。
+
+```mermaid
+stateDiagram-v2
+    direction LR
+    [*] --> PendingPayment : 创建订单
+    PendingPayment --> Paid : Pay 支付
+    Paid --> Shipped : Ship 发货
+    Shipped --> Completed : Complete 确认收货
+    PendingPayment --> Cancelled : Cancel
+    Paid --> Cancelled : Cancel 退款
+    Completed --> [*]
+    Cancelled --> [*]
+```
+
+| 角色 | 文件 |
+| --- | --- |
+| 状态接口 | [`Order/IOrderState.cs`](Order/IOrderState.cs) |
+| 上下文 | [`Order/Order.cs`](Order/Order.cs) |
+| 具体状态 | [`Order/PendingPaymentState.cs`](Order/PendingPaymentState.cs) 等 5 个 |
+| 客户端 | [`Program.cs`](Program.cs) |
+
+### 3.3 运行结果
+
+```bash
+========== 状态模式 (State Pattern) ==========
+允许对象在内部状态改变时改变其行为
+
+--- 经典场景: 自动糖果机 ---
+[糖果机] 装填 2 颗糖果
+>> 转动摇杆（未投币）
+[拒绝] 请先投币再转动摇杆
+[拒绝] 无法出货
+>> 投币
+[投币成功] 已投入硬币
+>> 再次投币
+[拒绝] 不能投入更多硬币
+>> 转动摇杆
+[转动] 摇杆转动中
+[出货] 一颗糖果滚落出来（剩余 1 颗）
+>> 投币 + 转动摇杆
+[投币成功] 已投入硬币
+[转动] 摇杆转动中
+[出货] 一颗糖果滚落出来（剩余 0 颗）
+[售罄] 糖果已售完
+>> 投币（已售罄）
+[拒绝] 糖果已售罄
+
+--- 软件项目: 电商订单流转 ---
+[创建] 订单 SO-1001 已创建，等待支付
+>> 支付
+[支付成功] 订单已支付，等待发货
+>> 发货
+[已发货] 商品运输中
+>> 确认收货
+[已完成] 确认收货，交易完成
+>> 完成后取消
+[拒绝] 订单已完成，无法取消
+
+[创建] 订单 SO-1002 已创建，等待支付
+>> 未支付直接发货
+[拒绝] 请先支付
+>> 支付
+[支付成功] 订单已支付，等待发货
+>> 支付后取消
+[已取消] 订单已取消，退款将原路退回
+>> 取消后再支付
+[拒绝] 订单已取消
 ```
 
 <br/>
 
-## 四、🔍 核心解析
+## 四、📝 小结
 
-### 4.1 状态接口
+- **核心思想**：状态封装为对象，上下文委托动作，状态类自行决定行为与流转
 
-`IState` 定义了所有可能动作的契约。每个具体状态类实现这些动作，根据自身逻辑决定行为和状态切换。
+- **两个示例**：糖果机展示"同动作不同状态不同结果"，订单展示软件项目中的状态机与非法操作拦截
 
-### 4.2 上下文委托
-
-`GumballMachine` 持有当前状态对象 `_state`，所有动作直接委托给 `_state.InsertQuarter()` 等方法。上下文不包含状态判断逻辑。
-
-### 4.3 状态自切换
-
-状态切换由状态类自身决定。例如 `NoQuarterState.InsertQuarter()` 收币后主动切换到 `HasQuarterState`，实现了"状态决定行为，行为决定下一状态"。
-
-### 4.4 对比传统方式
-
-传统实现用 `if-else` 或 `switch` 在一个类中判断所有状态，代码随状态增多急剧膨胀。状态模式将判断逻辑分散到各状态类，每个类只关心自己的行为。
-
-<br/>
-
-## 五、🎯 应用场景
-
-### 5.1 适用场景
-
-- 对象行为随内部状态变化而不同
-
-- 状态转换规则复杂，且可能扩展
-
-- 代码中存在大量与状态相关的条件分支
-
-### 5.2 实际案例
-
-- **游戏AI**：NPC在巡逻、追击、逃跑等状态间切换
-
-- **订单系统**：订单在待支付、已支付、已发货、已完成等状态间流转
-
-- **网络连接**：TCP连接在LISTEN、ESTABLISHED、CLOSE_WAIT等状态间转换
-
-<br/>
-
-## 六、⚖️ 优缺点分析
-
-### 6.1 优点
-
-- **职责分离**：每个状态的行为独立封装在一个类中
-
-- **消除条件分支**：用多态替代大量 `if-else` 或 `switch`
-
-- **易于扩展**：新增状态只需新增状态类，无需修改已有状态
-
-- **状态转换显式化**：每个状态类明确知道可切换到哪些状态
-
-### 6.2 缺点
-
-- **类数量增多**：每个状态需要一个独立的类
-
-- **状态分散**：状态转换逻辑分散在各状态类中，整体流程不易把握
-
-- **适用范围有限**：状态数量少时，直接用条件分支更简单
-
-<br/>
-
-## 七、📝 总结
-
-- **核心思想**：将状态封装为独立对象，行为随状态变化
-
-- **关键角色**：上下文（GumballMachine）、状态接口（IState）、具体状态类
-
-- **适用场景**：对象行为随状态变化，状态转换规则复杂
-
-- **注意事项**：状态数量少时，简单的条件分支可能更直观
-
----
-
-## 八、🔬 状态模式与策略模式对比
-
-两者结构几乎相同（上下文 + 接口 + 多个实现类），但**意图和行为流转方式截然不同**：
-
-| 对比项         | 状态模式                                         | 策略模式                           |
-| -------------- | ------------------------------------------------ | ---------------------------------- |
-| **意图**       | 对象行为随**内部状态**自动变化                   | 客户端**主动选择**算法并替换       |
-| **切换驱动者** | 状态对象自身决定下一个状态                       | 外部客户端通过 `Set` 方法切换      |
-| **状态间感知** | 状态对象持有上下文引用，**知道**可切换到哪些状态 | 策略之间**互不知道**对方存在       |
-| **流转模式**   | 有明确的状态流转图（有向图/环）                  | 平级替换，无固定顺序               |
-| **典型场景**   | 订单状态机（待支付→已支付→已发货→已完成）        | 支付方式选择（支付宝/微信/银行卡） |
-
-**关键差异**：在本例中，`NoQuarterState.InsertQuarter()` 执行后**自动**调用 `_machine.SetState(_machine.HasQuarterState)` 切换状态——这是状态模式的核心特征。而策略模式中，客户端必须**显式**调用 `duck.SetFlyBehaviour(new FlyNope())` 才能切换行为。
-
-**判断口诀**：行为变化是**对象内部事件驱动**的 → 状态模式；行为变化是**外部调用者决定**的 → 策略模式。
+- **注意事项**：状态数量少时直接用条件分支更直观；状态类多了整体流转图不易把握，可配合状态图文档化

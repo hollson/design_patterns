@@ -1,62 +1,40 @@
-// 策略模式（Strategy Pattern）—— 运行时替换算法族
-// 鸭子的飞行和叫声行为独立变化，通过组合而非继承实现复用
+// 策略模式（Strategy Pattern）
+// 定义一族算法，封装成独立类，运行时自由切换。
 
-using Ducks;
+using StrategyPattern;
 
 Console.WriteLine("\n========== 策略模式 (Strategy Pattern) ==========");
-Console.WriteLine("定义一系列算法，将每一个封装起来，并使它们可互相替换\n");
+Console.WriteLine("定义一族算法，封装成独立类，运行时自由切换\n");
 
-var mallard = new MallardDuck { Quacker = new QuackNormal() };
-mallard.Display();
-mallard.Flyer = new FlyWings();
-mallard.Display();
+// 排序策略
+Console.WriteLine("--- 排序策略 ---");
+var sorter = new Sorter(new BubbleSort());
+int[] arr1 = [3, 1, 4, 1, 5];
+sorter.Sort(arr1);
 
-namespace Ducks
-{
-    internal class Duck
-    {
-        private IQuackBehaviour _quacker = null!;
-        private IFlyBehaviour _flyer = null!;
+sorter.SetStrategy(new QuickSort());
+int[] arr2 = [9, 2, 6, 5, 3];
+sorter.Sort(arr2);
 
-        public IQuackBehaviour Quacker
-        {
-            set
-            {
-                _quacker = value;
-            }
-        }
+sorter.SetStrategy(new MergeSort());
+int[] arr3 = [7, 8, 0, 2, 4];
+sorter.Sort(arr3);
 
-        public IFlyBehaviour Flyer
-        {
-            set
-            {
-                _flyer = value;
-            }
-        }
+// 支付方式
+Console.WriteLine("\n--- 支付方式 ---");
+var payment = new PaymentContext(new Alipay());
+payment.Pay(100);
 
-        protected void PerformQuack()
-        {
-            _quacker.Quack();
-        }
+payment.SetStrategy(new WeChatPay());
+payment.Pay(200);
 
-        protected void PerformFly()
-        {
-            _flyer.Fly();
-        }
-    }
+payment.SetStrategy(new CreditCard());
+payment.Pay(300);
 
-    internal class MallardDuck : Duck
-    {
-        public MallardDuck()
-        {
-            Flyer = new FlyNope();
-            Quacker = new QuackNope();
-        }
+// 路线规划
+Console.WriteLine("\n--- 路线规划 ---");
+var navigator = new Navigator(new Bicycle());
+navigator.Navigate("公司", "地铁站", "1.5km");
 
-        public void Display()
-        {
-            PerformFly();
-            PerformQuack();
-        }
-    }
-}
+navigator.SetStrategy(new HighSpeedRail());
+navigator.Navigate("北京", "上海", "1318km");

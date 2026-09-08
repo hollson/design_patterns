@@ -1,263 +1,205 @@
-# 组合模式（Composite Pattern）教程
+# 组合模式（Composite Pattern）
 
 [TOC]
 
 ## 一、📖 概述
 
-组合模式是**结构型设计模式**，将对象组合成**树形结构**以表示"部分-整体"的层次关系，使**单个对象和组合对象的使用具有一致性**。
+组合模式是**结构型设计模式**，将对象组合成**树形结构**以表示"部分-整体"的层次关系，使客户端对**单个对象（叶子）和组合对象（容器）的使用具有一致性**。
 
-核心思想：客户端可以用同一套接口操作叶子节点和容器节点，无需区分类型。以菜单系统为例，顶层菜单包含子菜单，子菜单又包含菜单项，递归遍历即可输出整棵树。
-
-### 核心特性
-
-- **透明性**：叶子和容器实现同一接口，客户端无需判断类型
-
-- **递归结构**：容器节点递归调用子组件，天然支持树形遍历
-
-- **可扩展**：新增叶子或容器只需实现统一接口，不改现有代码
-
-- **符合开闭原则**：对扩展开放，对修改关闭
+核心思想：叶子和容器实现同一抽象，容器持有子节点列表并把操作**递归下发**——客户端一次调用，整棵树自动展开，无需关心节点是叶子还是容器。
 
 <br/>
 
-## 二、📐 结构图解
+## 二、🧩 模式解析
 
-### 2.1 整体结构
-
-```mermaid
-flowchart TD
-    A["客户端"] -->|"调用统一接口"| B["MenuComponent 抽象组件"]
-    B -->|"继承"| C["Menu 组合节点"]
-    B -->|"继承"| D["MenuItem 叶子节点"]
-    C -->|"包含多个"| E["子 MenuComponent"]
-    E -->|"递归指向"| B
-
-    style A fill:#4A90D9,color:#fff
-    style B fill:#E67E22,color:#fff
-    style C fill:#7B68EE,color:#fff
-    style D fill:#27AE60,color:#fff
-    style E fill:#7B68EE,color:#fff
-```
-
-### 2.2 类关系
+### 2.1 类关系图
 
 ```mermaid
 classDiagram
-    class MenuComponent {
-        <<abstract>>
-        +Add(component: MenuComponent) void
-        +Remove(component: MenuComponent) void
-        +GetChild(index: int) MenuComponent
-        +Print() void
+    direction LR
+    class Component {
+        <<interface>>
+        +Operation()
     }
-    class Menu {
-        -components: List~MenuComponent~
-        +Add(component: MenuComponent) void
-        +Remove(component: MenuComponent) void
-        +GetChild(index: int) MenuComponent
-        +Print() void
+    class Leaf {
+        +Operation() 自身行为
     }
-    class MenuItem {
-        -name: string
-        -price: double
-        +Print() void
+    class Composite {
+        -children: List~Component~
+        +Add(Component)
+        +Operation() 递归下发
     }
+    class Client
 
-    MenuComponent <|-- Menu
-    MenuComponent <|-- MenuItem
-    Menu o-- "0..*" MenuComponent
+    Client --> Component : 面向抽象
+    Component <|.. Leaf : 实现
+    Component <|.. Composite : 实现
+    Composite o--> "0..*" Component : 持有子组件
 ```
 
-### 2.3 关键角色
+| 关键角色 | 说明 |
+| --- | --- |
+| **抽象组件（Component）** | 定义叶子与容器的统一契约 |
+| **叶子节点（Leaf）** | 树的末端，实现自身业务行为 |
+| **组合节点（Composite）** | 持有子节点列表，操作递归下发给子节点 |
 
-| 角色                  | 说明                                        |
-| --------------------- | ------------------------------------------- |
-| 抽象组件（Component） | 定义叶子和容器的统一接口                    |
-| 组合节点（Composite） | 包含子组件，实现容器操作（Add/Remove/遍历） |
-| 叶子节点（Leaf）      | 不含子节点，实现具体业务操作                |
-
-<br/>
-
-## 三、💻 代码实现
-
-以菜单系统为例：顶层菜单包含早餐、午餐、晚餐子菜单，午餐子菜单下再嵌套甜点菜单项，演示递归遍历。
-
-### 3.1 抽象组件
+### 2.2 核心代码
 
 ```csharp
-// MenuComponent.cs — 统一接口（简化）
-public abstract class MenuComponent
+// 抽象组件：叶子和容器的统一契约
+abstract class Component
 {
-    public virtual void Add(MenuComponent component) =>
-        throw new NotImplementedException();
+    abstract void Operation();                   // 共有操作
 
-    public virtual void Remove(MenuComponent component) =>
-        throw new NotImplementedException();
-
-    public virtual MenuComponent GetChild(int index) =>
-        throw new NotImplementedException();
-
-    public abstract void Print();
+    virtual void Add(Component c) => throw ...;  // 透明式：容器方法也声明在此
 }
-```
 
-### 3.2 叶子节点
-
-```csharp
-// MenuItem.cs — 菜单项（不可包含子节点）
-public class MenuItem : MenuComponent
+// 叶子：没有子节点，实现自身行为
+class Leaf : Component
 {
-    private string _name;
-    private double _price;
+    void Operation() => /* 自身行为 */;
+}
 
-    public MenuItem(string name, double price)
+// 组合：持有子节点，操作递归下发
+class Composite : Component
+{
+    List<Component> _children;
+
+    void Add(Component c) => _children.Add(c);
+
+    void Operation()
     {
-        _name = name;
-        _price = price;
-    }
-
-    public override void Print() =>
-        Console.WriteLine($"  {_name} : {_price}");
-}
-```
-
-### 3.3 组合节点
-
-```csharp
-// Menu.cs — 菜单（可包含子组件，递归打印）
-public class Menu : MenuComponent
-{
-    private string _name;
-    private List<MenuComponent> _components = new();
-
-    public Menu(string name) => _name = name;
-
-    public override void Add(MenuComponent component) =>
-        _components.Add(component);
-
-    public override void Remove(MenuComponent component) =>
-        _components.Remove(component);
-
-    public override void Print()
-    {
-        Console.WriteLine(_name);
-        foreach (var component in _components)
-            component.Print();  // 递归：叶子打印自身，容器继续展开
+        // ... 自身处理
+        foreach (var child in _children)
+            child.Operation();                   // 叶子执行自身，容器继续展开
     }
 }
 ```
 
-### 3.4 客户端使用
+> 协作方式：客户端只面向 `Component` 抽象调用 `Operation()`；叶子执行自身行为，容器把操作递归下发给每个子节点——整棵树在一次调用中自动展开，递归终止于叶子。
 
-```csharp
-// Program.cs — 构建树并统一调用
-var allMenus = new Menu("全部菜单");
+### 2.3 透明式 vs 安全式
 
-var breakfast = new Menu("早餐");
-breakfast.Add(new MenuItem("煎蛋", 5.0));
-breakfast.Add(new MenuItem("吐司", 3.0));
+`Add`/`Remove` 声明在哪，是组合模式的核心取舍，两个示例各体现一种风格：
 
-var lunch = new Menu("午餐");
-lunch.Add(new MenuItem("牛排", 25.0));
-var dessert = new Menu("甜点");
-dessert.Add(new MenuItem("蛋糕", 8.0));
-lunch.Add(dessert);
+| 维度 | 透明式（3.1 文件系统） | 安全式（3.2 组织架构） |
+| --- | --- | --- |
+| 接口划分 | `Add`/`Remove` 也声明在抽象组件 | `Add` 仅声明在组合节点 |
+| 叶子节点 | 被迫暴露无意义方法，调用抛异常 | 接口干净，不含容器方法 |
+| 误用暴露 | 运行期抛 `NotSupportedException` | 编译期即拦截 |
+| 客户端 | 完全透明，无需区分类型 | 组装树时需感知容器类型 |
+| 适用场景 | 以统一遍历为主 | 需要类型安全或方法差异大 |
 
-allMenus.Add(breakfast);
-allMenus.Add(lunch);
+<br/>
 
-allMenus.Print();  // 一次调用，递归输出整棵树
+## 三、💻 代码示例
+
+### 3.1 透明式：文件系统
+
+> 场景：文件夹（容器）嵌套子文件夹与文件（叶子）；`Display()` 递归打印整棵目录树，`Size()` 递归聚合总大小——等价于 `tree` 与 `du` 命令。叶子继承的 `Add` 抛出异常，是透明式的代价。
+
+```mermaid
+flowchart LR
+    C["客户端"] -->|"Display() / Size()"| R["project/ 组合"]
+    R --> S["src/ 组合"]
+    R --> D["docs/ 组合"]
+    R --> F1["global.json 叶子"]
+    S --> F2["Program.cs"]
+    S --> F3["Utils.cs"]
+    D --> F4["README.md"]
+
+    style C fill:#4A90D9,color:#fff
+    style R fill:#E67E22,color:#fff
+    style S fill:#E67E22,color:#fff
+    style D fill:#E67E22,color:#fff
+    style F1 fill:#27AE60,color:#fff
+    style F2 fill:#27AE60,color:#fff
+    style F3 fill:#27AE60,color:#fff
+    style F4 fill:#27AE60,color:#fff
 ```
 
-**运行结果**：
+| 角色 | 文件 |
+| --- | --- |
+| 抽象组件 | [`FileSystem/FileSystemNode.cs`](FileSystem/FileSystemNode.cs) |
+| 叶子节点 | [`FileSystem/FileNode.cs`](FileSystem/FileNode.cs) |
+| 组合节点 | [`FileSystem/FolderNode.cs`](FileSystem/FolderNode.cs) |
+| 客户端 | [`Program.cs`](Program.cs) |
 
+### 3.2 安全式：组织架构
+
+> 场景：部门（容器）混合包含子部门与员工（叶子）；`HeadCount()` 与 `TotalSalary()` 递归聚合，对总公司调用一次即可算出全公司人数与人力成本。`Add` 只在 `Department` 上，员工误调 `Add` 编译不通过。
+
+```mermaid
+flowchart LR
+    C["客户端"] -->|"Print() / HeadCount() / TotalSalary()"| CO["总公司 组合"]
+    CO --> T["技术部 组合"]
+    CO --> H["人事部 组合"]
+    T --> B["后端组 组合"]
+    T --> F["前端组 组合"]
+    T --> E1["赵六 叶子"]
+    B --> E2["张三"]
+    B --> E3["李四"]
+    F --> E4["王五"]
+    H --> E5["钱七"]
+
+    style C fill:#4A90D9,color:#fff
+    style CO fill:#E67E22,color:#fff
+    style T fill:#E67E22,color:#fff
+    style H fill:#E67E22,color:#fff
+    style B fill:#E67E22,color:#fff
+    style F fill:#E67E22,color:#fff
+    style E1 fill:#27AE60,color:#fff
+    style E2 fill:#27AE60,color:#fff
+    style E3 fill:#27AE60,color:#fff
+    style E4 fill:#27AE60,color:#fff
+    style E5 fill:#27AE60,color:#fff
 ```
-全部菜单
-早餐
-  煎蛋 : 5
-  吐司 : 3
-午餐
-  牛排 : 25
-甜点
-  蛋糕 : 8
+
+| 角色 | 文件 |
+| --- | --- |
+| 抽象组件 | [`Organization/IOrgUnit.cs`](Organization/IOrgUnit.cs) |
+| 叶子节点 | [`Organization/Employee.cs`](Organization/Employee.cs) |
+| 组合节点 | [`Organization/Department.cs`](Organization/Department.cs) |
+| 客户端 | [`Program.cs`](Program.cs) |
+
+### 3.3 运行结果
+
+```bash
+========== 组合模式 (Composite Pattern) ==========
+将对象组合成树形结构，使叶子与容器的使用具有一致性
+
+--- 透明式: 文件系统 ---
+project/  (共 2700 B)
+  src/  (共 2000 B)
+    Program.cs  (1200 B)
+    Utils.cs  (800 B)
+  docs/  (共 600 B)
+    README.md  (600 B)
+  global.json  (100 B)
+>> du: project 总大小 2700 B
+>> 文件调用 Add: NotSupportedException（透明式运行期才暴露误用）
+
+--- 安全式: 组织架构 ---
+部门 总公司
+  部门 技术部
+    部门 后端组
+      员工 张三  月薪 25000
+      员工 李四  月薪 22000
+    部门 前端组
+      员工 王五  月薪 20000
+    员工 赵六  月薪 30000
+  部门 人事部
+    员工 钱七  月薪 15000
+>> HeadCount: 总人数 5
+>> TotalSalary: 月薪总额 112000
 ```
 
 <br/>
 
-## 四、🔍 核心解析
+## 四、📝 小结
 
-### 4.1 统一接口
+- **核心思想**：部分-整体树形结构，叶子与容器统一接口，操作递归下发
 
-`MenuComponent` 定义了 `Add/Remove/GetChild/Print` 等方法。叶子节点不支持的操作（如 Add）由基类抛出异常，客户端调用 `Print()` 时无需关心具体类型。
+- **两种风格**：透明式统一到底（客户端零分支，误用运行期暴露）；安全式职责分离（接口干净，误用编译期拦截）
 
-### 4.2 递归遍历
-
-`Menu.Print()` 遍历 `_components` 列表，对每个子组件调用 `Print()`。叶子节点打印自身，容器节点继续展开——递归自然终止于叶子。
-
-### 4.3 客户端透明
-
-`Program` 只持有 `MenuComponent` 类型引用，调用 `allMenus.Print()` 即可遍历整棵树。新增菜单层级或菜单项无需修改客户端代码。
-
-<br/>
-
-## 五、🎯 应用场景
-
-### 5.1 适用场景
-
-- 文件系统：文件夹包含文件和子文件夹
-
-- UI 组件树：容器组件包含叶子组件和其他容器
-
-- 组织架构：部门包含员工和子部门
-
-### 5.2 实际案例
-
-- **.NET WinForms**：`Control` 基类统一处理 `Control` 和 `ControlCollection`
-
-- **XML/DOM**：`XmlNode` 统一操作元素和文本节点
-
-- **菜单系统**：本示例的菜单树遍历
-
-<br/>
-
-## 六、⚖️ 优缺点分析
-
-### 6.1 优点
-
-- **调用透明**：客户端无需判断叶子或容器，统一调用同一接口
-
-- **易于扩展**：新增叶子或容器只需实现抽象类，不改现有结构
-
-- **自然递归**：树形结构天然适合递归遍历，代码简洁
-
-### 6.2 缺点
-
-- **接口臃肿**：抽象类需包含所有操作的默认实现，叶子可能被迫看到不相关的方法
-
-- **设计困难**：何时使用组合模式、何时拆分为独立接口，需要审慎判断
-
-<br/>
-
-## 七、🔍 透明式 vs 安全式
-
-| 维度       | 透明式（本教程）                                    | 安全式                                                  |
-| ---------- | --------------------------------------------------- | ------------------------------------------------------- |
-| 统一接口   | Component 声明所有方法（Add/Remove/GetChild/Print） | Component 仅声明叶子操作，容器方法仅在 Composite 中定义 |
-| 叶子节点   | 被迫看到 Add/Remove 等无意义方法，通常抛出异常      | 不感知容器操作，接口更干净                              |
-| 客户端体验 | 完全透明，无需判断叶子或容器                        | 需要区分类型才能调用容器方法                            |
-| 类型安全   | 叶子调用 Add 可能运行时才报错                       | 编译期即可捕获类型错误                                  |
-| 适用场景   | 客户端主要做统一遍历操作（如 Print）                | 叶子和容器的方法差异大，且客户端可能需要特化操作        |
-
-> **本教程示例**：采用透明式——`MenuComponent` 统一声明 `Add/Remove/GetChild/Print`，`MenuItem` 中不支持的方法由基类抛出 `NotImplementedException`。
-
-<br/>
-
-## 八、📝 总结
-
-- **核心思想**：将对象组合成树形结构，使叶子和容器的使用具有一致性
-
-- **关键角色**：MenuComponent（抽象组件）、Menu（组合节点）、MenuItem（叶子节点）
-
-- **适用场景**：树形层次结构，客户端需要统一操作叶子和容器
-
-- **注意事项**：抽象类接口不宜过大，避免叶子节点承担过多无意义的默认实现
+- **注意事项**：叶子和容器行为差异大时避免强行统一接口；抽象接口不宜过大，别让叶子承担无意义的方法
