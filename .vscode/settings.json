@@ -12,10 +12,20 @@
   // ============================================================
   // C# / .NET
   // ============================================================
-  "dotnet.defaultSolution": "DesignPatterns.sln",
+  "dotnet.defaultSolution": "DesignPatterns.slnx",
   "omnisharp.enableEditorConfigSupport": true,
   "omnisharp.enableRoslynAnalyzers": true,
-  "editor.formatOnSave": true,
+  "dotnet.enableServerCodeModel": false,
+  "dotnet.buildOnSave": false,
+  "dotnet.restore.enableTelemetry": false,
+  "dotnetBackgroundTerminal.environment": {
+    "DOTNET_CLI_TELEMETRY_OPTOUT": "1"
+  },
+  "csharp.suppressDotnetRestoreNotification": true,
+  "files.associations": {
+    "*.slnx": "xml",
+    "*.sln": "xml"
+  },
 
   // ============================================================
   // 语言特定格式化器
@@ -30,8 +40,6 @@
     "editor.defaultFormatter": "esbenp.prettier-vscode",
     "editor.wordWrap": "on"
   },
-  "[yaml]": { "editor.defaultFormatter": "redhat.vscode-yaml" },
-  "[xml]": { "editor.defaultFormatter": "dotnettools.xml" },
 
   // ============================================================
   // 文件资源管理器排除
@@ -62,7 +70,7 @@
   "explorer.fileNesting.patterns": {
     "*.cs": "${capture}.cs",
     "*.csproj": "*.props,*.targets,Directory.Build.props,Directory.Build.targets",
-    "DesignPatterns.sln": "*.csproj,.editorconfig,.gitignore",
-    "README.md": "LICENSE,.gitignore"
+    "DesignPatterns.slnx": "*.csproj,.editorconfig,.gitignore,*.sln",
+    "README.md": "LICENSE"
   }
 }

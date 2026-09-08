@@ -1,21 +1,259 @@
 {
-    "version": "0.2.0",
-    "configurations": [
-        {
-            "name": "Launch Current Project",
-            "type": "coreclr",
-            "request": "launch",
-            "preLaunchTask": "build",
-            "program": "${workspaceFolder}/${fileDirname}/${fileDirnameNoFolder}.dll",
-            "args": [],
-            "cwd": "${workspaceFolder}/${fileDirname}",
-            "console": "internalConsole",
-            "stopAtEntry": false
-        },
-        {
-            "name": ".NET Attach",
-            "type": "coreclr",
-            "request": "attach"
-        }
-    ]
+  "version": "0.2.0",
+  "configurations": [
+    {
+      "name": "Launch Current File",
+      "type": "coreclr",
+      "request": "launch",
+      "preLaunchTask": "build",
+      "program": "${fileDirname}/bin/Debug/net8.0/${fileDirnameNoFolder}.dll",
+      "args": [],
+      "cwd": "${fileDirname}",
+      "console": "internalConsole",
+      "stopAtEntry": false,
+      "env": {
+        "DOTNET_ENVIRONMENT": "Development"
+      }
+    },
+    {
+      "name": "AbstractFactoryPattern",
+      "type": "coreclr",
+      "request": "launch",
+      "program": "${workspaceFolder}/AbstractFactoryPattern/bin/Debug/net8.0/AbstractFactoryPattern.dll",
+      "args": [],
+      "cwd": "${workspaceFolder}/AbstractFactoryPattern",
+      "console": "internalConsole",
+      "stopAtEntry": false
+    },
+    {
+      "name": "AdapterPattern",
+      "type": "coreclr",
+      "request": "launch",
+      "program": "${workspaceFolder}/AdapterPattern/bin/Debug/net8.0/AdapterPattern.dll",
+      "args": [],
+      "cwd": "${workspaceFolder}/AdapterPattern",
+      "console": "internalConsole",
+      "stopAtEntry": false
+    },
+    {
+      "name": "BridgePattern",
+      "type": "coreclr",
+      "request": "launch",
+      "program": "${workspaceFolder}/BridgePattern/bin/Debug/net8.0/BridgePattern.dll",
+      "args": [],
+      "cwd": "${workspaceFolder}/BridgePattern",
+      "console": "internalConsole",
+      "stopAtEntry": false
+    },
+    {
+      "name": "BuilderPattern",
+      "type": "coreclr",
+      "request": "launch",
+      "program": "${workspaceFolder}/BuilderPattern/bin/Debug/net8.0/BuilderPattern.dll",
+      "args": [],
+      "cwd": "${workspaceFolder}/BuilderPattern",
+      "console": "internalConsole",
+      "stopAtEntry": false
+    },
+    {
+      "name": "ChainOfResponsibilityPattern",
+      "type": "coreclr",
+      "request": "launch",
+      "program": "${workspaceFolder}/ChainOfResponsibilityPattern/bin/Debug/net8.0/ChainOfResponsibilityPattern.dll",
+      "args": [],
+      "cwd": "${workspaceFolder}/ChainOfResponsibilityPattern",
+      "console": "internalConsole",
+      "stopAtEntry": false
+    },
+    {
+      "name": "CommandPattern",
+      "type": "coreclr",
+      "request": "launch",
+      "program": "${workspaceFolder}/CommandPattern/bin/Debug/net8.0/CommandPattern.dll",
+      "args": [],
+      "cwd": "${workspaceFolder}/CommandPattern",
+      "console": "internalConsole",
+      "stopAtEntry": false
+    },
+    {
+      "name": "CompositePattern",
+      "type": "coreclr",
+      "request": "launch",
+      "program": "${workspaceFolder}/CompositePattern/bin/Debug/net8.0/CompositePattern.dll",
+      "args": [],
+      "cwd": "${workspaceFolder}/CompositePattern",
+      "console": "internalConsole",
+      "stopAtEntry": false
+    },
+    {
+      "name": "DecoratorPattern",
+      "type": "coreclr",
+      "request": "launch",
+      "program": "${workspaceFolder}/DecoratorPattern/bin/Debug/net8.0/DecoratorPattern.dll",
+      "args": [],
+      "cwd": "${workspaceFolder}/DecoratorPattern",
+      "console": "internalConsole",
+      "stopAtEntry": false
+    },
+    {
+      "name": "FacadePattern",
+      "type": "coreclr",
+      "request": "launch",
+      "program": "${workspaceFolder}/FacadePattern/bin/Debug/net8.0/FacadePattern.dll",
+      "args": [],
+      "cwd": "${workspaceFolder}/FacadePattern",
+      "console": "internalConsole",
+      "stopAtEntry": false
+    },
+    {
+      "name": "FactoryMethodPattern",
+      "type": "coreclr",
+      "request": "launch",
+      "program": "${workspaceFolder}/FactoryMethodPattern/bin/Debug/net8.0/FactoryMethodPattern.dll",
+      "args": [],
+      "cwd": "${workspaceFolder}/FactoryMethodPattern",
+      "console": "internalConsole",
+      "stopAtEntry": false
+    },
+    {
+      "name": "FactoryPattern",
+      "type": "coreclr",
+      "request": "launch",
+      "program": "${workspaceFolder}/FactoryPattern/bin/Debug/net8.0/FactoryPattern.dll",
+      "args": [],
+      "cwd": "${workspaceFolder}/FactoryPattern",
+      "console": "internalConsole",
+      "stopAtEntry": false
+    },
+    {
+      "name": "FlyweightPattern",
+      "type": "coreclr",
+      "request": "launch",
+      "program": "${workspaceFolder}/FlyweightPattern/bin/Debug/net8.0/FlyweightPattern.dll",
+      "args": [],
+      "cwd": "${workspaceFolder}/FlyweightPattern",
+      "console": "internalConsole",
+      "stopAtEntry": false
+    },
+    {
+      "name": "InterpreterPattern",
+      "type": "coreclr",
+      "request": "launch",
+      "program": "${workspaceFolder}/InterpreterPattern/bin/Debug/net8.0/InterpreterPattern.dll",
+      "args": [],
+      "cwd": "${workspaceFolder}/InterpreterPattern",
+      "console": "internalConsole",
+      "stopAtEntry": false
+    },
+    {
+      "name": "IteratorPattern",
+      "type": "coreclr",
+      "request": "launch",
+      "program": "${workspaceFolder}/IteratorPattern/bin/Debug/net8.0/IteratorPattern.dll",
+      "args": [],
+      "cwd": "${workspaceFolder}/IteratorPattern",
+      "console": "internalConsole",
+      "stopAtEntry": false
+    },
+    {
+      "name": "MediatorPattern",
+      "type": "coreclr",
+      "request": "launch",
+      "program": "${workspaceFolder}/MediatorPattern/bin/Debug/net8.0/MediatorPattern.dll",
+      "args": [],
+      "cwd": "${workspaceFolder}/MediatorPattern",
+      "console": "internalConsole",
+      "stopAtEntry": false
+    },
+    {
+      "name": "MementoPattern",
+      "type": "coreclr",
+      "request": "launch",
+      "program": "${workspaceFolder}/MementoPattern/bin/Debug/net8.0/MementoPattern.dll",
+      "args": [],
+      "cwd": "${workspaceFolder}/MementoPattern",
+      "console": "internalConsole",
+      "stopAtEntry": false
+    },
+    {
+      "name": "ObserverPattern",
+      "type": "coreclr",
+      "request": "launch",
+      "program": "${workspaceFolder}/ObserverPattern/bin/Debug/net8.0/ObserverPattern.dll",
+      "args": [],
+      "cwd": "${workspaceFolder}/ObserverPattern",
+      "console": "internalConsole",
+      "stopAtEntry": false
+    },
+    {
+      "name": "PrototypePattern",
+      "type": "coreclr",
+      "request": "launch",
+      "program": "${workspaceFolder}/PrototypePattern/bin/Debug/net8.0/PrototypePattern.dll",
+      "args": [],
+      "cwd": "${workspaceFolder}/PrototypePattern",
+      "console": "internalConsole",
+      "stopAtEntry": false
+    },
+    {
+      "name": "ProxyPattern",
+      "type": "coreclr",
+      "request": "launch",
+      "program": "${workspaceFolder}/ProxyPattern/bin/Debug/net8.0/ProxyPattern.dll",
+      "args": [],
+      "cwd": "${workspaceFolder}/ProxyPattern",
+      "console": "internalConsole",
+      "stopAtEntry": false
+    },
+    {
+      "name": "SingletonPattern",
+      "type": "coreclr",
+      "request": "launch",
+      "program": "${workspaceFolder}/SingletonPattern/bin/Debug/net8.0/SingletonPattern.dll",
+      "args": [],
+      "cwd": "${workspaceFolder}/SingletonPattern",
+      "console": "internalConsole",
+      "stopAtEntry": false
+    },
+    {
+      "name": "StatePattern",
+      "type": "coreclr",
+      "request": "launch",
+      "program": "${workspaceFolder}/StatePattern/bin/Debug/net8.0/StatePattern.dll",
+      "args": [],
+      "cwd": "${workspaceFolder}/StatePattern",
+      "console": "internalConsole",
+      "stopAtEntry": false
+    },
+    {
+      "name": "StrategyPattern",
+      "type": "coreclr",
+      "request": "launch",
+      "program": "${workspaceFolder}/StrategyPattern/bin/Debug/net8.0/StrategyPattern.dll",
+      "args": [],
+      "cwd": "${workspaceFolder}/StrategyPattern",
+      "console": "internalConsole",
+      "stopAtEntry": false
+    },
+    {
+      "name": "TemplatePattern",
+      "type": "coreclr",
+      "request": "launch",
+      "program": "${workspaceFolder}/TemplatePattern/bin/Debug/net8.0/TemplatePattern.dll",
+      "args": [],
+      "cwd": "${workspaceFolder}/TemplatePattern",
+      "console": "internalConsole",
+      "stopAtEntry": false
+    },
+    {
+      "name": "VisitorPattern",
+      "type": "coreclr",
+      "request": "launch",
+      "program": "${workspaceFolder}/VisitorPattern/bin/Debug/net8.0/VisitorPattern.dll",
+      "args": [],
+      "cwd": "${workspaceFolder}/VisitorPattern",
+      "console": "internalConsole",
+      "stopAtEntry": false
+    }
+  ]
 }

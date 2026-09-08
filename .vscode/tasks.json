@@ -4,12 +4,10 @@
         {
             "label": "build",
             "command": "dotnet",
-            "type": "process",
+            "type": "shell",
             "args": [
                 "build",
-                "${workspaceFolder}/DesignPatterns.sln",
-                "/property:GenerateFullPaths=true",
-                "/consoleloggerparameters:NoSummary;ForceNoAlign"
+                "${fileDirname}"
             ],
             "problemMatcher": "$msCompile",
             "group": {
@@ -18,22 +16,33 @@
             }
         },
         {
+            "label": "run",
+            "command": "dotnet",
+            "type": "shell",
+            "args": [
+                "run",
+                "--project",
+                "${fileDirname}"
+            ],
+            "problemMatcher": []
+        },
+        {
             "label": "clean",
             "command": "dotnet",
-            "type": "process",
+            "type": "shell",
             "args": [
                 "clean",
-                "${workspaceFolder}/DesignPatterns.sln"
+                "${fileDirname}"
             ],
             "problemMatcher": "$msCompile"
         },
         {
             "label": "restore",
             "command": "dotnet",
-            "type": "process",
+            "type": "shell",
             "args": [
                 "restore",
-                "${workspaceFolder}/DesignPatterns.sln"
+                "${fileDirname}"
             ],
             "problemMatcher": []
         }

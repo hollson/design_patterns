@@ -65,7 +65,7 @@ classDiagram
 
 ## 三、💻 代码示例
 
-### 3.1 编译器（GoF 经典）
+### 3.1 编译器示例
 
 > 场景：编译一个程序要经历词法分析 → 语法分析 → 代码生成，客户端不想逐个调用，`Compiler` 外观一行搞定。
 
@@ -89,7 +89,7 @@ flowchart TD
 | 外观 | [`CompilerDemo/Compiler.cs`](CompilerDemo/Compiler.cs) |
 | 客户端 | [`Program.cs`](Program.cs) |
 
-### 3.2 家庭影院（Head First 经典）
+### 3.2 家庭影院示例
 
 > 场景：看一部电影需要依次操作灯光、幕布、投影仪、功放，`HomeTheaterFacade` 一键观影、一键结束。
 

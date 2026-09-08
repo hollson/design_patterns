@@ -104,7 +104,7 @@ flowchart TD
 | 真实对象（远端） | [`RemoteProxy/RealHotel.cs`](RemoteProxy/RealHotel.cs) |
 | 代理 | [`RemoteProxy/HotelProxy.cs`](RemoteProxy/HotelProxy.cs) |
 
-### 3.3 保护代理：数据库权限校验
+### 3.3 保护代理：权限校验
 
 > 场景：`AuthDatabaseProxy` 在执行 `Query` 前校验用户是否已登录，未登录则拒绝。
 

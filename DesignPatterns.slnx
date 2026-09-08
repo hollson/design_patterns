@@ -4,17 +4,22 @@
     <Platform Name="x64" />
     <Platform Name="x86" />
   </Configurations>
+  <Project Path="AbstractFactoryPattern/AbstractFactoryPattern.csproj" />
   <Project Path="AdapterPattern/AdapterPattern.csproj" />
   <Project Path="BridgePattern/BridgePattern.csproj" />
   <Project Path="BuilderPattern/BuilderPattern.csproj" />
+  <Project Path="ChainOfResponsibilityPattern/ChainOfResponsibilityPattern.csproj" />
   <Project Path="CommandPattern/CommandPattern.csproj" />
   <Project Path="CompositePattern/CompositePattern.csproj" />
   <Project Path="DecoratorPattern/DecoratorPattern.csproj" />
   <Project Path="FacadePattern/FacadePattern.csproj" />
+  <Project Path="FactoryMethodPattern/FactoryMethodPattern.csproj" />
   <Project Path="FactoryPattern/FactoryPattern.csproj" />
   <Project Path="FlyweightPattern/FlyweightPattern.csproj" />
+  <Project Path="InterpreterPattern/InterpreterPattern.csproj" />
   <Project Path="IteratorPattern/IteratorPattern.csproj" />
   <Project Path="MediatorPattern/MediatorPattern.csproj" />
+  <Project Path="MementoPattern/MementoPattern.csproj" />
   <Project Path="ObserverPattern/ObserverPattern.csproj" />
   <Project Path="PrototypePattern/PrototypePattern.csproj" />
   <Project Path="ProxyPattern/ProxyPattern.csproj" />
