@@ -1,4 +1,4 @@
-# 代理模式（Proxy Pattern）教程
+# 代理模式（Proxy Pattern）
 
 [TOC]
 
@@ -6,235 +6,156 @@
 
 代理模式是**结构型设计模式**，为真实对象提供一个**代理**，由代理控制对真实对象的访问。
 
-核心思想：代理与真实对象实现相同接口，客户端通过代理间接访问真实对象，代理可在访问前后附加额外逻辑（如延迟加载、访问控制、日志记录等），对客户端完全透明。
-
-### 核心特性
-
-- **透明性**：客户端无需知道代理的存在，通过相同接口调用
-
-- **延迟加载**：虚拟代理可在首次访问时才创建真实对象，节省资源
-
-- **访问控制**：代理可拦截调用，执行权限检查等前置逻辑
-
-- **符合开闭原则**：新增代理类型无需修改真实对象代码
+核心思想：代理与真实对象实现相同接口，客户端通过代理间接访问真实对象，代理可在访问前后附加额外逻辑（如延迟加载、访问控制、远程调用等），对客户端完全透明。
 
 <br/>
 
-## 二、📐 结构图解
+## 二、🧩 模式解析
 
-### 2.1 整体结构
+### 2.1 类关系图
+
+```mermaid
+classDiagram
+    class Subject {
+        <<interface>>
+        +Operation() void
+    }
+    class RealSubject {
+        +Operation() void
+    }
+    class Proxy {
+        -realSubject: RealSubject
+        +Operation() void
+    }
+    class Client {
+        +Main() void
+    }
+
+    Subject <|.. RealSubject : 实现
+    Subject <|.. Proxy : 实现
+    Proxy o--> RealSubject : 持有引用
+    Client ..> Subject : 面向接口
+```
+
+### 2.2 三类代理对比
+
+| 类型 | 目的 | 实现要点 |
+| --- | --- | --- |
+| **虚拟代理 Virtual** | 延迟创建开销大的对象 | 首次访问时才实例化真实对象，后续复用 |
+| **远程代理 Remote** | 为远程对象提供本地代表 | 本地代理封装网络通信细节 |
+| **保护代理 Protective** | 控制对真实对象的访问权限 | 调用前检查用户身份或权限 |
+
+> 三种类型的具体示例见第三节。
+
+### 2.3 关键解析
+
+**客户端无感知**：代理与真实对象实现相同接口，客户端只面向接口编程，切换实现无需修改客户端逻辑（开闭原则）。
+
+**与装饰器模式的区别**：
+
+| 对比维度 | 代理模式 Proxy | 装饰器模式 Decorator |
+| --- | --- | --- |
+| 核心目的 | **控制对象访问**——控制什么时候、是否可以创建/调用真实对象 | **叠加新增功能**——调用前后附加能力 |
+| 包装对象 | 通常只包装 1 个对象 | 支持多层嵌套包装 |
+| 目标 | 管控访问，不是增强能力 | 增强能力，不是管控访问 |
+
+<br/>
+
+## 三、💻 代码示例
+
+### 3.1 虚拟代理：图片延迟加载
+
+> 场景：`ProxyImage` 构造时只记录文件名，首次 `display()` 才创建 `RealImage` 并从磁盘加载，后续调用直接复用。
 
 ```mermaid
 flowchart TD
-    A["客户端"] -->|"调用接口"| B["代理 Proxy"]
-    B -->|"延迟创建/控制"| C["真实对象 RealSubject"]
-    B -->|"实现"| D["主题接口 Subject"]
-    C -->|"实现"| D
+    A["客户端"] -->|"display()"| B["ProxyImage"]
+    B -->|"首次：new RealImage + 加载"| C["RealImage"]
+    B -->|"后续：直接复用"| C
+
+    style A fill:#4A90D9,color:#fff
+    style B fill:#E67E22,color:#fff
+    style C fill:#27AE60,color:#fff
+```
+
+| 角色 | 文件 |
+| --- | --- |
+| 主题接口 | [`VirtualProxy/Image.cs`](VirtualProxy/Image.cs) |
+| 真实对象 | [`VirtualProxy/RealImage.cs`](VirtualProxy/RealImage.cs) |
+| 代理 | [`VirtualProxy/ProxyImage.cs`](VirtualProxy/ProxyImage.cs) |
+
+### 3.2 远程代理：酒店预订
+
+> 场景：`HotelProxy` 在本地扮演远端酒店，封装模拟网络往返，客户端无需感知调用了远程服务。
+
+```mermaid
+flowchart TD
+    A["客户端"] -->|"Book()"| B["HotelProxy"]
+    B -->|"模拟网络往返"| C["RealHotel (远端)"]
+
+    style A fill:#4A90D9,color:#fff
+    style B fill:#E67E22,color:#fff
+    style C fill:#27AE60,color:#fff
+```
+
+| 角色 | 文件 |
+| --- | --- |
+| 主题接口 | [`RemoteProxy/IHotel.cs`](RemoteProxy/IHotel.cs) |
+| 真实对象（远端） | [`RemoteProxy/RealHotel.cs`](RemoteProxy/RealHotel.cs) |
+| 代理 | [`RemoteProxy/HotelProxy.cs`](RemoteProxy/HotelProxy.cs) |
+
+### 3.3 保护代理：数据库权限校验
+
+> 场景：`AuthDatabaseProxy` 在执行 `Query` 前校验用户是否已登录，未登录则拒绝。
+
+```mermaid
+flowchart TD
+    A["客户端"] -->|"Query()"| B["AuthDatabaseProxy"]
+    B -->|"已登录？"| C{权限校验}
+    C -->|"是"| D["RealDatabase 执行"]
+    C -->|"否"| E["拒绝查询"]
 
     style A fill:#4A90D9,color:#fff
     style B fill:#E67E22,color:#fff
     style C fill:#7B68EE,color:#fff
     style D fill:#27AE60,color:#fff
+    style E fill:#E74C3C,color:#fff
 ```
 
-### 2.2 类关系
+| 角色 | 文件 |
+| --- | --- |
+| 主题接口 | [`ProtectiveProxy/IDatabase.cs`](ProtectiveProxy/IDatabase.cs) |
+| 真实对象 | [`ProtectiveProxy/RealDatabase.cs`](ProtectiveProxy/RealDatabase.cs) |
+| 代理 | [`ProtectiveProxy/AuthDatabaseProxy.cs`](ProtectiveProxy/AuthDatabaseProxy.cs) |
+| 客户端 | [`Program.cs`](Program.cs) |
 
-```mermaid
-classDiagram
-    class Image {
-        <<interface>>
-        +display(): void
-    }
-    class RealImage {
-        -fileName: string
-        +display(): void
-    }
-    class ProxyImage {
-        -realImage: RealImage
-        -fileName: string
-        +display(): void
-    }
-    class Program {
-        +Main()
-    }
-
-    Image <|.. RealImage : 实现
-    Image <|.. ProxyImage : 实现
-    ProxyImage o--> RealImage : 延迟创建
-    Program ..> Image : 面向接口
-```
-
-### 2.3 关键角色
-
-| 角色                    | 说明                                     |
-| ----------------------- | ---------------------------------------- |
-| 主题接口（Subject）     | 定义真实对象和代理的公共接口             |
-| 真实对象（RealSubject） | 实际执行业务逻辑的对象                   |
-| 代理（Proxy）           | 持有真实对象引用，控制访问并附加额外逻辑 |
-| 客户端（Client）        | 面向主题接口编程，不感知代理的存在       |
-
-<br/>
-
-## 三、💻 代码实现
-
-以虚拟代理延迟加载图片为例：`ProxyImage` 先只记录文件名，仅当第一次调用 `display()` 时才创建 `RealImage` 并加载磁盘，后续调用直接复用。
-
-### 3.1 主题接口
-
-```csharp
-// 图片接口，定义公共操作
-public interface IImage
-{
-    void Display();
-}
-```
-
-### 3.2 真实对象
-
-```csharp
-// 真实图片，构造时立即从磁盘加载
-public class RealImage : IImage
-{
-    private string _fileName;
-
-    public RealImage(string fileName)
-    {
-        _fileName = fileName;
-        LoadFromDisk();
-    }
-
-    public void Display() => Console.WriteLine($"显示图片: {_fileName}");
-
-    private void LoadFromDisk() => Console.WriteLine($"加载图片: {_fileName}");
-}
-```
-
-### 3.3 代理对象
-
-```csharp
-// 代理图片，延迟加载核心逻辑
-public class ProxyImage : IImage
-{
-    private RealImage _realImage;
-    private string _fileName;
-
-    public ProxyImage(string fileName)
-    {
-        _fileName = fileName;
-        // 构造时不创建RealImage，仅记录文件名
-    }
-
-    public void Display()
-    {
-        if (_realImage == null)
-        {
-            _realImage = new RealImage(_fileName); // 首次访问才创建
-        }
-        _realImage.Display();
-    }
-}
-```
-
-### 3.4 客户端使用
-
-```csharp
-public class Program
-{
-    public static void Main()
-    {
-        IImage image = new ProxyImage("photo.jpg");
-
-        // 第一次调用：触发加载
-        image.Display();
-
-        // 第二次调用：直接显示，不再加载
-        image.Display();
-    }
-}
-```
-
-**运行结果**：
+### 3.4 运行结果
 
 ```
-加载图片: photo.jpg
-显示图片: photo.jpg
-显示图片: photo.jpg
+========== 代理模式 (Proxy Pattern) ==========
+为其他对象提供代理以控制对这个对象的访问
+
+--- 虚拟代理 (Virtual Proxy) ---
+加载 photo.jpg
+显示 photo.jpg
+
+显示 photo.jpg
+
+--- 远程代理 (Remote Proxy) ---
+正在联系远程酒店服务器...
+预订成功: 海景双人房
+
+--- 保护代理 (Protective Proxy) ---
+执行查询: SELECT * FROM users
+拒绝查询: 未登录，无权访问数据库
 ```
 
 <br/>
 
-## 四、🔍 核心解析
-
-### 4.1 接口一致性
-
-`ProxyImage` 和 `RealImage` 都实现 `IImage` 接口，客户端面向接口编程，无需区分代理与真实对象。
-
-### 4.2 延迟加载机制
-
-`ProxyImage` 构造时仅保存文件名，`Display()` 中通过 `if (_realImage == null)` 判断是否需要创建真实对象，首次调用后复用已有实例。
-
-### 4.3 客户端无感知
-
-客户端代码只依赖 `IImage` 接口，代理的存在对客户端透明，切换代理实现无需修改客户端逻辑。
-
-<br/>
-
-## 五、🎯 应用场景
-
-### 5.1 适用场景
-
-- 资源加载代价高昂，需要延迟到使用时才初始化
-
-- 需要对远程对象进行本地代理调用
-
-- 需要在访问真实对象前执行权限检查或日志记录
-
-### 5.2 实际案例
-
-- **虚拟代理**：图片编辑器延迟加载大图，避免启动卡顿
-
-- **远程代理**：.NET `MarshalByRefObject` 远程对象代理
-
-- **保护代理**：数据库访问层在执行前检查用户权限
-
-<br/>
-
-## 六、⚖️ 优缺点分析
-
-### 6.1 优点
-
-- **延迟初始化**：减少不必要的资源消耗，提升启动性能
-
-- **访问控制**：代理层可灵活添加权限、日志等横切关注点
-
-- **客户端透明**：无需修改客户端代码即可引入代理逻辑
-
-### 6.2 缺点
-
-- **增加间接层**：调用链变长，可能引入轻微性能开销
-
-- **复杂度增加**：需要维护代理与真实对象的同步逻辑
-
-<br/>
-
-## 七、🔍 三种代理类型
-
-| 类型                         | 目的                     | 典型场景                     | 实现要点                   |
-| ---------------------------- | ------------------------ | ---------------------------- | -------------------------- |
-| 虚拟代理（Virtual Proxy）    | 延迟创建开销大的对象     | 图片延迟加载、大文件按需读取 | 首次访问时才实例化真实对象 |
-| 远程代理（Remote Proxy）     | 为远程对象提供本地代表   | RPC 调用、Web Service 客户端 | 本地代理封装网络通信细节   |
-| 保护代理（Protective Proxy） | 控制对真实对象的访问权限 | 权限校验、审计日志           | 调用前检查用户身份或权限   |
-
-> **本教程示例**：`ProxyImage` 是虚拟代理——构造时仅记录文件名，首次 `Display()` 才从磁盘加载真实图片。
-
-<br/>
-
-## 八、📝 总结
+## 四、📝 小结
 
 - **核心思想**：为真实对象提供代理，由代理控制访问，对客户端透明
 
-- **关键角色**：主题接口、真实对象、代理、客户端
+- **三类应用**：虚拟代理延迟加载、远程代理封装网络、保护代理校验权限
 
-- **适用场景**：延迟加载、远程调用、访问控制等需要间接访问的场景
-
-- **注意事项**：代理应保持接口一致性，避免引入额外的耦合
+- **注意事项**：代理应保持与真实对象接口一致，避免引入额外耦合；延迟加载只在首次产生成本
