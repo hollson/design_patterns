@@ -1,294 +1,174 @@
-# 工厂模式（Factory Pattern）教程
+# 简单工厂模式（Simple Factory）
 
 [TOC]
 
 ## 一、📖 概述
 
-工厂模式是**创建型设计模式**，把"创建对象"的职责从客户端抽离，交给专门的工厂类。本示例涵盖两种工厂模式：
+简单工厂是**创建型模式**的入门款：由**一个工厂类 + 一个创建方法**集中管理对象创建，客户端只传"要什么"，不关心"怎么 new"。它不在 GoF 23 种模式之列，却是工厂三兄弟（简单工厂 → [工厂方法](../FactoryMethodPattern/README.md) → [抽象工厂](../AbstractFactoryPattern/README.md)）中最常用的一环。
 
-- **工厂方法模式**：定义创建对象的接口，让**子类决定实例化哪一个类**，将创建延迟到子类
-
-- **抽象工厂模式**：提供创建**一族相关产品**的接口，无需指定具体类
-
-核心思想：客户端面向抽象工厂接口编程，更换风味只需更换工厂实现，完全符合**开闭原则**。
-
-### 核心特性
-
-- **解耦创建与使用**：客户端不直接 new 对象，通过工厂获取
-
-- **产品族一致性**：同一工厂产出的面团、酱料、奶酪等配料属于同一风味
-
-- **可扩展**：新增风味只需新增工厂类，无需修改现有代码
-
-- **符合开闭原则**：对扩展开放，对修改关闭
+核心思想：把散落在各处的 `new` 收拢到一处，客户端与具体产品类**解耦**；代价是新增产品要修改工厂分支，违背开闭原则。
 
 <br/>
 
-## 二、📐 结构图解
+## 二、🧩 模式解析
 
-### 2.1 工厂方法流程
-
-```mermaid
-flowchart TD
-    A["客户端下单"] --> B{"选择风味?"}
-    B -- 纽约 --> C["NyPizzaFactory"]
-    B -- 芝加哥 --> D["ChicagoPizzaFactory"]
-    C --> E["创建纽约披萨"]
-    D --> F["创建芝加哥披萨"]
-    E --> G["准备→烘烤→切片→装盒"]
-    F --> G
-    G --> H["交付披萨"]
-
-    style A fill:#4A90D9,color:#fff
-    style B fill:#E67E22,color:#fff
-    style C fill:#7B68EE,color:#fff
-    style D fill:#7B68EE,color:#fff
-    style E fill:#27AE60,color:#fff
-    style F fill:#27AE60,color:#fff
-    style G fill:#7B68EE,color:#fff
-    style H fill:#27AE60,color:#fff
-```
-
-### 2.2 抽象工厂结构
-
-```mermaid
-flowchart TD
-    A["披萨店"] -->|"依赖"| B["IIngredientsFactory"]
-    B -->|"实现"| C["NyIngredientsFactory"]
-    B -->|"实现"| D["ChicagoIngredientsFactory"]
-    C -->|"创建"| E["薄面团+番茄酱"]
-    C -->|"创建"| F["马苏里拉+蛤蜊"]
-    D -->|"创建"| G["深盘面团+番茄酱"]
-    D -->|"创建"| H["帕尔马干酪+冷冻蛤蜊"]
-
-    style A fill:#4A90D9,color:#fff
-    style B fill:#E67E22,color:#fff
-    style C fill:#7B68EE,color:#fff
-    style D fill:#7B68EE,color:#fff
-    style E fill:#27AE60,color:#fff
-    style F fill:#27AE60,color:#fff
-    style G fill:#27AE60,color:#fff
-    style H fill:#27AE60,color:#fff
-```
-
-### 2.3 类关系
+### 2.1 类关系图
 
 ```mermaid
 classDiagram
-    class PizzaFactory {
-        <<abstract>>
-        +Order(type) Pizza
-        +Create(type)* Pizza
+    direction LR
+    class Client
+    class SimpleFactory {
+        <<static>>
+        +Create(type) IProduct
     }
-    class NyPizzaFactory {
-        +Create(type) Pizza
-    }
-    class ChicagoPizzaFactory {
-        +Create(type) Pizza
-    }
-    class IIngredientsFactory {
+    class IProduct {
         <<interface>>
-        +CreateDough() IDough
-        +CreateSauce() ISauce
-        +CreateCheese() ICheese
-        +CreateClam() IClam
+        +Act()
     }
-    class Pizza {
-        <<abstract>>
-        +Prepare()
-        +Bake()
-        +Cut()
-        +Box()
-    }
-    class CheesePizza {
-        +Prepare()
-    }
-    class ClamPizza {
-        +Prepare()
-    }
+    class ProductA
+    class ProductB
 
-    PizzaFactory <|-- NyPizzaFactory
-    PizzaFactory <|-- ChicagoPizzaFactory
-    PizzaFactory ..> Pizza : 创建
-    Pizza <|-- CheesePizza
-    Pizza <|-- ClamPizza
+    Client --> SimpleFactory : 传类型参数
+    SimpleFactory ..> ProductA : new
+    SimpleFactory ..> ProductB : new
+    IProduct <|.. ProductA
+    IProduct <|.. ProductB
+    Client ..> IProduct : 拿到抽象产品
 ```
 
-### 2.3 关键角色
+| 关键角色 | 说明 |
+| --- | --- |
+| **工厂（Factory）** | 一个静态创建方法 + 集中的分支/注册表，是唯一出现 `new` 的地方 |
+| **产品接口（Product）** | 所有产品的统一契约，客户端只面向它 |
+| **具体产品（Concrete Product）** | 被创建的实际对象 |
 
-| 角色                     | 说明                           |
-| ------------------------ | ------------------------------ |
-| 抽象工厂 Creator         | 定义创建产品的接口             |
-| 具体工厂 ConcreteCreator | 实现工厂接口，决定创建哪种产品 |
-| 抽象产品 Product         | 定义产品接口                   |
-| 具体产品 ConcreteProduct | 实现产品接口                   |
-
-<br/>
-
-## 三、💻 代码实现
-
-以披萨店为例：纽约和芝加哥两种风味，每种风味的面团、酱料、奶酪、海鲜配料各不相同。
-
-### 3.1 抽象工厂
+### 2.2 核心代码
 
 ```csharp
-// 工厂方法模式：抽象工厂定义模板流程
-public abstract class PizzaFactory
+// 简单工厂：一个静态方法 + 集中分支
+static class SimpleFactory
 {
-    // 模板方法：固定流程
-    public Pizza Order(PizzaType type)
+    static IProduct Create(ProductType type) => type switch
     {
-        var pizza = Create(type);  // 工厂方法，由子类决定
-        pizza.Prepare();
-        pizza.Bake();
-        pizza.Cut();
-        pizza.Box();
-        return pizza;
-    }
-
-    // 抽象工厂方法
-    protected abstract Pizza Create(PizzaType type);
+        ProductType.A => new ProductA(),      // 分支集中在这一处
+        ProductType.B => new ProductB(),
+        _ => throw new NotSupportedException($"未知类型：{type}"),
+    };
 }
+
+// 客户端：不 new，只报类型
+IProduct product = SimpleFactory.Create(ProductType.A);
+product.Act();
 ```
 
-### 3.2 具体工厂
+> 协作方式：客户端只传"要什么"，工厂集中决定"怎么造"；新增产品必须改工厂分支——这正是它违背开闭原则、被[工厂方法](../FactoryMethodPattern/README.md)改进的地方。
 
-```csharp
-// 纽约风味工厂
-public class NyPizzaFactory : PizzaFactory
-{
-    protected override Pizza Create(PizzaType type)
-    {
-        // 使用纽约配料族
-        var ingredients = new NyIngredientsFactory();
-        return new CheesePizza(ingredients) { BoxColor = "blue" };
-    }
-}
+### 2.3 关键解析
 
-// 芝加哥风味工厂
-public class ChicagoPizzaFactory : PizzaFactory
-{
-    protected override Pizza Create(PizzaType type)
-    {
-        // 使用芝加哥配料族
-        var ingredients = new ChicagoIngredientsFactory();
-        return new ClamPizza(ingredients) { BoxColor = "red" };
-    }
-}
+与工厂方法对比：
+
+| 对比维度 | 简单工厂 | 工厂方法 |
+| --- | --- | --- |
+| 新增一个产品 | 修改 `Create()` 分支 | 新增一对类，零修改 |
+| 开闭原则 | 违背 | 符合 |
+| 类数量 | 最少 | 产品数 × 2 |
+| 适用场景 | 产品少且稳定 | 产品体系需要持续扩展 |
+
+两种实现风味（本模式两个示例各用一种）：
+
+- **switch 表达式版**：类型少（<10 个）时最直观
+- **字典注册版**：类型多时 O(1) 查找，注册即扩展，更贴近 DI 容器的注册表实现
+
+BCL 中的身影：`Encoding.GetEncoding("utf-8")`、`Color.FromArgb(...)` 都是简单工厂。
+
+<br/>
+
+## 三、💻 代码示例
+
+### 3.1 经典场景：咖啡店点单
+
+> 场景：顾客报品类，咖啡工厂按 switch 分支制作——最直观的简单工厂；菜单外的品类在工厂统一拦截。
+
+```mermaid
+flowchart LR
+    C["顾客"] -->|"Create(type)"| F["CoffeeFactory<br/>switch 集中分支"]
+    F -->|"Latte"| L["拿铁 ¥28"]
+    F -.->|"Mocha"| M["摩卡 ¥32"]
+    F -.->|"99?"| X["报错: 未知类型"]
+
+    style C fill:#4A90D9,color:#fff
+    style F fill:#E67E22,color:#fff
+    style L fill:#27AE60,color:#fff
+    style M fill:#27AE60,color:#fff
+    style X fill:#E74C3C,color:#fff
 ```
 
-### 3.3 抽象工厂
+| 角色 | 文件 |
+| --- | --- |
+| 抽象产品 | [`Coffee/Coffee.cs`](Coffee/Coffee.cs) |
+| 具体产品 | [`Coffee/Latte.cs`](Coffee/Latte.cs)、[`Americano.cs`](Coffee/Americano.cs)、[`Mocha.cs`](Coffee/Mocha.cs) |
+| 工厂 | [`Coffee/CoffeeFactory.cs`](Coffee/CoffeeFactory.cs)（switch 表达式版） |
+| 客户端 | [`Program.cs`](Program.cs) |
 
-```csharp
-// 抽象工厂：定义配料族接口
-public interface IIngredientsFactory
-{
-    IDough CreateDough();
-    ISauce CreateSauce();
-    ICheese CreateCheese();
-    IClam CreateClam();
-}
+### 3.2 软件项目：文件解析器
 
-// 纽约配料工厂
-public class NyIngredientsFactory : IIngredientsFactory
-{
-    public IDough CreateDough() => new ThinCrust();       // 薄面团
-    public ISauce CreateSauce() => new CherryTomato();    // 樱桃番茄酱
-    public ICheese CreateCheese() => new Mozarella();     // 马苏里拉
-    public IClam CreateClam() => new FreshClam();         // 新鲜蛤蜊
-}
+> 场景：按文件扩展名分发到 JSON/XML/CSV 解析器——字典注册表式工厂，软件项目中最常见的用法（`FrozenDictionary` 查找 O(1)）。
 
-// 芝加哥配料工厂
-public class ChicagoIngredientsFactory : IIngredientsFactory
-{
-    public IDough CreateDough() => new DeepDish();        // 深盘面团
-    public ISauce CreateSauce() => new PlumTomato();      // 李子番茄酱
-    public ICheese CreateCheese() => new Parmesan();      // 帕尔马干酪
-    public IClam CreateClam() => new FrozenClam();        // 冷冻蛤蜊
-}
+```mermaid
+flowchart LR
+    B["业务代码"] -->|"GetParser(.json)"| F["ParserFactory<br/>FrozenDictionary 注册表"]
+    F --> J["JsonParser 解析 .json"]
+    F -.-> V["CsvParser 解析 .csv"]
+    F -.->|"未知扩展名"| X["报错: 不支持"]
+
+    style B fill:#4A90D9,color:#fff
+    style F fill:#E67E22,color:#fff
+    style J fill:#27AE60,color:#fff
+    style V fill:#27AE60,color:#fff
+    style X fill:#E74C3C,color:#fff
 ```
 
-### 3.4 客户端使用
+| 角色 | 文件 |
+| --- | --- |
+| 产品接口 | [`Parser/IDataParser.cs`](Parser/IDataParser.cs) |
+| 具体产品 | [`Parser/JsonParser.cs`](Parser/JsonParser.cs)、[`XmlParser.cs`](Parser/XmlParser.cs)、[`CsvParser.cs`](Parser/CsvParser.cs) |
+| 工厂 | [`Parser/ParserFactory.cs`](Parser/ParserFactory.cs)（FrozenDictionary 注册版） |
+| 客户端 | [`Program.cs`](Program.cs) |
 
-```csharp
-// 客户端只面向工厂接口
-var nyStore = new NyPizzaFactory();
-nyStore.Order(PizzaType.Cheese);   // 纽约风味芝士披萨，蓝色盒
+### 3.3 运行结果
 
-var chicagoStore = new ChicagoPizzaFactory();
-chicagoStore.Order(PizzaType.Clam); // 芝加哥风味蛤蜊披萨，红色盒
+```bash
+========== 简单工厂模式 (Simple Factory) ==========
+一个工厂方法集中管理创建，客户端不直接 new 产品
+
+--- 经典场景: 咖啡店点单（switch 表达式版） ---
+>> 顾客依次点单：
+
+[下单] 拿铁 Latte ¥28 — 浓缩咖啡 + 蒸奶 + 细奶泡
+[下单] 美式 Americano ¥22 — 浓缩咖啡 + 热水
+[下单] 摩卡 Mocha ¥32 — 浓缩咖啡 + 巧克力酱 + 蒸奶 + 奶泡
+
+>> 顾客点了菜单外的品类：
+[报错] 未知咖啡类型：99
+
+--- 软件项目: 文件解析器（字典注册版） ---
+>> 按扩展名分发到对应解析器：
+
+[解析] users.json（JSON）：读取 25 字符，反序列化为对象树
+[解析] config.xml（XML）：读取 33 字符，构建 DOM 文档
+[解析] books.csv（CSV）：按分隔符切分为 3 行 × 2 列
+
+>> 传入不支持的 .txt 文件：
+[报错] 不支持的文件格式：.txt
 ```
 
 <br/>
 
-## 四、🔍 核心解析
+## 四、📝 小结
 
-### 4.1 工厂方法 vs 抽象工厂
+- **核心思想**：创建逻辑集中到一个静态工厂方法，客户端面向产品接口编程，不接触具体类
 
-| 维度     | 工厂方法                         | 抽象工厂                                      |
-| -------- | -------------------------------- | --------------------------------------------- |
-| 产品数量 | 一个工厂创建一种产品             | 一个工厂创建一族产品                          |
-| 扩展方式 | 新增产品 → 新增工厂子类          | 新增产品族 → 新增工厂实现                     |
-| 抽象层级 | 单一产品接口                     | 多个产品组成的族接口                          |
-| 本例对应 | `PizzaFactory` 决定创建哪种披萨  | `IIngredientsFactory` 创建面团+酱料+奶酪+海鲜 |
-| 适用场景 | 只需一种产品，创建逻辑因类型而异 | 需要一组风格一致的配套产品                    |
+- **两个示例**：咖啡店展示 switch 分支版的生活直觉，文件解析器展示字典注册版的软件实战
 
-### 4.2 模板方法与工厂方法协作
-
-`PizzaFactory.Order()` 是模板方法，固定了"创建→准备→烘烤→切片→装盒"流程；`Create()` 是工厂方法，由子类决定实例化哪个具体产品。
-
-### 4.3 客户端解耦
-
-客户端通过 `PizzaFactory` 基类引用操作，不依赖具体工厂类。切换风味只需更换一行工厂实例化代码，无需修改客户端业务逻辑。
-
-<br/>
-
-## 五、🎯 应用场景
-
-### 5.1 适用场景
-
-- 系统需要多个系列的相关对象（如不同风味的食品、不同平台的UI组件）
-
-- 创建对象的逻辑复杂且随产品族变化
-
-- 需要在运行时动态切换产品族
-
-### 5.2 实际案例
-
-- **.NET数据库访问**：`IDbProviderFactory` 创建Connection、Command等数据库对象族
-
-- **跨平台UI框架**：Windows/Mac/Linux不同风格组件族
-
-- **游戏引擎**：不同主题的道具、角色外观、音效等资源族
-
-<br/>
-
-## 六、⚖️ 优缺点分析
-
-### 6.1 优点
-
-- **产品族一致性**：同一工厂创建的配料（面团、酱料、奶酪）风格统一
-
-- **符合开闭原则**：新增风味只需新增工厂类，不修改现有代码
-
-- **解耦客户端**：客户端面向抽象接口，更换风味只需更换工厂实例
-
-### 6.2 缺点
-
-- **扩展困难**：新增产品类型（如新增配料种类）需修改所有工厂接口
-
-- **类数量增多**：每新增一个风味，需要增加对应的工厂类和配料类
-
-<br/>
-
-## 七、📝 总结
-
-- **核心思想**：把创建对象的职责从客户端抽离，交给专门的工厂
-
-- **两种模式**：工厂方法让子类决定创建哪种产品；抽象工厂创建一整套相关产品族
-
-- **关键角色**：抽象工厂、具体工厂、抽象产品、具体产品
-
-- **适用场景**：需要多套风格一致的产品族，且运行时动态切换
-
-- **注意事项**：新增产品类型成本较高，设计时需预估扩展方向
+- **注意事项**：产品种类持续增长时，升级为工厂方法（每种产品一对类）；简单工厂的"修改分支"在小规模下反而是优势——类最少、结构最简单
