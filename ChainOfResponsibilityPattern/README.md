@@ -1,284 +1,231 @@
-# 职责链模式（Chain of Responsibility Pattern）教程
+# 责任链模式（Chain of Responsibility Pattern）
 
 [TOC]
 
 ## 一、📖 概述
 
-职责链模式是**行为型设计模式**，将请求的发送者与接收者解耦，使**多个对象都有机会处理同一个请求**。这些处理对象被连成一条链，请求沿链传递，直到某个处理器能处理它为止。发送者无需知道具体由谁处理。
+责任链是**行为型设计模式**，让多个对象都有机会处理请求，把这些对象**连成一条链**，请求沿链传递，直到有一个对象处理它为止。
 
-核心思想：将每个处理逻辑封装为独立节点，通过链表组织起来。新增处理只需追加节点并挂到链尾，符合**开闭原则**；链尾无人响应时返回 null，天然支持"兜底不处理"。
-
-### 核心特性
-
-- **解耦发送者与接收者**：客户端不关心请求由谁处理
-
-- **链式传递**：请求沿处理链逐个传递，直到被处理
-
-- **动态组合**：运行时可灵活增删链中的处理器
-
-- **符合开闭原则**：新增处理器无需修改现有代码
+核心思想：发送者只知道链头，不知道谁会处理；每个处理者**只判断自己的部分**，处理不了就交给下一环。发送者与接收者解耦，新增/移除处理者零改动客户端。典型应用：审批流、异常处理、HTTP 中间件、事件冒泡。
 
 <br/>
 
-## 二、📐 结构图解
+## 二、🧩 模式解析
 
-### 2.1 处理流程
-
-以计算器为例：加法、减法、乘法三个处理器组成链，客户端发送请求，链上各节点依次尝试处理。
-
-```mermaid
-flowchart TD
-    A["客户端发送请求"] --> B{"AdditionHandler\n能否处理?"}
-    B -- 是 --> C["执行加法运算"]
-    B -- 否 --> D{"SubtractionHandler\n能否处理?"}
-    D -- 是 --> E["执行减法运算"]
-    D -- 否 --> F{"MultiplicationHandler\n能否处理?"}
-    F -- 是 --> G["执行乘法运算"]
-    F -- 否 --> H["返回null:无人处理"]
-    C --> I["返回结果"]
-    E --> I
-    G --> I
-
-    style A fill:#4A90D9,color:#fff
-    style B fill:#E67E22,color:#fff
-    style D fill:#E67E22,color:#fff
-    style F fill:#E67E22,color:#fff
-    style C fill:#7B68EE,color:#fff
-    style E fill:#7B68EE,color:#fff
-    style G fill:#7B68EE,color:#fff
-    style H fill:#95A5A6,color:#fff
-    style I fill:#27AE60,color:#fff
-```
-
-### 2.2 类关系
+### 2.1 类关系图
 
 ```mermaid
 classDiagram
-    class IHandler {
-        <<interface>>
-        +AddChain(handler:IHandler):void
-        +Handle(values:double[], action:string):double?
+    direction LR
+    class Client
+    class Handler {
+        <<abstract>>
+        #next Handler?
+        +SetNext(Handler) Handler
+        +Handle(request)
+        +CanHandle(request)* bool
     }
-    class BaseHandler {
-        #_nextInLine:IHandler
-        +AddChain(handler:IHandler):void
-        +Handle(values:double[], action:string):double?
+    class ConcreteHandlerA {
+        +CanHandle() 自己的判断
     }
-    class AdditionHandler {
-        +Handle(values:double[], action:string):double?
-    }
-    class SubtractionHandler {
-        +Handle(values:double[], action:string):double?
-    }
-    class MultiplicationHandler {
-        +Handle(values:double[], action:string):double?
+    class ConcreteHandlerB {
+        +CanHandle() 自己的判断
     }
 
-    IHandler <|.. BaseHandler
-    BaseHandler <|-- AdditionHandler
-    BaseHandler <|-- SubtractionHandler
-    BaseHandler <|-- MultiplicationHandler
-    IHandler o--> IHandler : 后继节点
+    Client --> Handler : 只认识链头
+    Handler <|-- ConcreteHandlerA
+    Handler <|-- ConcreteHandlerB
+    Handler o--> Handler : next 后继者
 ```
 
-### 2.3 关键角色
+| 关键角色 | 说明 | 审批示例 |
+| --- | --- | --- |
+| **抽象处理者（Handler）** | 持有 `next` 引用，实现"处理或转交"骨架 | `Approver` |
+| **具体处理者（Concrete Handler）** | 只判断自己的权限，管不了就上报 | `TeamLead`/`Manager`/`Director`/`Ceo` |
+| **客户端（Client）** | 把请求发给链头，不关心谁处理 | `Program.cs` |
 
-| 角色                               | 说明                                             |
-| ---------------------------------- | ------------------------------------------------ |
-| **处理者接口（Handler）**          | 定义处理请求的接口和后继节点挂载方法             |
-| **抽象基类（Base Handler）**       | 维护后继节点引用 `_nextInLine`，实现链式传递逻辑 |
-| **具体处理器（Concrete Handler）** | 判断能否处理当前请求，能则处理，不能则传递给后继 |
-
-<br/>
-
-## 三、💻 代码实现
-
-以计算器为例：三个处理器（加法、减法、乘法）组成职责链，客户端发送不同运算请求。
-
-### 3.1 处理者接口与基类
+### 2.2 核心代码
 
 ```csharp
-// 职责链接口
-public interface IHandler
+// 抽象处理者：串链 + 处理或转交
+abstract class Handler
 {
-    void AddChain(IHandler handler);
-    double? Handle(double[] values, string action);
-}
+    private Handler? _next;                      // 后继者
 
-// 抽象基类：维护后继节点
-public abstract class BaseHandler : IHandler
-{
-    protected IHandler? _nextInLine;
-
-    public void AddChain(IHandler handler)
+    public Handler SetNext(Handler next)         // 串链（返回 next 便于链式组装）
     {
-        _nextInLine = handler;
+        _next = next;
+        return next;
     }
 
-    public abstract double? Handle(double[] values, string action);
+    public void Handle(Request request)
+    {
+        if (CanHandle(request)) { /* 处理 */ }
+        else if (_next is not null) _next.Handle(request);   // 转交
+        else { /* 链尾兜底：拒绝 */ }
+    }
+
+    protected abstract bool CanHandle(Request request);      // 只管自己的判断
 }
 ```
 
-### 3.2 具体处理器
+> 协作方式：客户端把请求发给链头；每个处理者只回答一个问题——"我能不能管"，管得了就处理，管不了就转给 `next`——发送者与具体处理者互不相识。
 
-```csharp
-// 加法处理器
-public class AdditionHandler : BaseHandler
-{
-    public override double? Handle(double[] values, string action)
-    {
-        if (string.Equals(action, "Add"))
-            return values[0] + values[1];
+### 2.3 关键解析
 
-        return _nextInLine?.Handle(values, action); // 传给下一个
-    }
-}
+**两种链策略**：
 
-// 减法处理器
-public class SubtractionHandler : BaseHandler
-{
-    public override double? Handle(double[] values, string action)
-    {
-        if (string.Equals(action, "Minus"))
-            return values[0] - values[1];
+| 策略 | 行为 | 示例 |
+| --- | --- | --- |
+| 处理即终止 | 有一个环节接手就结束 | 报销审批（组长批了就不再上报） |
+| 全链穿透 | 每环都过一遍（观察/加工） | HTTP 中间件（认证→限流→日志依次检查） |
 
-        return _nextInLine?.Handle(values, action);
-    }
-}
+- **BCL 中的身影**：ASP.NET Core 中间件管道 `app.Use(async (ctx, next) => { ...; await next(ctx); })` 就是责任链的 lambda 版；WinForms/WPF 事件冒泡、`Exception.GetBaseException()` 异常链同理
+- **纯版 vs 变体**：GoF 纯版"要么处理要么转交"，变体"处理后仍继续传递"（中间件模型）——本模式两个示例各演示一种
+- **注意事项**：请求可能到链尾无人处理（需兜底）；调试时链路不直观，日志要打清楚在哪一环
 
-// 乘法处理器
-public class MultiplicationHandler : BaseHandler
-{
-    public override double? Handle(double[] values, string action)
-    {
-        if (string.Equals(action, "Multiply"))
-            return values[0] * values[1];
+<br/>
 
-        return _nextInLine?.Handle(values, action);
-    }
-}
+## 三、💻 代码示例
+
+### 3.1 经典场景：公司报销审批
+
+> 场景：组长（≤500）→ 经理（≤5000）→ 总监（≤5 万）→ CEO（不限）逐级审批——员工只管提交，系统自动找到有权限的审批人。
+
+```mermaid
+flowchart LR
+    E["员工"] -->|"提交报销"| T["组长<br/>≤500"]
+    T -->|"超权限上报"| M["经理<br/>≤5000"]
+    M -->|"超权限上报"| D["总监<br/>≤5万"]
+    D -->|"超权限上报"| C["CEO<br/>不限"]
+    T -->|"✅ 批"| P["[通过]"]
+    M --> P
+    D --> P
+    C --> P
+
+    style E fill:#4A90D9,color:#fff
+    style T fill:#7B68EE,color:#fff
+    style M fill:#7B68EE,color:#fff
+    style D fill:#7B68EE,color:#fff
+    style C fill:#7B68EE,color:#fff
+    style P fill:#27AE60,color:#fff
 ```
 
-### 3.3 客户端使用
+| 角色 | 文件 |
+| --- | --- |
+| 请求对象 | [`Approval/ExpenseRequest.cs`](Approval/ExpenseRequest.cs) |
+| 抽象处理者 | [`Approval/Approver.cs`](Approval/Approver.cs) |
+| 具体处理者 | [`Approval/TeamLead.cs`](Approval/TeamLead.cs)、[`Manager.cs`](Approval/Manager.cs)、[`Director.cs`](Approval/Director.cs)、[`Ceo.cs`](Approval/Ceo.cs) |
+| 客户端 | [`Program.cs`](Program.cs) |
 
-```csharp
-// 组装链：加法 → 减法 → 乘法
-var multiplicationHandler = new MultiplicationHandler();
-var subtractionHandler = new SubtractionHandler();
-var additionHandler = new AdditionHandler();
+### 3.2 软件项目：HTTP 中间件管道
 
-subtractionHandler.AddChain(multiplicationHandler);
-additionHandler.AddChain(subtractionHandler);
+> 场景：请求流经 认证 → 限流 → 日志 → 控制器——无 Token 在认证环被 401 截断，超频在限流环被 429 截断，全部通过才到达业务控制器（ASP.NET Core 的核心机制）。
 
-double[] numbers = [2, 3];
+```mermaid
+flowchart LR
+    R["HTTP 请求"] --> A["认证中间件"]
+    A -->|"无 Token 401 截断"| X1["401 未认证"]
+    A -->|"放行"| L["限流中间件"]
+    L -->|"超频 429 截断"| X2["429 触发限流"]
+    L -->|"放行"| G["日志中间件"]
+    G -->|"放行"| O["订单控制器"]
+    O --> OK["200 下单成功"]
 
-// 请求加法 → AdditionHandler 处理
-var addResult = additionHandler.Handle(numbers, "Add");       // 5
+    style R fill:#4A90D9,color:#fff
+    style A fill:#7B68EE,color:#fff
+    style L fill:#7B68EE,color:#fff
+    style G fill:#7B68EE,color:#fff
+    style O fill:#E67E22,color:#fff
+    style X1 fill:#E74C3C,color:#fff
+    style X2 fill:#E74C3C,color:#fff
+    style OK fill:#27AE60,color:#fff
+```
 
-// 请求除法 → 链中无人处理 → null
-var divideResult = additionHandler.Handle(numbers, "divide"); // null
+| 角色 | 文件 |
+| --- | --- |
+| 请求对象 | [`Middleware/HttpContext.cs`](Middleware/HttpContext.cs) |
+| 抽象处理者 | [`Middleware/Middleware.cs`](Middleware/Middleware.cs) |
+| 具体处理者 | [`Middleware/AuthMiddleware.cs`](Middleware/AuthMiddleware.cs)、[`RateLimitMiddleware.cs`](Middleware/RateLimitMiddleware.cs)、[`LoggingMiddleware.cs`](Middleware/LoggingMiddleware.cs)、[`OrderController.cs`](Middleware/OrderController.cs) |
+| 客户端 | [`Program.cs`](Program.cs) |
+
+### 3.3 运行结果
+
+```bash
+========== 责任链模式 (Chain of Responsibility) ==========
+请求沿链传递，每个处理者决定处理或转交下一位
+
+--- 经典场景: 公司报销审批 ---
+>> 审批链：组长(≤500) → 经理(≤5000) → 总监(≤5万) → CEO(不限)
+
+>> 小陈 提交「团建零食」¥320
+[通过] 组长老王 审批通过：小陈 的「团建零食」¥320
+
+>> 小周 提交「差旅费」¥3800
+[上报] 组长老王：¥3800 超出我的权限，转交 经理老李
+[通过] 经理老李 审批通过：小周 的「差旅费」¥3800
+
+>> 小吴 提交「展会物料」¥28000
+[上报] 组长老王：¥28000 超出我的权限，转交 经理老李
+[上报] 经理老李：¥28000 超出我的权限，转交 张总监
+[通过] 张总监 审批通过：小吴 的「展会物料」¥28000
+
+>> 小郑 提交「服务器采购」¥500000
+[上报] 组长老王：¥500000 超出我的权限，转交 经理老李
+[上报] 经理老李：¥500000 超出我的权限，转交 张总监
+[上报] 张总监：¥500000 超出我的权限，转交 赵总
+[通过] 赵总 审批通过：小郑 的「服务器采购」¥500000
+
+--- 软件项目: HTTP 中间件管道 ---
+>> 管道：认证 → 限流 → 日志 → 控制器（ASP.NET Core 的核心机制）
+
+>> 请求进入管道：GET /api/orders（Token：jwt-token-abc）
+[执行] 认证中间件：GET /api/orders
+[放行] 认证中间件 检查通过，进入下一环
+[执行] 限流中间件：/api/orders 已访问 0/3 次
+[放行] 限流中间件 检查通过，进入下一环
+[执行] 日志中间件：记录 GET /api/orders
+[放行] 日志中间件 检查通过，进入下一环
+[执行] 订单控制器：处理业务 /api/orders
+[截断] 订单控制器 终止管道：200 OK 订单创建成功
+
+>> 请求进入管道：GET /api/orders（Token：无）
+[执行] 认证中间件：GET /api/orders
+[截断] 认证中间件 终止管道：401 Unauthorized 未认证
+
+>> 请求进入管道：GET /api/orders（Token：jwt-token-abc）
+[执行] 认证中间件：GET /api/orders
+[放行] 认证中间件 检查通过，进入下一环
+[执行] 限流中间件：/api/orders 已访问 1/3 次
+[放行] 限流中间件 检查通过，进入下一环
+[执行] 日志中间件：记录 GET /api/orders
+[放行] 日志中间件 检查通过，进入下一环
+[执行] 订单控制器：处理业务 /api/orders
+[截断] 订单控制器 终止管道：200 OK 订单创建成功
+
+>> 请求进入管道：GET /api/orders（Token：jwt-token-abc）
+[执行] 认证中间件：GET /api/orders
+[放行] 认证中间件 检查通过，进入下一环
+[执行] 限流中间件：/api/orders 已访问 2/3 次
+[放行] 限流中间件 检查通过，进入下一环
+[执行] 日志中间件：记录 GET /api/orders
+[放行] 日志中间件 检查通过，进入下一环
+[执行] 订单控制器：处理业务 /api/orders
+[截断] 订单控制器 终止管道：200 OK 订单创建成功
+
+>> 请求进入管道：GET /api/orders（Token：jwt-token-abc）
+[执行] 认证中间件：GET /api/orders
+[放行] 认证中间件 检查通过，进入下一环
+[执行] 限流中间件：/api/orders 已访问 3/3 次
+[截断] 限流中间件 终止管道：429 Too Many Requests 触发限流
 ```
 
 <br/>
 
-## 四、🔍 核心解析
+## 四、📝 小结
 
-### 4.1 链式接口
+- **核心思想**：处理者串成链，各自只判断自己的部分，处理或转交；客户端只认识链头
 
-`IHandler` 定义了两个方法：`AddChain` 用于挂载后继节点，`Handle` 用于处理请求。所有处理器遵循统一接口，客户端无感知。
+- **两个示例**：报销审批展示"处理即终止"的逐级上报，HTTP 中间件展示"全链穿透 + 拦截截断"的软件工程用法
 
-### 4.2 抽象基类
-
-`BaseHandler` 维护 `_nextInLine` 引用，实现 `AddChain` 方法。具体处理器继承基类，只需实现自己的 `Handle` 逻辑。
-
-### 4.3 请求传递
-
-每个具体处理器判断能否处理当前请求：能处理则直接返回结果；不能处理则调用 `_nextInLine?.Handle()` 向后传递。链尾无人处理时，`?.` 空合并运算符返回 null。
-
-### 4.4 链的组装
-
-客户端通过 `AddChain` 将处理器串成单向链表。链的顺序决定了优先级：先注册的处理器优先尝试处理。
-
-<br/>
-
-## 五、🎯 应用场景
-
-### 5.1 适用场景
-
-- 多个对象可能处理同一请求，具体处理者在运行时确定
-
-- 需要在不指定接收者的情况下发送请求
-
-- 处理者集合应动态指定
-
-- 请求需要经过多级处理、过滤或校验
-
-### 5.2 实际案例
-
-- **Web中间件管道**：ASP.NET Core 的请求管道，中间件按顺序处理请求
-
-- **审批流程**：员工请假逐级上报，主管→经理→总监依次审批
-
-- **异常处理**：try-catch 链中多个 catch 块依次尝试匹配
-
-- **事件冒泡**：DOM 事件从子元素向父元素逐层传递
-
-<br/>
-
-## 六、⚖️ 优缺点分析
-
-### 6.1 优点
-
-- **解耦请求发送者与处理者**：发送者不关心谁处理
-
-- **灵活调整链结构**：运行时动态增删处理器
-
-- **符合开闭原则**：新增处理器不影响现有代码
-
-- **职责单一**：每个处理器只关注自己的逻辑
-
-### 6.2 缺点
-
-- **请求可能无人处理**：链尾无兜底时请求丢失
-
-- **链过长影响性能**：请求需逐个传递，链太长时效率降低
-
-- **调试困难**：请求在链中流转，排查问题时不易追踪
-
-<br/>
-
-## 七、📝 总结
-
-- **核心思想**：将请求的发送者与接收者解耦，多个对象沿链依次尝试处理请求
-
-- **关键角色**：处理者接口、抽象基类、具体处理器、客户端
-
-- **适用场景**：多个对象可能处理同一请求，需动态指定处理者
-
-- **注意事项**：设计时考虑链的长度和兜底处理器，避免请求无人处理
-
----
-
-## 八、🔬 与中间件管道的对比
-
-职责链模式和现代 Web 框架的**中间件管道（Middleware Pipeline）** 思想相近，但有关键差异：
-
-| 对比项       | 职责链模式                               | 中间件管道（如 ASP.NET Core）                        |
-| ------------ | ---------------------------------------- | ---------------------------------------------------- |
-| **传递方向** | 单向：请求沿链**单向传递**，处理后即终止 | 双向：请求"进入"管道，响应"返回"管道                 |
-| **能否短路** | 能：处理器处理后直接返回，不传递后续节点 | 能：中间件可选择不调用 `next()` 短路管道             |
-| **后处理**   | 不支持：处理完毕即返回                   | 支持：中间件可在 `next()` 之后添加后处理逻辑         |
-| **依赖模型** | 后继节点通过 `AddChain` 手动串成链表     | 中间件通过 `Use`/`Map` 注册到管道，框架自动串联      |
-| **典型结构** | `Handler → next → Handler → next → null` | `Middleware₁ → next → Middleware₂ → next → Endpoint` |
-
-**核心差异**：职责链是一条"单行道"，请求到达某个处理器后即返回；中间件管道是"双向隧道"，请求可以穿过所有中间件到达终点，然后响应原路返回。这使得中间件非常适合做**请求前置处理 + 响应后置处理**（如日志、认证、CORS），而职责链更适合做**多选一的处理者查找**（如审批流、事件分发）。
-
-```
-职责链：  Request → [Handler₁] → [Handler₂] → [Handler₃] → null
-                         ↑ 处理后直接返回
-
-中间件：  Request → [MW₁ 前置] → [MW₂ 前置] → [Endpoint]
-          Response ← [MW₁ 后置] ← [MW₂ 后置] ←
-```
-
-**选择建议**：需要"一请求一处理"的多选一逻辑 → 职责链；需要请求/响应双向拦截管道 → 中间件模式。
+- **注意事项**：链要设计兜底（链尾无人处理时的默认行为）；性能敏感场景注意长链的逐环开销

@@ -1,29 +1,55 @@
-// 职责链模式（Chain of Responsibility Pattern）
-// 将请求的发送者和接收者解耦，让多个对象都有机会处理请求。
-// 这些对象连接成一条链，并沿着这条链传递请求，直到有一个对象处理它为止。
+// 职责链模式：请求沿处理者链传递，每个处理者决定处理或转发
 
 using ChainOfResponsibilityPattern;
 
-Console.WriteLine("\n========== 责任链模式 (Chain of Responsibility Pattern) ==========");
-Console.WriteLine("将请求沿处理者链传递，每个处理者决定处理或转发\n");
+Console.WriteLine("========== 责任链模式 (Chain of Responsibility) ==========");
+Console.WriteLine("请求沿链传递，每个处理者决定处理或转交下一位\n");
 
-// 创建处理器
-var additionHandler = new AdditionHandler();
-var subtractionHandler = new SubtractionHandler();
-var multiplicationHandler = new MultiplicationHandler();
+Console.WriteLine("--- 经典场景: 公司报销审批 ---");
+Console.WriteLine(">> 审批链：组长(≤500) → 经理(≤5000) → 总监(≤5万) → CEO(不限)\n");
 
-// 构建责任链：加法 → 减法 → 乘法
-subtractionHandler.AddChain(multiplicationHandler);
-additionHandler.AddChain(subtractionHandler);
+// 链式组装审批链
+Approver chain = new TeamLead("组长老王");
+chain.SetNext(new Manager("经理老李"))
+     .SetNext(new Director("张总监"))
+     .SetNext(new Ceo("赵总"));
 
-// 执行请求
-double[] numbers = [2, 3, 4, 5];
-var additionResult = additionHandler.Handle(numbers, "Add");
-var subtractionResult = additionHandler.Handle(numbers, "Minus");
-var multResult = additionHandler.Handle(numbers, "Multiply");
-var divisionResult = additionHandler.Handle(numbers, "divide"); // 除法不在链中，返回 null
+ExpenseRequest[] requests =
+[
+    new("小陈", "团建零食", 320m),
+    new("小周", "差旅费", 3_800m),
+    new("小吴", "展会物料", 28_000m),
+    new("小郑", "服务器采购", 500_000m),
+];
 
-Console.WriteLine($"加法 = {additionResult}");
-Console.WriteLine($"减法 = {subtractionResult}");
-Console.WriteLine($"乘法 = {multResult}");
-Console.WriteLine($"除法 = {divisionResult}");
+foreach (var request in requests)
+{
+    Console.WriteLine($">> {request.Applicant} 提交「{request.Purpose}」¥{request.Amount}");
+    chain.Process(request);
+    Console.WriteLine();
+}
+
+Console.WriteLine("--- 软件项目: HTTP 中间件管道 ---");
+Console.WriteLine(">> 管道：认证 → 限流 → 日志 → 控制器（ASP.NET Core 的核心机制）\n");
+
+// 组装中间件管道
+Middleware pipeline = new AuthMiddleware();
+pipeline.Use(new RateLimitMiddleware())
+        .Use(new LoggingMiddleware())
+        .Use(new OrderController());
+
+HttpContext[] httpRequests =
+[
+    new("GET", "/api/orders") { Token = "jwt-token-abc" },        // 正常请求
+    new("GET", "/api/orders"),                                     // 未认证 → 401
+    new("GET", "/api/orders") { Token = "jwt-token-abc" },         // 正常
+    new("GET", "/api/orders") { Token = "jwt-token-abc" },         // 正常
+    new("GET", "/api/orders") { Token = "jwt-token-abc" },         // 第 4 次 → 429
+];
+
+foreach (var request in httpRequests)
+{
+    Console.WriteLine($">> 请求进入管道：{request.Method} {request.Path}（Token：{request.Token ?? "无"}）");
+    await pipeline.InvokeAsync(request);
+    Console.WriteLine();
+}
