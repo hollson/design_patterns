@@ -1,32 +1,26 @@
-// 模板方法模式示例
-// 展示了 Beverage 抽象基类定义的算法骨架（煮水→冲泡→倒杯→加料），
-// 子类只需覆写 Brew() 和 AddCondiments() 即可产生不同的饮品行为。
-// 同时演示了 IComparable 接口在集合排序中的应用。
+// 模板方法模式：基类固化算法骨架，子类只实现变化步骤
 
 using TemplatePattern;
-using TemplatePattern.Comparable;
 
-Console.WriteLine("\n========== 模板方法模式 (Template Method Pattern) ==========");
-Console.WriteLine("定义一个操作中的算法骨架，将步骤延迟到子类中\n");
+Console.WriteLine("========== 模板方法模式 (Template Method) ==========");
+Console.WriteLine("定义算法骨架，步骤实现延迟到子类\n");
 
-var tea = new Tea();
-var coffee = new Coffee();
-tea.WantsCondiments = true;
-tea.AddSugar = 5;
+Console.WriteLine("--- 经典场景: 茶与咖啡的冲泡流程 ---");
+Console.WriteLine(">> 同一套「烧水→冲泡→倒杯→加料」骨架，茶咖啡各自实现：\n");
+
+Beverage tea = new Tea();
 tea.Prepare();
 
 Console.WriteLine();
-coffee.WantsCondiments = true;
-coffee.Prepare();
+Beverage coffee = new Coffee();
+coffee.Prepare();          // 钩子关闭：这杯不加料
 
-var people = new List<Person> { new("Ram", 25), new("Abishek", 12), new("Ram", 18), new("Abishek", 18) };
-foreach (var person in people)
+Console.WriteLine("\n--- 软件项目: 单元测试框架生命周期 ---");
+Console.WriteLine(">> Setup → Test → TearDown 骨架固定，用例只写测试步骤（xUnit 同构）：\n");
+
+TestBase[] tests = [new LoginTest(), new InventoryTest()];
+foreach (var test in tests)
 {
-    Console.Write(person);
-}
-people.Sort();
-Console.WriteLine();
-foreach (var person in people)
-{
-    Console.Write(person);
+    test.Run();
+    Console.WriteLine();
 }

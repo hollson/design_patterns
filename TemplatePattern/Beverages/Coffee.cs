@@ -1,11 +1,12 @@
 namespace TemplatePattern;
 
-/// <summary>
-/// 咖啡 —— 继承 Beverage，覆写冲泡和加料方法。
-/// </summary>
-class Coffee : Beverage
+/// <summary>咖啡（具体类）：同一套流程骨架，另一个实现</summary>
+public class Coffee : Beverage
 {
-    protected override void Brew() => Console.WriteLine("将咖啡粉加入水中煮沸");
+    protected override void Brew() => Console.WriteLine("[咖啡] 用 92℃ 热水滴滤咖啡粉");
 
-    protected override void AddCondiments() => Console.WriteLine("加入牛奶和糖");
+    protected override void AddCondiments() => Console.WriteLine("[咖啡] 加糖和牛奶");
+
+    /// <summary>覆写钩子：这杯不加料</summary>
+    protected override bool WantsCondiments() => false;
 }

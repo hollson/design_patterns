@@ -1,278 +1,195 @@
-# 模板方法模式（Template Method Pattern）教程
+# 模板方法模式（Template Method Pattern）
 
 [TOC]
 
 ## 一、📖 概述
 
-模板方法模式是**行为型设计模式**，在一个方法中定义算法的**骨架**，将一些步骤**延迟到子类实现**。
+模板方法是**行为型设计模式**，在父类中定义一个算法的**骨架**，把某些步骤**延迟到子类**实现。
 
-核心思想：父类固定算法流程，子类只定制可变的步骤。在不改变算法结构的前提下复用公共逻辑。
-
-### 核心特性
-
-- **流程固定**：模板方法在父类中定义完整的执行顺序
-
-- **步骤延迟**：可变步骤声明为抽象方法，由子类实现
-
-- **符合开闭原则**：新增子类无需修改已有算法骨架
-
-- **消除重复**：公共逻辑上移到父类，子类只关注差异部分
+核心思想：流程怎么走由基类说了算（**不变**），每一步怎么做得看子类（**可变**）。子类覆写少数几个"变化点"，绝不允许改动骨架顺序——茶和咖啡的冲泡都是"烧水→冲泡→倒杯→加料"，差的只是每步的具体做法。
 
 <br/>
 
-## 二、📐 结构图解
+## 二、🧩 模式解析
 
-### 2.1 整体流程
-
-以泡咖啡和泡茶为例，两者共享"烧水→冲泡→倒杯→加料"的骨架：
-
-```mermaid
-flowchart TD
-    A["开始泡饮料"] --> B["烧水"]
-    B --> C{"选择饮品 ?"}
-    C -- 咖啡 --> D["研磨咖啡豆"]
-    C -- 茶叶 --> E["浸泡茶包"]
-    D --> F["倒入杯中"]
-    E --> F
-    F --> G{"需要加料 ?"}
-    G -- 咖啡 --> H["加糖加奶"]
-    G -- 茶 --> I["加柠檬"]
-    H --> J["完成"]
-    I --> J
-
-    style A fill:#4A90D9,color:#fff
-    style C fill:#E67E22,color:#fff
-    style D fill:#7B68EE,color:#fff
-    style E fill:#7B68EE,color:#fff
-    style G fill:#E67E22,color:#fff
-    style H fill:#7B68EE,color:#fff
-    style I fill:#7B68EE,color:#fff
-    style J fill:#27AE60,color:#fff
-```
-
-### 2.2 类关系
+### 2.1 类关系图
 
 ```mermaid
 classDiagram
-    class Beverage {
+    direction LR
+    class Client
+    class AbstractClass {
         <<abstract>>
-        +Prepare()
-        #BoilWater()
-        #Brew()*
-        #PourInCup()
-        #AddCondiment()*
+        +TemplateMethod() 固化骨架
+        #Step1() 固定实现
+        #Step2()* 抽象，子类实现
+        #Hook() 虚方法，子类可选
     }
-    class Coffee {
-        #Brew()
-        #AddCondiment()
+    class ConcreteClassA {
+        #Step2() 自己的做法
     }
-    class Tea {
-        #Brew()
-        #AddCondiment()
-    }
-    class Program {
-        +Main()
+    class ConcreteClassB {
+        #Step2() 自己的做法
+        #Hook() 覆写关闭分支
     }
 
-    Beverage <|-- Coffee
-    Beverage <|-- Tea
-    Program ..> Beverage
+    Client --> AbstractClass : 只调模板方法
+    AbstractClass <|-- ConcreteClassA
+    AbstractClass <|-- ConcreteClassB
 ```
 
-### 2.3 关键角色
+| 关键角色 | 说明 | 冲泡示例 |
+| --- | --- | --- |
+| **模板方法（Template Method）** | 基类中的非虚公开方法，固化步骤顺序 | `Prepare()` |
+| **抽象步骤（Primitive Operation）** | 无默认实现，子类必须覆写 | `Brew()`/`AddCondiments()` |
+| **固定步骤** | 私有实现，子类无感知 | `BoilWater()`/`PourInCup()` |
+| **钩子（Hook）** | 有默认实现的虚方法，控制流程分支 | `WantsCondiments()` |
 
-| 角色                           | 说明                                                       |
-| ------------------------------ | ---------------------------------------------------------- |
-| **抽象父类（Abstract Class）** | 定义模板方法（算法骨架）和固定步骤，声明可变步骤为抽象方法 |
-| **具体子类（Concrete Class）** | 实现可变步骤（`Brew`、`AddCondiment`），不改变算法骨架     |
-| **客户端**                     | 调用模板方法，无需关心具体子类实现                         |
-
-<br/>
-
-## 三、💻 代码实现
-
-以泡咖啡/泡茶为例，父类 `Beverage` 定义模板方法，子类实现可变步骤。
-
-### 3.1 抽象父类
+### 2.2 核心代码
 
 ```csharp
-public abstract class Beverage
+abstract class AbstractClass
 {
-    // 模板方法：定义算法骨架，不允许子类重写
-    public void Prepare()
+    // 模板方法：公开非虚——子类改不了流程，只能改步骤
+    public void TemplateMethod()
     {
-        BoilWater();       // 固定步骤：烧水
-        Brew();            // 可变步骤：子类实现
-        PourInCup();       // 固定步骤：倒入杯中
-        AddCondiment();    // 可变步骤：子类实现
+        Step1();                          // 固定步骤：基类私有实现
+        Step2();                          // 变化步骤：延迟到子类
+        if (Hook())                       // 钩子：子类可开启/关闭分支
+            Step3();                      // 变化步骤
     }
 
-    protected void BoilWater()
-        => Console.WriteLine("烧开水");
-
-    protected void PourInCup()
-        => Console.WriteLine("倒入杯中");
-
-    protected abstract void Brew();
-    protected abstract void AddCondiment();
+    private void Step1() { }
+    protected abstract void Step2();       // 必须实现
+    protected abstract void Step3();       // 必须实现
+    protected virtual bool Hook() => true;// 可选覆写
 }
-```
 
-### 3.2 具体子类
-
-```csharp
-public class Coffee : Beverage
+// 子类：只回答"每一步怎么做"，不碰"流程怎么走"
+class ConcreteClass : AbstractClass
 {
-    protected override void Brew()
-        => Console.WriteLine("研磨咖啡豆并冲泡");
-
-    protected override void AddCondiment()
-        => Console.WriteLine("加入糖和牛奶");
-}
-
-public class Tea : Beverage
-{
-    protected override void Brew()
-        => Console.WriteLine("浸泡茶包");
-
-    protected override void AddCondiment()
-        => Console.WriteLine("加入柠檬片");
+    protected override void Step2() { }   // 自己的做法
+    protected override void Step3() { }
 }
 ```
 
-### 3.3 客户端调用
+> 协作方式：客户端只调 `TemplateMethod()`；基类按固定顺序调用各步骤，遇到抽象步骤就落进子类实现，遇到钩子由子类决定走不走分支——"好莱坞原则：别调用我们，我们会调用你"。
 
-```csharp
-public class Program
-{
-    public static void Main()
-    {
-        Beverage coffee = new Coffee();
-        coffee.Prepare();
+### 2.3 关键解析
 
-        Console.WriteLine("---");
+**三类步骤的权限设计**是模板方法的精髓：
 
-        Beverage tea = new Tea();
-        tea.Prepare();
-    }
-}
+| 步骤类型 | 修饰 | 子类能做什么 |
+| --- | --- | --- |
+| 模板方法 | `public` 非虚 | 什么都不做（骨架不可动） |
+| 抽象步骤 | `protected abstract` | 必须实现 |
+| 钩子 | `protected virtual` | 可覆写可不理（默认行为继续） |
+
+- **模板方法 vs 策略**：模板方法用**继承**换骨架（子类填空），策略用**组合**换算法（整体替换）；骨架稳定填空用模板，整段算法互换用策略（见 [../StrategyPattern](../StrategyPattern/README.md)）
+- **BCL/框架中的身影**：xUnit/NUnit 的 `Setup → Test → TearDown`、ASP.NET 的页面生命周期 `Page.Init/Load/Render`、`Stream.Read` 派生类只需实现核心读——到处都是
+- **工厂方法常藏在模板方法里**：骨架某步是"创建对象"时，那一步就是工厂方法（见 [../FactoryMethodPattern](../FactoryMethodPattern/README.md)）
+
+<br/>
+
+## 三、💻 代码示例
+
+### 3.1 经典场景：茶与咖啡的冲泡流程
+
+> 场景：HFDP 教材经典——「烧水→冲泡→倒杯→加料」骨架固定；茶 85℃ 浸泡加柠檬，咖啡 92℃ 滴滤加糖奶，咖啡用钩子关闭"加料"分支。
+
+```mermaid
+flowchart LR
+    P["Prepare() 模板方法<br/>烧水→冲泡→倒杯→加料"] --> T["Tea"]
+    P --> C["Coffee"]
+    T -->|"Brew()"| T1["85℃ 浸泡 3 分钟"]
+    T -->|"WantsCondiments()=true"| T2["加一片柠檬"]
+    C -->|"Brew()"| C1["92℃ 滴滤"]
+    C -->|"钩子覆写 =false"| C2["跳过加料"]
+
+    style P fill:#E67E22,color:#fff
+    style T fill:#7B68EE,color:#fff
+    style C fill:#7B68EE,color:#fff
+    style T1 fill:#27AE60,color:#fff
+    style T2 fill:#27AE60,color:#fff
+    style C1 fill:#27AE60,color:#fff
+    style C2 fill:#95A5A6,color:#fff
 ```
 
-**运行结果**：
+| 角色 | 文件 |
+| --- | --- |
+| 抽象类（模板方法） | [`Beverages/Beverage.cs`](Beverages/Beverage.cs) |
+| 具体类 | [`Beverages/Tea.cs`](Beverages/Tea.cs)、[`Coffee.cs`](Beverages/Coffee.cs) |
+| 客户端 | [`Program.cs`](Program.cs) |
 
+### 3.2 软件项目：单元测试框架生命周期
+
+> 场景：`Run()` 固化 Setup → Test → TearDown 生命周期，失败也保证清理——用例只写测试步骤；登录测试通过、库存测试断言失败但 Teardown 照常执行，xUnit 同构。
+
+```mermaid
+flowchart LR
+    R["Run() 模板方法<br/>Setup→Test→TearDown"] --> L["LoginTest"]
+    R --> I["InventoryTest"]
+    L -->|"Setup()"| L1["启动浏览器"]
+    L -->|"Test()"| L2["登录并校验 token"]
+    I -->|"Test()"| I2["下单 8 件<br/>断言失败"]
+    I -->|"TearDown()"| I3["回滚数据（失败也执行）"]
+
+    style R fill:#E67E22,color:#fff
+    style L fill:#7B68EE,color:#fff
+    style I fill:#7B68EE,color:#fff
+    style L1 fill:#27AE60,color:#fff
+    style L2 fill:#27AE60,color:#fff
+    style I2 fill:#E74C3C,color:#fff
+    style I3 fill:#27AE60,color:#fff
 ```
-烧开水
-研磨咖啡豆并冲泡
-倒入杯中
-加入糖和牛奶
----
-烧开水
-浸泡茶包
-倒入杯中
-加入柠檬片
+
+| 角色 | 文件 |
+| --- | --- |
+| 抽象类（模板方法） | [`Testing/TestBase.cs`](Testing/TestBase.cs) |
+| 具体类 | [`Testing/LoginTest.cs`](Testing/LoginTest.cs)、[`InventoryTest.cs`](Testing/InventoryTest.cs) |
+| 客户端 | [`Program.cs`](Program.cs) |
+
+### 3.3 运行结果
+
+```bash
+========== 模板方法模式 (Template Method) ==========
+定义算法骨架，步骤实现延迟到子类
+
+--- 经典场景: 茶与咖啡的冲泡流程 ---
+>> 同一套「烧水→冲泡→倒杯→加料」骨架，茶咖啡各自实现：
+
+[固定] 把水烧开
+[茶] 用 85℃ 热水浸泡茶叶 3 分钟
+[固定] 倒进杯子
+[茶] 加一片柠檬
+
+[固定] 把水烧开
+[咖啡] 用 92℃ 热水滴滤咖啡粉
+[固定] 倒进杯子
+
+--- 软件项目: 单元测试框架生命周期 ---
+>> Setup → Test → TearDown 骨架固定，用例只写测试步骤（xUnit 同构）：
+
+>> 运行 登录测试
+[Setup] 启动浏览器，打开登录页
+[Test] 输入账号密码并提交
+[Test] 校验 token 已签发
+[通过] 测试通过
+[Teardown] 关闭浏览器，清理会话
+
+>> 运行 库存扣减测试
+[Setup] 预置商品库存 5 件
+[Test] 下单购买 8 件
+[失败] 断言失败：库存不足：剩 5 件，需要 8 件
+[Teardown] 回滚测试数据，恢复库存
 ```
 
 <br/>
 
-## 四、🔍 核心解析
+## 四、📝 小结
 
-### 4.1 模板方法
+- **核心思想**：基类固化流程骨架，子类填空变化步骤；模板方法非虚，改流程 = 改基类
 
-`Prepare()` 在父类中定义了完整的算法骨架，声明为 `public` 且不允许子类重写。它保证了无论哪个子类执行，流程顺序始终一致。
+- **两个示例**：茶咖冲泡展示"固定步骤 + 抽象步骤 + 钩子"三件套，测试基类展示框架中最常见的生命周期模板
 
-### 4.2 固定步骤 vs 可变步骤
-
-`BoilWater()` 和 `PourInCup()` 是所有饮品共有的操作，直接在父类实现。`Brew()` 和 `AddCondiment()` 是差异化的步骤，声明为抽象方法交给子类。
-
-### 4.3 控制反转
-
-模板方法模式实现了"向上传调用"——父类调用子类的抽象方法，而非子类调用父类。父类控制整体节奏，子类只负责填充细节。
-
-<br/>
-
-## 五、🎯 应用场景
-
-### 5.1 适用场景
-
-- 多个类有相似的算法流程，仅部分步骤不同
-
-- 需要统一算法骨架，但允许子类定制具体行为
-
-- 想在不修改已有代码的前提下扩展算法的某些步骤
-
-### 5.2 实际案例
-
-- **.NET Stream**：`Stream` 基类定义读写骨架，子类实现具体I/O
-
-- **ASP.NET Middleware**：`Middleware` 基类定义 `Invoke` 流程
-
-- **单元测试框架**：`TestBase` 定义 `Setup→Run→Verify` 流程，子类实现具体测试
-
-<br/>
-
-## 六、⚖️ 优缺点分析
-
-### 6.1 优点
-
-- **代码复用**：公共逻辑集中在父类，避免重复
-
-- **流程可控**：父类掌控算法骨架，子类无法改变执行顺序
-
-- **扩展灵活**：新增子类即可扩展新行为，无需改动父类
-
-### 6.2 缺点
-
-- **继承强耦合**：子类与父类绑定紧密，修改模板方法影响所有子类
-
-- **类数量增加**：每个变体都需要一个子类实现
-
-- **违反里氏替换**：父类增加抽象方法时，所有已有子类都需要修改
-
-<br/>
-
-## 七、📝 总结
-
-- **核心思想**：固定算法骨架，延迟可变步骤到子类
-
-- **关键角色**：抽象父类（定义模板方法）、具体子类（实现可变步骤）
-
-- **适用场景**：多个类有相似流程但部分步骤不同
-
-- **注意事项**：模板方法数量不宜过多，避免类层次过深导致维护困难
-
----
-
-## 八、🔬 好莱坞原则
-
-模板方法模式是**好莱坞原则（Hollywood Principle）** 的经典体现，其核心思想是：
-
-> **"Don't call us, we'll call you."（别调用我们，我们会调用你。）**
-
-### 8.1 与依赖注入原则的对比
-
-| 原则                    | 调用方向                                   | 典型模式             |
-| ----------------------- | ------------------------------------------ | -------------------- |
-| **依赖注入原则（DIP）** | 高层不调用低层，低层通过注入被高层使用     | 策略模式、观察者模式 |
-| **好莱坞原则**          | 高层调用低层的抽象方法，低层不主动调用高层 | 模板方法模式         |
-
-### 8.2 本例中的好莱坞原则
-
-```
-Beverage.Prepare()  ← 父类控制整体流程
-  → BoilWater()     ← 父类直接调用固定步骤
-  → Brew()          ← 父类调用子类的抽象方法（好莱坞原则）
-  → PourInCup()     ← 父类直接调用固定步骤
-  → AddCondiment()  ← 父类调用子类的抽象方法（好莱坞原则）
-```
-
-子类 `Coffee` 和 `Tea` 永远不会主动调用 `Prepare()`，而是**被动等待**父类在合适时机回调它们的 `Brew()` 和 `AddCondiment()`。这保证了：
-
-- **流程控制权在父类**：算法骨架的执行顺序由父类唯一决定
-- **子类只关注细节**：子类无需知道整体流程，只需填充自己的步骤
-- **防止违反流程**：子类无法跳过或重排步骤，因为 `Prepare()` 不允许重写
-
-### 8.3 实际应用
-
-- **ASP.NET Core**：`ControllerBase` 的 `OnActionExecuting` → 执行 Action → `OnActionExecuted` 流程，子控制器只需重写钩子方法
-- **单元测试框架**：`[SetUp]` → `[Test]` → `[TearDown]` 流程由框架控制，测试类只填充具体断言
-- **游戏循环**：`Init()` → `Update()` → `Render()` 由引擎驱动，游戏逻辑只实现具体行为
+- **注意事项**：骨架依赖继承，子类过多时改基类波及面大；步骤超过 5~7 个或需要运行时换整段流程时，改用策略模式
