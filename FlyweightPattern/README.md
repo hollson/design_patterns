@@ -1,260 +1,187 @@
-# 享元模式（Flyweight Pattern）教程
+# 享元模式（Flyweight Pattern）
 
 [TOC]
 
 ## 一、📖 概述
 
-享元模式是**结构型设计模式**，运用**共享技术**有效支持大量细粒度对象的复用。将对象的**内部状态**（可共享、不变）与**外部状态**（随场景变化）分离，通过工厂缓存共享实例，减少内存消耗与对象创建开销。
+享元是**结构型设计模式**，运用共享技术有效支持大量**细粒度**对象，避免对象爆炸带来的内存开销。
 
-核心思想：同一种对象只创建一次，所有使用者复用同一实例。以奶茶店为例，每种奶茶类型作为共享的内部状态，订单中的糖度、冰量等作为外部状态，同一奶茶只实例化一次。
-
-### 核心特性
-
-- **内部状态共享**：不变的部分（如奶茶类型）只创建一次，所有实例共享
-
-- **外部状态分离**：随场景变化的部分（如订单编号）由客户端传入
-
-- **工厂缓存**：通过字典缓存已创建的享元对象，命中则直接复用
-
-- **减少内存开销**：大量相似对象合并为少量共享实例
+核心思想：把对象状态一分为二——**内部状态**（不变、可共享）提取到享元对象中，**外部状态**（随场景变化）由调用方每次传入。全盘 300 个棋子不再各造一个对象，黑白**各共享一个**；工厂 + 缓存池保证同键取到同一实例。
 
 <br/>
 
-## 二、📐 结构图解
+## 二、🧩 模式解析
 
-### 2.1 整体流程
-
-```mermaid
-flowchart TD
-    A["客户端下单"] --> B{"缓存中存在?"}
-    B -- 是 --> C["返回缓存实例"]
-    B -- 否 --> D["创建新享元"]
-    D --> E["存入缓存"]
-    E --> F["返回实例"]
-    F --> G["客户端使用"]
-
-    style A fill:#4A90D9,color:#fff
-    style B fill:#E67E22,color:#fff
-    style C fill:#7B68EE,color:#fff
-    style D fill:#7B68EE,color:#fff
-    style E fill:#7B68EE,color:#fff
-    style F fill:#27AE60,color:#fff
-    style G fill:#27AE60,color:#fff
-```
-
-### 2.2 类关系
+### 2.1 类关系图
 
 ```mermaid
 classDiagram
-    class IBeverage {
-        <<interface>>
-        +Drink() void
+    direction LR
+    class Client
+    class FlyweightFactory {
+        -pool Dictionary
+        +GetFlyweight(key) Flyweight
     }
-    class BubbleMilkTea {
-        +Drink() void
+    class Flyweight {
+        +intrinsicState 内部状态
+        +Operation(extrinsicState)
     }
-    class FoamMilkTea {
-        +Drink() void
-    }
-    class OolingMilkTea {
-        +Drink() void
-    }
-    class CoconutMilkTea {
-        +Drink() void
-    }
-    class BeverageFlyweightFactory {
-        -beverages: Dictionary~BeverageType,IBeverage~
-        +MakeBeverage(type) IBeverage
-    }
-    class BubbleTeaShop {
-        -factory: BeverageFlyweightFactory
-        -takeAwayOrders: List~IBeverage~
-        +TakeOrders() void
-    }
+    class ConcreteFlyweightA
+    class ConcreteFlyweightB
 
-    IBeverage <|.. BubbleMilkTea
-    IBeverage <|.. FoamMilkTea
-    IBeverage <|.. OolingMilkTea
-    IBeverage <|.. CoconutMilkTea
-    BeverageFlyweightFactory o-- IBeverage : 缓存共享实例
-    BubbleTeaShop --> BeverageFlyweightFactory : 通过工厂获取享元
+    Client --> FlyweightFactory : 按键取
+    FlyweightFactory o--> Flyweight : 缓存共享
+    Flyweight <|-- ConcreteFlyweightA
+    Flyweight <|-- ConcreteFlyweightB
+    Client ..> Flyweight : 传入外部状态
 ```
 
-### 2.3 关键角色
+| 关键角色 | 说明 | 围棋示例 |
+| --- | --- | --- |
+| **享元（Flyweight）** | 只装内部状态，操作时接收外部状态 | `GoStone`（颜色/材质） |
+| **享元工厂（Factory）** | 按键缓存，同键返回同一实例 | `GoStoneFactory` |
+| **内部状态（Intrinsic）** | 不随环境变化、可共享 | 颜色、材质 |
+| **外部状态（Extrinsic）** | 随场景变化、不可共享 | 落子坐标 (x, y) |
 
-| 角色                           | 说明                               |
-| ------------------------------ | ---------------------------------- |
-| 享元接口（Flyweight）          | 定义共享对象的公共操作接口         |
-| 具体享元（Concrete Flyweight） | 存储内部状态，实现共享行为         |
-| 享元工厂（FlyweightFactory）   | 管理缓存池，负责创建和复用享元实例 |
-| 客户端（Client）               | 通过工厂获取享元，传入外部状态使用 |
-
-<br/>
-
-## 三、💻 代码实现
-
-以奶茶店为例：多种奶茶类型通过享元工厂缓存复用，下单6杯实际只创建4个实例。
-
-### 3.1 享元接口与类型枚举
+### 2.2 核心代码
 
 ```csharp
-// 享元接口：定义共享对象的公共行为
-public interface IBeverage
+// 享元：只装可共享的内部状态
+class Flyweight(string intrinsic)
 {
-    void Drink();
+    public void Operation(object extrinsic) { }     // 外部状态由调用方传入
 }
 
-// 饮品类型枚举：作为缓存的键
-public enum BeverageType
+// 享元工厂：同键复用
+class FlyweightFactory
 {
-    BubbleMilk,
-    FoamMilk,
-    OolingMilk,
-    CoconutMilk
-}
-```
+    private readonly Dictionary<string, Flyweight> _pool = [];
 
-### 3.2 具体享元
-
-```csharp
-// 具体享元：构造时打印信息便于观察创建次数
-public class BubbleMilkTea : IBeverage
-{
-    public BubbleMilkTea()
-    {
-        Console.WriteLine("Initializing BubbleMilkTea...");
-    }
-
-    public void Drink() => Console.WriteLine("喝一杯珍珠奶茶");
+    public Flyweight Get(string key) =>
+        _pool.TryGetValue(key, out var fly)
+            ? fly                                  // 已有：直接复用
+            : _pool[key] = new Flyweight(key);     // 没有：创建并入池
 }
 ```
 
-### 3.3 享元工厂
+> 协作方式：客户端向工厂按"内部状态键"取享元对象，拿到的是缓存的共享实例；调用 `Operation()` 时把外部状态作为参数传进去——对象是共享的，效果是个性化的。
 
-```csharp
-// 享元工厂：字典缓存，命中复用，未命中才创建
-public class BeverageFlyweightFactory
-{
-    private readonly Dictionary<BeverageType, IBeverage> _beverages = new();
+### 2.3 关键解析
 
-    public IBeverage MakeBeverage(BeverageType type)
-    {
-        if (!_beverages.ContainsKey(type))
-        {
-            _beverages[type] = type switch
-            {
-                BeverageType.BubbleMilk => new BubbleMilkTea(),
-                BeverageType.FoamMilk => new FoamMilkTea(),
-                BeverageType.OolingMilk => new OolingMilkTea(),
-                BeverageType.CoconutMilk => new CoconutMilkTea(),
-                _ => throw new ArgumentOutOfRangeException()
-            };
-        }
-        return _beverages[type];
-    }
-}
+**判断哪些状态能共享**是使用本模式的第一步：
+
+| 状态类型 | 特征 | 存放位置 | 围棋示例 |
+| --- | --- | --- | --- |
+| 内部状态 Intrinsic | 不变、重复率高 | 享元对象内 | 黑/白颜色、材质 |
+| 外部状态 Extrinsic | 随处变化、不可共享 | 调用方传入 | 坐标、时间 |
+
+- **BCL 中的身影**：`string.Intern()`（字符串驻留池）、`Convert.ChangeType` 缓存、ASP.NET Core 的 `MemoryCache`——共享池思想无处不在
+- **享元 vs 单例**：单例是"全局只有一个"，享元是"同键只有一个"（键空间内共享），一个应用可有任意多个享元实例
+- **享元 vs 对象池**：池化关心"借还生命周期"（用完归还），享元关心"状态共享"（不分你我、一直用）
+- **注意事项**：外部状态穿参会增加调用复杂度；只有对象量级大（万级以上）且内部状态重复率高才值得用
+
+<br/>
+
+## 三、💻 代码示例
+
+### 3.1 经典场景：围棋棋子
+
+> 场景：一盘棋 300 手落子，若每手 new 一个棋子对象就要 300 个；黑白棋子的颜色材质（内部状态）不变，共享两个实例，坐标（外部状态）落子时传入。
+
+```mermaid
+flowchart LR
+    P["对局进程"] -->|"GetStone(黑)"| F["GoStoneFactory<br/>共享池"]
+    F --> B["黑子×1<br/>云子窑烧"]
+    F --> W["白子×1<br/>蛤碁石打磨"]
+    B -->|"Place(x, y) 传坐标"| G["棋盘网格"]
+    W --> G
+
+    style P fill:#4A90D9,color:#fff
+    style F fill:#E67E22,color:#fff
+    style B fill:#7B68EE,color:#fff
+    style W fill:#7B68EE,color:#fff
+    style G fill:#27AE60,color:#fff
 ```
 
-### 3.4 客户端使用
+| 角色 | 文件 |
+| --- | --- |
+| 享元 | [`Chess/GoStone.cs`](Chess/GoStone.cs) |
+| 享元工厂 | [`Chess/GoStoneFactory.cs`](Chess/GoStoneFactory.cs) |
+| 客户端 | [`Program.cs`](Program.cs) |
 
-```csharp
-// 客户端：通过工厂获取享元，重复类型自动复用
-public class BubbleTeaShop
-{
-    private readonly BeverageFlyweightFactory _factory = new();
-    private readonly List<IBeverage> _takeAwayOrders = new();
+### 3.2 软件项目：富文本编辑器字符样式
 
-    public void TakeOrders()
-    {
-        _takeAwayOrders.Add(_factory.MakeBeverage(BeverageType.BubbleMilk)); // 创建
-        _takeAwayOrders.Add(_factory.MakeBeverage(BeverageType.BubbleMilk)); // 复用!
-        _takeAwayOrders.Add(_factory.MakeBeverage(BeverageType.FoamMilk));
-        _takeAwayOrders.Add(_factory.MakeBeverage(BeverageType.OolingMilk));
-        _takeAwayOrders.Add(_factory.MakeBeverage(BeverageType.OolingMilk)); // 复用!
-        _takeAwayOrders.Add(_factory.MakeBeverage(BeverageType.CoconutMilk));
-    }
-}
+> 场景：文档里每个字符都带样式（字体/字号/颜色）——相同样式的字符共享同一个 `TextStyle` 实例，渲染 12 个字符只创建 2 个样式对象（正文 1 + 标点 1）。
 
-// 6杯订单，实际仅创建4个享元实例
+```mermaid
+flowchart LR
+    E["编辑器"] -->|"GetStyle(字体,字号,颜色)"| F["TextStyleFactory<br/>共享池"]
+    F --> S1["正文样式×1<br/>雅黑 14pt 黑"]
+    F --> S2["标点样式×1<br/>雅黑 10pt 灰"]
+    S1 -->|"Render(ch, i)"| D["文档字符流"]
+    S2 --> D
+
+    style E fill:#4A90D9,color:#fff
+    style F fill:#E67E22,color:#fff
+    style S1 fill:#7B68EE,color:#fff
+    style S2 fill:#7B68EE,color:#fff
+    style D fill:#27AE60,color:#fff
+```
+
+| 角色 | 文件 |
+| --- | --- |
+| 享元 | [`TextEditor/TextStyle.cs`](TextEditor/TextStyle.cs) |
+| 享元工厂 | [`TextEditor/TextStyleFactory.cs`](TextEditor/TextStyleFactory.cs) |
+| 客户端 | [`Program.cs`](Program.cs) |
+
+### 3.3 运行结果
+
+```bash
+========== 享元模式 (Flyweight Pattern) ==========
+共享内部状态，外部状态调用方传入，节省内存
+
+--- 经典场景: 围棋棋子 ---
+>> 一盘棋几百个落子，黑白棋子各只需一个实例：
+
+>> 全盘 300 手棋落子完毕
+[统计] 不共享需要 300 个棋子对象；实际只创建了 2 个（黑、白各一）
+
+>> 黑白棋子是同一个实例吗？
+[验证] ReferenceEquals(black1, black2) = True —— 同一实例，位置是外部参数
+
+>> 实际落子（位置作为外部状态传入）：
+[落子] 黑子放在 (3, 15) — 材质：云子窑烧
+[落子] 白子放在 (16, 3) — 材质：蛤碁石打磨
+
+--- 软件项目: 富文本编辑器字符样式 ---
+>> 一行文档十几个字符，相同样式共享同一实例：
+
+>> 逐字符渲染（首次遇到样式才创建）：
+[创建] 新样式实例：微软雅黑 14pt 黑色（池中第 1 个）
+  [0] 'H' ← 微软雅黑 14pt 黑色
+  [1] 'e' ← 微软雅黑 14pt 黑色
+  [2] 'l' ← 微软雅黑 14pt 黑色
+  [3] 'l' ← 微软雅黑 14pt 黑色
+  [4] 'o' ← 微软雅黑 14pt 黑色
+[创建] 新样式实例：微软雅黑 10pt 灰色（池中第 2 个）
+  [5] ',' ← 微软雅黑 10pt 灰色
+  [6] ' ' ← 微软雅黑 14pt 黑色
+  [7] '享' ← 微软雅黑 14pt 黑色
+  [8] '元' ← 微软雅黑 14pt 黑色
+  [9] '模' ← 微软雅黑 14pt 黑色
+  [10] '式' ← 微软雅黑 14pt 黑色
+  [11] '!' ← 微软雅黑 10pt 灰色
+
+>> 渲染 12 个字符完毕
+[统计] 样式实例只有 2 个（正文 1 + 标点 1），字符各自只存引用
 ```
 
 <br/>
 
-## 四、🔍 核心解析
+## 四、📝 小结
 
-### 4.1 享元工厂
+- **核心思想**：内部状态进享元、外部状态做参数，工厂缓存保证同键同实例
 
-`BeverageFlyweightFactory` 用 `Dictionary` 做缓存，`MakeBeverage` 先查字典：命中直接返回缓存实例，未命中才创建新实例并加入缓存。这是享元模式的核心机制。
+- **两个示例**：围棋展示 GoF 经典的"300 手落子 2 个对象"，富文本编辑器展示软件项目中的"样式驻留"
 
-### 4.2 内部状态 vs 外部状态
-
-| 维度     | 内部状态（Intrinsic State）            | 外部状态（Extrinsic State）    |
-| -------- | -------------------------------------- | ------------------------------ |
-| 定义     | 存在于享元对象内部，不随环境改变       | 由客户端传入，每次调用可能不同 |
-| 可共享   | 是，所有使用者共享同一份               | 否，每个使用场景独立           |
-| 存储位置 | 享元对象的字段                         | 客户端局部变量或方法参数       |
-| 生命周期 | 与享元工厂缓存同寿                     | 每次方法调用时传入，用完即弃   |
-| 本示例   | 奶茶类型（`BubbleMilk`、`FoamMilk`等） | 订单编号、取餐时间、糖度冰量   |
-| 设计原则 | 提取变化频率最低的状态作为内部状态     | 其余一切状态都应外部化         |
-
-> **分离判断**：如果一个属性对所有同类型对象都相同 → 内部状态；如果每个对象实例需要不同的值 → 外部状态。
-
-### 4.3 实例复用验证
-
-构造函数中的 `Initializing...` 输出用于观察实际创建次数。下单6杯但只有4种类型时，只会打印4次初始化信息，证明重复类型被复用。
-
-<br/>
-
-## 五、🎯 应用场景
-
-### 5.1 适用场景
-
-- 系统中存在大量相似对象，且大部分状态可外部化
-
-- 对象的多数状态可以变为外部状态
-
-- 去除外部状态后，对象组可以用少量共享实例替代
-
-- 需要降低内存使用量
-
-### 5.2 实际案例
-
-- **字符串常量池**：相同字符串只存储一份，引用复用
-
-- **线程池**：线程创建开销大，复用已有线程处理任务
-
-- **数据库连接池**：连接对象复用，避免频繁创建销毁
-
-- **棋子/子弹对象**：游戏中大量同类型对象通过享元复用
-
-<br/>
-
-## 六、⚖️ 优缺点分析
-
-### 6.1 优点
-
-- **大幅减少内存占用**：大量相似对象合并为少量共享实例
-
-- **减少对象创建开销**：工厂缓存避免重复创建
-
-- **外部状态独立**：不同场景可传入不同外部状态，不影响共享
-
-### 6.2 缺点
-
-- **增加复杂度**：需要分离内部状态与外部状态，增加了设计复杂度
-
-- **运行时间可能增加**：查找缓存和外部状态计算有一定开销
-
-- **适用范围受限**：对象必须可以划分为内部状态和外部状态
-
-<br/>
-
-## 七、📝 总结
-
-- **核心思想**：将内部状态与外部状态分离，通过工厂缓存实现大量相似对象的共享复用
-
-- **关键角色**：享元接口、具体享元、享元工厂、客户端
-
-- **实现要点**：工厂用字典缓存，命中复用，未命中才创建
-
-- **适用场景**：大量相似对象且大部分状态可外部化的场景
+- **注意事项**：先用真实内存数据确认对象量级，再决定是否引入；享元与缓存池思想相通，但关注点是**状态共享**而非生命周期管理
