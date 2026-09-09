@@ -1,216 +1,186 @@
-﻿# 适配器模式（Adapter Pattern）教程
+# 适配器模式（Adapter Pattern）
 
 [TOC]
 
 ## 一、📖 概述
 
-适配器模式是**结构型设计模式**，将一个类的接口转换成客户期望的另一个接口，使原本接口不兼容、无法一起工作的类可以协同工作。
+适配器是**结构型设计模式**，把一个类的接口**转换成客户端期望的另一个接口**，使原本接口不兼容的类可以协同工作。
 
-核心思想：适配器像"转接头"，不改变原对象本身，只做接口翻译。当客户端依赖某个接口，而实际要复用的类接口不兼容时，适配器通过包装不兼容对象，将目标接口的调用翻译为被适配对象的操作，让新旧代码平滑整合。
-
-### 核心特性
-
-- **接口转换**：将被适配者的接口翻译为目标接口
-
-- **不改变原有类**：被适配者无需修改，符合开闭原则
-
-- **透明性**：客户端只面向目标接口编程，不感知适配器的存在
-
-- **行为适配**：不仅翻译方法名，还能调整行为语义（如飞行距离适配）
+核心思想：不改被适配者、不改客户端，中间加一层**转换器**——像旅行电源转换头一样，外接国标插孔、内接英标三脚。典型应用：集成第三方 SDK、复用遗留系统、统一多个不兼容库的调用方式。
 
 <br/>
 
-## 二、📐 结构图解
+## 二、🧩 模式解析
 
-### 2.1 整体结构
-
-```mermaid
-flowchart TD
-    A["客户端 Client"] -->|"依赖"| B["目标接口 IDuck"]
-    B -->|"实现"| C["适配器 TurkeyAdapter"]
-    C -->|"组合持有"| D["被适配者 WildTurkey"]
-
-    style A fill:#4A90D9,color:#fff
-    style B fill:#E67E22,color:#fff
-    style C fill:#7B68EE,color:#fff
-    style D fill:#27AE60,color:#fff
-```
-
-### 2.2 类关系
+### 2.1 类关系图
 
 ```mermaid
 classDiagram
+    direction LR
     class Client {
-        +Test(duck: IDuck): void
+        只认 Target 接口
     }
-    class IDuck {
+    class ITarget {
         <<interface>>
-        +Quack(): void
-        +Fly(): void
+        +Request()
     }
-    class TurkeyAdapter {
-        -turkey: ITurkey
-        +Quack(): void
-        +Fly(): void
+    class Adapter {
+        -adaptee Adaptee
+        +Request() 转调
     }
-    class WildTurkey {
-        +Gobble(): void
-        +Fly(): void
+    class Adaptee {
+        +SpecificRequest() 接口不兼容
     }
 
-    Client ..> IDuck : 面向接口编程
-    IDuck <|.. TurkeyAdapter : 实现
-    TurkeyAdapter o-- WildTurkey : 组合持有
+    Client --> ITarget : 依赖目标接口
+    ITarget <|.. Adapter : 实现
+    Adapter o--> Adaptee : 组合被适配者
 ```
 
-### 2.3 关键角色
+| 关键角色 | 说明 | 电源示例 |
+| --- | --- | --- |
+| **目标接口（Target）** | 客户端期望的接口 | 国标插座 `IStdSocket` |
+| **被适配者（Adaptee）** | 接口不兼容的现存类，不能改 | 英标插头 `BritishPlug` |
+| **适配器（Adapter）** | 实现目标接口，组合被适配者并转调 | 旅行转换头 `TravelAdapter` |
 
-| 角色                | 说明                                         |
-| ------------------- | -------------------------------------------- |
-| 目标接口（Target）  | 客户端期望使用的接口                         |
-| 被适配者（Adaptee） | 接口不兼容、需要被适配的已有类               |
-| 适配器（Adapter）   | 实现目标接口，内部持有被适配者，完成接口翻译 |
-
-<br/>
-
-## 三、💻 代码实现
-
-以火鸡适配鸭子为例：鸭子接口有 Quack() 和 Fly(500m)，火鸡只有 Gobble() 和 Fly(100m)，通过适配器让火鸡伪装成鸭子。
-
-### 3.1 目标接口与被适配者
+### 2.2 核心代码
 
 ```csharp
-// 目标接口：客户端期望的鸭子接口
-public interface IDuck
+// 目标接口：客户端期望的样子
+interface ITarget
 {
-    void Quack();
-    void Fly();
+    void Request();
 }
 
-// 被适配者：已有的火鸡类，接口不兼容
-public class WildTurkey
+// 被适配者：接口不兼容的现存类
+class Adaptee
 {
-    public void Gobble() => Console.WriteLine("Gobble gobble");
-    public void Fly() => Console.WriteLine("飞100米");
+    public void SpecificRequest() { }
+}
+
+// 对象适配器：组合 + 转调（推荐）
+class Adapter(Adaptee adaptee) : ITarget
+{
+    public void Request() => adaptee.SpecificRequest();     // 转调并做必要转换
 }
 ```
 
-### 3.2 适配器实现
+> 协作方式：客户端只依赖 `ITarget`；适配器实现目标接口，内部持有被适配者，把调用转调过去（顺带做单位换算、格式转换等"接口翻译"）——客户端全程不知道被适配者的存在。
+
+### 2.3 对象适配器 vs 类适配器
+
+C# 不支持多重继承，类适配器通过"继承被适配者 + 实现目标接口"实现：
 
 ```csharp
-// 适配器：实现目标接口，内部持有被适配者
-public class TurkeyAdapter : IDuck
+// 类适配器：继承 Adaptee + 实现 ITarget（C# 只能继承类 + 实现接口）
+class ClassAdapter : Adaptee, ITarget
 {
-    private readonly WildTurkey _turkey;
-
-    public TurkeyAdapter(WildTurkey turkey) => _turkey = turkey;
-
-    // Quack 翻译为 Gobble
-    public void Quack() => _turkey.Gobble();
-
-    // 行为适配：火鸡飞100米，鸭子飞500米，循环5次模拟
-    public void Fly()
-    {
-        for (int i = 0; i < 5; i++)
-            _turkey.Fly();
-    }
+    public void Request() => SpecificRequest();     // 直接调继承来的方法
 }
 ```
 
-### 3.3 客户端使用
+| 对比维度 | 对象适配器（组合） | 类适配器（继承） |
+| --- | --- | --- |
+| 被适配者限制 | 类和子类都适用（面向接口） | 只能适配那个具体类 |
+| 覆写被适配者行为 | 不行 | 可以（继承覆写） |
+| C# 可行性 | 完全支持 | 受单继承限制，较少用 |
+| 推荐 | ✅ 首选 | 了解即可 |
 
-```csharp
-// 客户端只认识 IDuck
-static void Tester(IDuck duck)
-{
-    duck.Fly();    // 实际是火鸡连续飞5次
-    duck.Quack();  // 实际是火鸡 Gobble
-}
+- **BCL 中的身影**：`Stream` 适配器（`StreamReader`/`StreamWriter` 把字节流适配成文本读写）、`IEnumerable<T>.Cast<TResult>()` 把旧集合适配成泛型序列
+- **适配器 vs 装饰器**：适配器**改变接口**（形状转换），装饰器**保持接口**（功能叠加），见 [../DecoratorPattern](../DecoratorPattern/README.md)
+- **适配器 vs 外观**：适配器做接口转换（一对一），外观做子系统简化（一对多），见 [../FacadePattern](../FacadePattern/README.md)
 
-// 创建适配器
-var turkey = new WildTurkey();
-var adapter = new TurkeyAdapter(turkey);
-Tester(adapter);   // 火鸡以鸭子身份被使用
+<br/>
+
+## 三、💻 代码示例
+
+### 3.1 经典场景：旅行电源转换头
+
+> 场景：港版吹风机是英标三脚插头，国标插座只认两脚扁平——旅行转换头一头接国标插孔、一头接英标插头，形状转换后照常供电。
+
+```mermaid
+flowchart LR
+    P["旅客"] -->|"PowerOn()"| S["IStdSocket 国标插座<br/>(目标接口)"]
+    S -->|"实现"| A["TravelAdapter 转换头<br/>形状转换"]
+    A -->|"ThreePinConnect()"| B["BritishPlug 英标设备<br/>(被适配者)"]
+
+    style P fill:#4A90D9,color:#fff
+    style S fill:#E67E22,color:#fff
+    style A fill:#7B68EE,color:#fff
+    style B fill:#27AE60,color:#fff
+```
+
+| 角色 | 文件 |
+| --- | --- |
+| 目标接口 | [`PowerAdapter/IStdSocket.cs`](PowerAdapter/IStdSocket.cs) |
+| 被适配者 | [`PowerAdapter/BritishPlug.cs`](PowerAdapter/BritishPlug.cs) |
+| 适配器 | [`PowerAdapter/TravelAdapter.cs`](PowerAdapter/TravelAdapter.cs) |
+| 客户端 | [`Program.cs`](Program.cs) |
+
+### 3.2 软件项目：统一支付网关
+
+> 场景：电商收银台只认 `IPaymentGateway`（元 + Pay/Refund），微信 SDK 收"int 分"、支付宝 SDK 收"元字符串"——两个适配器各自做单位换算与接口翻译，SDK 变化不波及收银台。
+
+```mermaid
+flowchart LR
+    K["收银台"] -->|"Pay(订单, 元)"| G["IPaymentGateway<br/>(目标接口)"]
+    G --> WA["WeChatPayAdapter<br/>元 → 分"]
+    G -.-> AA["AlipayAdapter<br/>元 → 字符串"]
+    WA --> W["WeChatPaySdk<br/>UnifiedOrder"]
+    AA --> AL["AlipaySdk<br/>CreateTrade"]
+
+    style K fill:#4A90D9,color:#fff
+    style G fill:#E67E22,color:#fff
+    style WA fill:#7B68EE,color:#fff
+    style AA fill:#7B68EE,color:#fff
+    style W fill:#27AE60,color:#fff
+    style AL fill:#27AE60,color:#fff
+```
+
+| 角色 | 文件 |
+| --- | --- |
+| 目标接口 | [`Payment/IPaymentGateway.cs`](Payment/IPaymentGateway.cs) |
+| 被适配者 | [`Payment/WeChatPaySdk.cs`](Payment/WeChatPaySdk.cs)、[`AlipaySdk.cs`](Payment/AlipaySdk.cs) |
+| 适配器 | [`Payment/WeChatPayAdapter.cs`](Payment/WeChatPayAdapter.cs)、[`AlipayAdapter.cs`](Payment/AlipayAdapter.cs) |
+| 客户端 | [`Program.cs`](Program.cs) |
+
+### 3.3 运行结果
+
+```bash
+========== 适配器模式 (Adapter Pattern) ==========
+转换接口，让原本不兼容的类协同工作
+
+--- 经典场景: 旅行电源转换头（对象适配器） ---
+
+>> 把港版吹风机（英标三脚插头）插进国标插座：
+[失败] 插头形状不匹配，插不进去（接口不兼容，编译都过不了）
+
+>> 插上旅行转换头再试：
+[转换] 旅行转换头：外接国标插孔 → 内接英标三脚
+[供电] 英标三脚插头已连接，220V 供电成功，港版吹风机开始工作
+
+--- 软件项目: 统一支付网关（对象适配器） ---
+>> 收银台只认 IPaymentGateway，两家 SDK 接口各不相同：
+
+>> 用微信支付 199.50 元：
+[适配] 微信适配器：¥199.50 → 19950 分
+[微信] UnifiedOrder 下单成功：WX-2024-001，金额 19950 分
+
+>> 用支付宝支付 88 元：
+[适配] 支付宝适配器：¥88 → "88.00" 字符串
+[支付宝] CreateTrade 创建交易：ALI-2024-002，金额 ¥88.00
+
+>> 微信退款 199.50 元：
+[适配] 微信适配器：¥199.50 → 19950 分
+[微信] RefundOrder 退款成功：WX-2024-001，金额 19950 分
 ```
 
 <br/>
 
-## 四、🔍 核心解析
+## 四、📝 小结
 
-### 4.1 接口翻译
+- **核心思想**：不改动双方，中间加转换层；实现目标接口 + 组合被适配者 + 转调翻译
 
-TurkeyAdapter 实现 IDuck 接口，将 Quack() 调用委托给 \_turkey.Gobble()，完成方法名和语义的翻译。
+- **两个示例**：电源转换头展示"形状转换"的物理直觉，支付网关展示软件项目中最常见的"隔离第三方 SDK"
 
-### 4.2 行为适配
-
-火鸡单次飞行100米，鸭子飞行500米。适配器通过循环调用5次 Fly() 模拟鸭子的飞行距离，体现了适配器不仅做接口映射，还能调整行为差异。
-
-### 4.3 客户端解耦
-
-Tester 方法只依赖 IDuck 接口，不感知 TurkeyAdapter 的存在。运行时传入适配器，客户端无需任何修改。
-
-<br/>
-
-## 五、🎯 应用场景
-
-### 5.1 适用场景
-
-- 系统需要复用已有的类，但其接口与当前系统不兼容
-
-- 需要在不修改原有类的前提下集成第三方库
-
-- 多个不同接口的类需要统一调用方式
-
-### 5.2 实际案例
-
-- **数据库驱动适配**：不同数据库的API差异通过适配器统一为标准接口
-
-- **第三方库集成**：将旧版SDK的API适配为新版接口规范
-
-- **日志框架切换**：将不同日志库的接口适配为统一的日志抽象
-
-<br/>
-
-## 六、⚖️ 优缺点分析
-
-### 6.1 优点
-
-- **符合开闭原则**：无需修改原有类即可集成新接口
-
-- **复用已有代码**：通过适配器复用不兼容的旧类
-
-- **解耦客户端**：客户端只面向目标接口编程
-
-### 6.2 缺点
-
-- **增加复杂度**：每增加一个适配器就多一个类
-
-- **间接层开销**：增加了一层调用转发，有轻微性能损耗
-
-- **过度使用风险**：如果系统设计初期就考虑好接口统一，适配器可能是不必要的
-
-<br/>
-
-## 七、🔍 类适配器 vs 对象适配器
-
-| 维度     | 类适配器                       | 对象适配器                         |
-| -------- | ------------------------------ | ---------------------------------- |
-| 实现方式 | 继承被适配者（多继承/接口+类） | 组合持有被适配者实例               |
-| 灵活性   | 编译期确定，无法切换被适配者   | 运行时可替换不同的被适配者         |
-| 耦合度   | 与被适配者有继承耦合           | 仅依赖目标接口，更松耦合           |
-| 适用语言 | 适合支持多继承的语言（C++）    | 适合单继承语言（C#、Java），更通用 |
-| 覆盖能力 | 可重写被适配者的方法           | 仅能调用被适配者的公开方法         |
-
-> **本教程示例**：`TurkeyAdapter` 采用对象适配器方式——通过构造函数组合持有 `WildTurkey`，这是 C# / Java 中更推荐的做法。
-
-<br/>
-
-## 八、📝 总结
-
-- **核心思想**：将不兼容的接口转换为客户期望的接口，使类可以协同工作
-
-- **关键角色**：目标接口、被适配者、适配器
-
-- **适用场景**：需要复用不兼容的已有类，且不修改原有代码
-
-- **注意事项**：适度使用，避免因频繁适配导致系统复杂度上升
+- **注意事项**：适配器是"亡羊补牢"的补救模式——接口能提前统一就统一（直接实现目标接口），别滥用适配器掩盖设计问题
