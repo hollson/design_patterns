@@ -1,331 +1,226 @@
-# 访问者模式（Visitor Pattern）教程
+# 访问者模式（Visitor Pattern）
 
 [TOC]
 
 ## 一、📖 概述
 
-访问者模式是**行为型设计模式**，在**不修改现有类的前提下**为其增加新的操作，通过"访问者"在运行时对结构中每个元素执行相应操作。
+访问者是**行为型设计模式**，表示一个作用于某对象结构中各元素的操作，**使你可以在不改变各元素类的前提下定义作用于这些元素的新操作**。
 
-核心思想：将算法与对象结构分离，元素类只暴露 `Accept` 方法，具体操作集中在访问者中。典型实现为**双重分派**——元素接受访问者时调用访问者的对应重载方法。
-
-### 核心特性
-
-- **开闭原则**：新增访问者无需修改元素类
-
-- **关注点分离**：每种操作封装在独立的访问者中
-
-- **双重分派**：运行时根据元素类型和访问者类型共同决定执行逻辑
-
-- **结构稳定**：适用于元素类型不常变化，但操作频繁增加的场景
+核心思想：**双重分派**——`element.Accept(visitor)` 是第一次分派（由元素类型决定走哪个 Accept），Accept 内部回传 `visitor.VisitXxx(this)` 是第二次分派（由访问者类型决定具体逻辑）。两轴相乘，"元素类型 × 操作类型"的每一种组合都有独立落点，新增操作只需新增访问者。适用前提：**元素结构稳定，操作频繁扩展**。
 
 <br/>
 
-## 二、📐 结构图解
+## 二、🧩 模式解析
 
-### 2.1 整体流程
-
-```mermaid
-flowchart TD
-    A["客户端"] -->|"调用"| B["元素.接受(访问者)"]
-    B -->|"第一重分派"| C{"元素类型 ?"}
-    C -->|"卧室"| D["访问者.访问卧室(this)"]
-    C -->|"客厅"| E["访问者.访问客厅(this)"]
-    C -->|"公寓"| F["访问者.访问公寓(this)"]
-    D -->|"第二重分派"| G{"访问者类型 ?"}
-    G -->|"检查员"| H["执行检查"]
-    G -->|"清洁工"| I["执行清洁"]
-    G -->|"业主"| J["执行参观"]
-
-    style A fill:#4A90D9,color:#fff
-    style C fill:#E67E22,color:#fff
-    style D fill:#7B68EE,color:#fff
-    style E fill:#7B68EE,color:#fff
-    style F fill:#7B68EE,color:#fff
-    style H fill:#27AE60,color:#fff
-    style I fill:#27AE60,color:#fff
-    style J fill:#27AE60,color:#fff
-```
-
-### 2.2 类关系
+### 2.1 类关系图
 
 ```mermaid
 classDiagram
-    class IUnitVisitor {
+    direction LR
+    class Client
+    class IVisitor {
         <<interface>>
-        +VisitApartment(apartment: Apartment): void
-        +VisitBedroom(bedroom: Bedroom): void
-        +VisitLivingRoom(livingRoom: LivingRoom): void
+        +VisitElementA(ElementA)
+        +VisitElementB(ElementB)
     }
-    class Inspector {
-        +VisitApartment(apartment: Apartment): void
-        +VisitBedroom(bedroom: Bedroom): void
-        +VisitLivingRoom(livingRoom: LivingRoom): void
+    class ConcreteVisitor1 {
+        操作一：算税
     }
-    class Cleaner {
-        +VisitApartment(apartment: Apartment): void
-        +VisitBedroom(bedroom: Bedroom): void
-        +VisitLivingRoom(livingRoom: LivingRoom): void
+    class ConcreteVisitor2 {
+        操作二：折扣
     }
-    class Unit {
+    class Element {
         <<abstract>>
-        +Accept(visitor: IUnitVisitor): void
+        +Accept(IVisitor)
     }
-    class Bedroom {
-        +Accept(visitor: IUnitVisitor): void
+    class ElementA {
+        +Accept(v) v.VisitElementA(this)
     }
-    class LivingRoom {
-        +Accept(visitor: IUnitVisitor): void
-    }
-    class Apartment {
-        +Accept(visitor: IUnitVisitor): void
+    class ElementB {
+        +Accept(v) v.VisitElementB(this)
     }
 
-    IUnitVisitor <|.. Inspector
-    IUnitVisitor <|.. Cleaner
-    Unit <|-- Bedroom
-    Unit <|-- LivingRoom
-    Unit <|-- Apartment
-    Apartment ..> Unit : contains
-    Bedroom ..> IUnitVisitor : Accept
+    Client --> Element : 遍历并 Accept
+    Client --> IVisitor : 注入操作
+    Element <|-- ElementA : 结构稳定侧
+    Element <|-- ElementB
+    IVisitor <|.. ConcreteVisitor1 : 操作可变侧
+    IVisitor <|.. ConcreteVisitor2
+    ElementA ..> IVisitor : 回传 this
+    ElementB ..> IVisitor : 回传 this
 ```
 
-### 2.3 关键角色
+| 关键角色 | 说明 | 购物示例 |
+| --- | --- | --- |
+| **元素接口（Element）** | 声明 `Accept(visitor)` | `Item` |
+| **具体元素（Concrete Element）** | Accept 中回传 `this` 给对应 Visit 方法 | `Book`/`Food`/`Electronics` |
+| **访问者接口（Visitor）** | 每种元素一个 Visit 方法（重载） | `IShoppingVisitor` |
+| **具体访问者（Concrete Visitor）** | 一种操作的全套实现 | `TaxVisitor`/`DiscountVisitor` |
 
-| 角色                               | 说明                                               |
-| ---------------------------------- | -------------------------------------------------- |
-| **元素接口（Element）**            | 声明 `Accept(visitor)` 方法，接受访问者            |
-| **具体元素（Concrete Element）**   | 实现 `Accept`，在内部调用 `visitor.VisitXxx(this)` |
-| **访问者接口（Visitor）**          | 为每种元素类型声明一个 `Visit` 重载方法            |
-| **具体访问者（Concrete Visitor）** | 实现特定操作逻辑，每个 `Visit` 方法处理一种元素    |
+### 2.2 核心代码
+
+```csharp
+// 访问者：每种元素一个 Visit 方法
+interface IVisitor
+{
+    void VisitElementA(ElementA elementA);
+    void VisitElementB(ElementB elementB);
+}
+
+// 元素：Accept 回传 this —— 双分派的关键
+abstract class Element
+{
+    public abstract void Accept(IVisitor visitor);
+}
+
+class ElementA : Element
+{
+    public override void Accept(IVisitor visitor) => visitor.VisitElementA(this);
+}
+
+// 客户端：遍历结构，注入不同访问者 = 不同操作
+foreach (var element in structure)
+    element.Accept(new ConcreteVisitor1());     // 操作一
+foreach (var element in structure)
+    element.Accept(new ConcreteVisitor2());     // 操作二：元素类零改动
+```
+
+> 协作方式：客户端遍历元素结构，对每个元素调用 `Accept(visitor)`；元素在 Accept 里把自己回传给访问者的对应 `VisitXxx`——"元素报身份，访问者出逻辑"，两轴分派定位到具体操作。
+
+### 2.3 关键解析
+
+**为什么需要双重分派？** C# 单分派只看调用者的编译类型：
+
+```csharp
+// 若不用访问者，直接 visitor.Process(item)：
+// item 静态类型是 Item，无法按 Book/Food/Electronics 分发
+// （C# 重载按编译期类型选择，不按运行期）
+
+// 双分派：先由 item 的运行期类型进 Accept，再回传 this 给 VisitXxx
+item.Accept(visitor);   // ① item 运行期类型 → Book.Accept
+                        // ② Book.Accept → visitor.VisitBook(this)
+```
+
+| 扩展方向 | 代价 | 说明 |
+| --- | --- | --- |
+| **新增操作**（新访问者） | ✅ 加一个类 | 模式的主打能力 |
+| **新增元素类型**（新商品类别） | ❌ 所有访问者接口 + 实现都要加方法 | 结构稳定是使用前提 |
+
+- **BCL/框架中的身影**：Roslyn 语法树（`CSharpSyntaxVisitor`：SyntaxNode.Accept + VisitXxx）、`ExpressionVisitor`（LINQ 表达式树改写）——都是"结构稳定、操作多变"的典型
+- **访问者 vs 策略**：策略是"一个上下文换算法"，访问者是"一组不同类型元素批量过一遍算法"
+- **常与组合模式连用**：组合树提供遍历骨架（`Accept` 递归子节点），访问者提供对各类节点的操作——Roslyn 表达式树正是如此
 
 <br/>
 
-## 三、💻 代码实现
+## 三、💻 代码示例
 
-以房间检查/清洁/参观为例：卧室、客厅、公寓等房间类型接受不同角色的访问。
+### 3.1 经典场景：购物车计税与折扣
 
-### 3.1 元素接口与具体元素
+> 场景：同一批商品跑两种访问者——图书 9%/食品免税/数码 13% 的**税费计算**，与图书满 50 减 10/数码 95 折的**会员折扣**，商品类零改动。
 
+```mermaid
+flowchart LR
+    C["购物车"] -->|"Accept()"| B["Book"]
+    C --> F["Food"]
+    C --> E["Electronics"]
+    B -->|"VisitBook(this)"| T["TaxVisitor 算税"]
+    F -->|"VisitFood(this)"| T
+    E -->|"VisitElectronics(this)"| T
+    B -.->|"同一结构"| D["DiscountVisitor 折扣"]
+    F -.-> D
+    E -.-> D
+
+    style C fill:#4A90D9,color:#fff
+    style B fill:#7B68EE,color:#fff
+    style F fill:#7B68EE,color:#fff
+    style E fill:#7B68EE,color:#fff
+    style T fill:#E67E22,color:#fff
+    style D fill:#E67E22,color:#fff
+```
+
+| 角色 | 文件 |
+| --- | --- |
+| 访问者接口 | [`Shopping/IShoppingVisitor.cs`](Shopping/IShoppingVisitor.cs) |
+| 具体访问者 | [`Shopping/TaxVisitor.cs`](Shopping/TaxVisitor.cs)、[`DiscountVisitor.cs`](Shopping/DiscountVisitor.cs) |
+| 抽象元素 | [`Shopping/Item.cs`](Shopping/Item.cs) |
+| 具体元素 | [`Shopping/Book.cs`](Shopping/Book.cs)、[`Food.cs`](Shopping/Food.cs)、[`Electronics.cs`](Shopping/Electronics.cs) |
+| 客户端 | [`Program.cs`](Program.cs) |
+
+### 3.2 软件项目：文档多格式导出
+
+> 场景：文档结构（标题/段落/代码块）稳定，导出格式（Markdown/HTML）多变——新增 PDF 导出器只加一个类，与 Roslyn 语法树访问者同构。
+
+```mermaid
+flowchart LR
+    D["文档"] --> H["Heading"]
+    D --> P["Paragraph"]
+    D --> K["CodeBlock"]
+    H -->|"VisitHeading(this)"| M["MarkdownExporter"]
+    P -->|"VisitParagraph(this)"| M
+    K -->|"VisitCodeBlock(this)"| M
+    H -.->|"同一结构"| X["HtmlExporter"]
+    P -.-> X
+    K -.-> X
+
+    style D fill:#4A90D9,color:#fff
+    style H fill:#7B68EE,color:#fff
+    style P fill:#7B68EE,color:#fff
+    style K fill:#7B68EE,color:#fff
+    style M fill:#E67E22,color:#fff
+    style X fill:#E67E22,color:#fff
+```
+
+| 角色 | 文件 |
+| --- | --- |
+| 访问者接口 | [`Docs/IExporter.cs`](Docs/IExporter.cs) |
+| 具体访问者 | [`Docs/MarkdownExporter.cs`](Docs/MarkdownExporter.cs)、[`HtmlExporter.cs`](Docs/HtmlExporter.cs) |
+| 抽象元素 | [`Docs/DocElement.cs`](Docs/DocElement.cs) |
+| 具体元素 | [`Docs/Heading.cs`](Docs/Heading.cs)、[`Paragraph.cs`](Docs/Paragraph.cs)、[`CodeBlock.cs`](Docs/CodeBlock.cs) |
+| 客户端 | [`Program.cs`](Program.cs) |
+
+### 3.3 运行结果
+
+```bash
+========== 访问者模式 (Visitor Pattern) ==========
+不改动元素类，为对象结构新增操作
+
+--- 经典场景: 购物车计税与折扣 ---
+>> 同一批商品，跑两种访问者（算税 / 算折扣）：
+
+>> 第一种操作：税费计算访问者
+[税费] 《设计模式：可复用面向对象软件的基础》¥89.00 × 9% = ¥8.01
+[税费] 有机菠菜 500g ¥12.50 × 0% = 免税（初级农产品）
+[税费] 机械键盘 ¥499.00 × 13% = ¥64.87
+[合计] 税费总计 ¥72.88
+
+>> 第二种操作：会员折扣访问者（商品类零改动）
+[折扣] 《设计模式：可复用面向对象软件的基础》¥89.00 → ¥79.00（图书满50减10）
+[折扣] 有机菠菜 500g ¥12.50（食品不参与折扣）
+[折扣] 机械键盘 ¥499.00 → ¥474.05（数码95折）
+[合计] 折后应付 ¥565.55
+
+--- 软件项目: 文档多格式导出 ---
+>> 同一份文档，导出两种格式：
+
+>> Markdown 导出器：
+# 访问者模式
+在不改变元素类的前提下定义新操作。
 ```csharp
-// 抽象元素
-public abstract class Unit
-{
-    public abstract void Accept(IUnitVisitor visitor);
-}
-
-// 具体元素：卧室
-public class Bedroom : Unit
-{
-    public override void Accept(IUnitVisitor visitor)
-    {
-        visitor.VisitBedroom(this);  // 第一重分派
-    }
-}
-
-// 具体元素：公寓（组合元素）
-public class Apartment : Unit
-{
-    private readonly List<Unit> _children = new();
-
-    public void Add(Unit unit) => _children.Add(unit);
-
-    public override void Accept(IUnitVisitor visitor)
-    {
-        visitor.VisitApartment(this);
-        foreach (var child in _children)
-            child.Accept(visitor);  // 遍历子元素
-    }
-}
+item.Accept(visitor);
 ```
 
-### 3.2 访问者接口与具体访问者
-
-```csharp
-// 访问者接口：为每种元素声明一个 Visit 重载
-public interface IUnitVisitor
-{
-    void VisitBedroom(Bedroom bedroom);
-    void VisitLivingRoom(LivingRoom livingRoom);
-    void VisitApartment(Apartment apartment);
-}
-
-// 具体访问者：检查员
-public class Inspector : IUnitVisitor
-{
-    public void VisitBedroom(Bedroom bedroom)
-        => Console.WriteLine("检查卧室的安全设施");
-
-    public void VisitLivingRoom(LivingRoom livingRoom)
-        => Console.WriteLine("检查客厅的消防通道");
-
-    public void VisitApartment(Apartment apartment)
-        => Console.WriteLine("检查公寓的整体结构");
-}
-
-// 具体访问者：清洁工
-public class Cleaner : IUnitVisitor
-{
-    public void VisitBedroom(Bedroom bedroom)
-        => Console.WriteLine("清洁卧室地面");
-
-    public void VisitLivingRoom(LivingRoom livingRoom)
-        => Console.WriteLine("清洁客厅窗户");
-
-    public void VisitApartment(Apartment apartment)
-        => Console.WriteLine("清洁公寓公共区域");
-}
-```
-
-### 3.3 客户端使用
-
-```csharp
-public class Program
-{
-    public static void Main()
-    {
-        // 构建房间树
-        var apartment = new Apartment();
-        apartment.Add(new Bedroom());
-        apartment.Add(new LivingRoom());
-
-        // 不同访问者访问同一结构，产生不同操作
-        apartment.Accept(new Inspector());
-        apartment.Accept(new Cleaner());
-    }
-}
-```
-
-**运行结果**：
-
-```
-检查公寓的整体结构
-检查卧室的安全设施
-检查客厅的消防通道
-清洁公寓公共区域
-清洁卧室地面
-清洁客厅窗户
+>> HTML 导出器（新增格式只加一个类）：
+<h1>访问者模式</h1>
+<p>在不改变元素类的前提下定义新操作。</p>
+<pre><code>item.Accept(visitor);</code></pre>
 ```
 
 <br/>
 
-## 四、🔍 核心解析
+## 四、📝 小结
 
-### 4.1 双重分派
+- **核心思想**：双重分派让"元素类型 × 操作类型"各自定位，新增操作只加访问者类
 
-双重分派是访问者模式的核心机制：元素的 `Accept` 方法接收访问者后，调用 `visitor.VisitXxx(this)`，将自身作为参数传回。此时方法的执行路径由**元素类型**和**访问者类型**共同决定。
+- **两个示例**：购物车展示同一结构的两种业务操作（税/折扣），文档导出展示 Roslyn 同构的"结构稳定、格式多变"
 
-```csharp
-// 第一重：元素类型决定调用哪个 Visit 重载
-visitor.VisitBedroom(this);
-// 第二重：访问者类型决定具体执行逻辑
-```
-
-### 4.2 开闭原则
-
-新增一种操作（如"消毒"）只需创建新的访问者类，无需修改任何房间类。新增房间类型则需修改访问者接口和所有实现——这正是访问者模式的代价。
-
-### 4.3 组合结构遍历
-
-`CompositeUnit` / `Apartment` 在 `Accept` 中先访问自身，再递归遍历子元素，使访问者能对整棵对象树执行操作。
-
-<br/>
-
-## 五、🎯 应用场景
-
-### 5.1 适用场景
-
-- 对象结构稳定，但需要对其执行多种不同操作
-
-- 需要在不修改已有类的前提下增加新操作
-
-- 操作涉及多个不同类型，且各类型的处理逻辑不同
-
-### 5.2 实际案例
-
-- **编译器**：AST节点类型固定，但需要执行类型检查、代码生成、优化等多种操作
-
-- **文档处理**：文档元素（段落、图片、表格）接受渲染、导出、统计等不同访问者
-
-- **UI事件处理**：控件树接受鼠标点击、键盘输入、无障碍访问等不同访问者
-
-<br/>
-
-## 六、⚖️ 优缺点分析
-
-### 6.1 优点
-
-- **符合开闭原则**：新增操作无需修改元素类
-
-- **关注点分离**：每种操作封装在独立访问者中，职责清晰
-
-- **可以访问组合对象内部**：访问者可访问元素的内部状态和结构
-
-### 6.2 缺点
-
-- **扩展元素困难**：新增元素类型需修改所有访问者接口和实现
-
-- **破坏封装**：访问者可能需要访问元素内部细节，暴露元素私有成员
-
-- **双重分派开销**：运行时存在额外的方法调用开销
-
-<br/>
-
-## 七、📝 总结
-
-- **核心思想**：将算法与对象结构分离，通过双重分派实现运行时多态
-
-- **关键角色**：抽象元素、具体元素、访问者接口、具体访问者
-
-- **适用场景**：元素类型稳定但操作频繁增加的场景
-
-- **注意事项**：新增元素类型成本高，设计时需评估元素类型的稳定性
-
----
-
-## 八、🔬 双重分派机制详解
-
-双重分派（Double Dispatch）是访问者模式的核心机制，解决了一个关键问题：**如何让执行逻辑同时取决于元素类型和访问者类型**。
-
-### 8.1 单分派 vs 双分派
-
-| 机制       | 决定因素                      | C# 实现方式                  | 局限               |
-| ---------- | ----------------------------- | ---------------------------- | ------------------ |
-| **单分派** | 仅由接收者类型决定            | 普通虚方法 `bedroom.Clean()` | 无法区分"谁来操作" |
-| **双分派** | 接收者类型 + 参数类型共同决定 | `Accept` + 方法重载          | 需要两层间接调用   |
-
-### 8.2 执行流程拆解
-
-以 `apartment.Accept(new Inspector())` 为例：
-
-```
-第一重分派（元素类型决定）：
-  apartment.Accept(visitor)
-    → visitor.VisitApartment(this)   ← 选择 Visit 重载（Bedroom/LivingRoom/Apartment）
-
-第二重分派（访问者类型决定）：
-  visitor.VisitApartment(apartment)
-    → Inspector 的具体实现            ← 选择访问者的实际逻辑（检查/清洁/参观）
-```
-
-### 8.3 为什么需要两重？
-
-```csharp
-// 如果只用一重分派（只有元素类型）：
-public class Bedroom
-{
-    public void Accept(Inspector inspector) { ... }  // 为每个访问者写重载 → 类爆炸
-    public void Accept(Cleaner cleaner) { ... }
-    public void Accept(HomeOwner owner) { ... }
-}
-
-// 访问者模式的解法（双重分派）：
-public class Bedroom
-{
-    public override void Accept(IUnitVisitor visitor)
-        => visitor.VisitBedroom(this);  // 统一入口，由接口分派到具体访问者
-}
-```
-
-**第一重**让元素选择正确的 `Visit` 重载（利用 C# 的**静态类型分派**，`this` 的编译时类型决定调用哪个重载）；**第二重**让访问者在 `VisitXxx` 方法中根据自身类型执行不同逻辑（利用 C# 的**运行时多态**，虚方法分派到 `Inspector` 或 `Cleaner`）。
-
-两重分派组合后，**无需为每对（元素 × 访问者）编写组合类**，新增访问者只需实现 `IUnitVisitor` 接口即可。
+- **注意事项**：元素类型会频繁增加时别用（每个访问者都要跟着改）；访问者需要读元素的内部细节，可能破坏封装——Roslyn 愿意开放正是为了换扩展性
