@@ -1,3 +1,5 @@
+namespace AbstractFactoryPattern;
+
 // 抽象产品：奶酪
 public interface ICheese
 {

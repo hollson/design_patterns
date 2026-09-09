@@ -168,3 +168,4 @@ orleans.codegen.cs
 _fake/
 .codegraph/
 omo/
+/.omo

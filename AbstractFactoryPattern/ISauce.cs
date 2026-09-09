@@ -1,3 +1,5 @@
+namespace AbstractFactoryPattern;
+
 // 抽象产品：酱料
 public interface ISauce
 {

@@ -1,3 +1,5 @@
+namespace AbstractFactoryPattern;
+
 // 芝加哥配料工厂
 public class ChicagoIngredientsFactory : IIngredientsFactory
 {

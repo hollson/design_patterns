@@ -1,3 +1,5 @@
+namespace AbstractFactoryPattern;
+
 // 抽象产品：面团
 public interface IDough
 {
